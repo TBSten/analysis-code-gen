@@ -68,7 +68,7 @@ API-11,I,M1,missing,,0,
 API-12,I,M1,missing,,0,
 API-13,U,M1,missing,,0,
 API-14,I,M2,missing,,0,
-API-15,U,M2,missing,,0,
+API-15,U,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.api.ApiCompatibilityUnitTest
 ANA-01,E,M1,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.ana.AnaE2ETest
 ANA-02,I,M1,missing,,0,
 ANA-03,I,M1,missing,,0,
