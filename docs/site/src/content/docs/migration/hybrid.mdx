@@ -1,0 +1,84 @@
+---
+title: 2. Hybrid で AA を使う
+description: KSP Bridge 上の Processor から、必要な箇所だけ Analysis API を直接使います。
+fixture: fixtures/docs/migration
+---
+
+:::note[レビューで判断してほしいこと]
+- `KaSymbol` などを外へ返せない、スコープ付きの `withAnalysis` だけを出す方針でよいか
+- 素の KSP では `withAnalysis` が例外になり、`isAnalysisCodegenBridge` で分岐してもらう形でよいか
+:::
+
+KSP の API では、プロパティの初期化式や関数の本体を読めません。Hybrid API を使うと、その箇所だけ Analysis API（AA）で読めます。
+
+例では、`@Hello` のクラスにある `val greeting = "Hi"` を読み、`Hi, Greeter!` を返すようにします。
+
+## 依存を足す
+
+Processor のモジュールに `ksp-bridge-api` を足します。素の KSP でも読み込めるよう、Processor に同梱します。
+
+```kotlin title="hello-hybrid-processor/build.gradle.kts"
+dependencies {
+    compileOnly("com.google.devtools.ksp:symbol-processing-api:2.3.14")
+    // withAnalysis など。素の KSP でも読み込めるよう Processor に同梱する
+    implementation("me.tbsten.analysiscodegen:ksp-bridge-api:0.1.0")
+}
+```
+
+## withAnalysis で AA に入る
+
+`KSClassDeclaration` などに `withAnalysis` を呼ぶと、対応する AA のシンボルを受け取れます。
+
+```kotlin title="hello-hybrid-processor/src/main/kotlin/com/example/hello/HelloSymbolProcessor.kt"
+// KSP ではプロパティの初期化式を読めない。AA で定数として評価する
+private fun KSClassDeclaration.greeting(): String? = withAnalysis { symbol ->
+    val property = (symbol.psi as? KtClassOrObject)?.declarations
+        ?.filterIsInstance<KtProperty>()?.firstOrNull { it.name == "greeting" }
+    (property?.initializer?.evaluate() as? KaConstantValue.StringValue)?.value
+}
+```
+
+ブロックの中は AA の `KaSession` です。`KaSymbol` や `KaType` はブロックの外に返せません。文字列などに変換してから返します。
+
+## 素の KSP でも動かす
+
+`withAnalysis` は KSP Bridge の上でだけ使えます。素の KSP でも動かすなら、`isAnalysisCodegenBridge` で分けます。
+
+```kotlin title="hello-hybrid-processor/src/main/kotlin/com/example/hello/HelloSymbolProcessor.kt"
+val bridge = resolver.isAnalysisCodegenBridge
+resolver.getSymbolsWithAnnotation("com.example.Hello")
+    .filterIsInstance<KSClassDeclaration>()
+    .forEach { generateHello(it, greeting = if (bridge) it.greeting() else null) }
+```
+
+分けずに素の KSP で呼ぶと `HybridNotSupportedException` になります。
+
+## 対応するもの
+
+| KSP | `withAnalysis` で受け取るもの |
+|---|---|
+| `KSDeclaration` | `KaDeclarationSymbol` |
+| `KSType` | `KaType` |
+| `KSFile` | `KtFile` |
+
+合成されたアクセサなど、AA に対応するものが無いときは `UnsupportedHybridConversionException` になります。
+
+```kotlin
+val type = parameter.type.resolve()
+val isNullable = type.withAnalysis { kaType -> kaType.isMarkedNullable }
+```
+
+`withAnalysis` の中で読んだファイルは、KSP の `Dependencies` に足してください。足さないと増分ビルドで更新されません。
+
+## まとめ
+
+| 要素 | 役割 |
+|---|---|
+| `ksp-bridge-api` | Hybrid API の入ったライブラリ |
+| `withAnalysis { }` | KS のオブジェクトから AA に入る |
+| `isAnalysisCodegenBridge` | Bridge の上かどうか |
+| `UnsupportedHybridConversionException` | AA に対応するものが無い |
+
+## 次のステップ
+
+- [3. Native Processor に書き換える](/analysis-code-gen/migration/native/): KSP API を外す
