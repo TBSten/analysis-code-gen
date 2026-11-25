@@ -214,7 +214,7 @@ RW-DAG-N1,E,任意,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.rw.Rea
 RW-DAG-N2,D,任意,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.rw.RealWorldDiffTest
 RW-ALL-I1,P,M2 / M3,pending,NotImplemented,2,me.tbsten.analysiscodegen.e2e.rw.RealWorldIncrementalPbtTest
 RW-ALL-P1,B,M2,pending,NotImplemented,2,me.tbsten.analysiscodegen.e2e.rw.RealWorldBenchTest
-TST-01,E,M1,missing,,0,
+TST-01,E,M1,pending,NotImplemented,2,me.tbsten.analysiscodegen.enginetests.tst.TestingNativeE2ETest
 TST-02,E,M1,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.tst.TestingFrameworkE2ETest
 TST-03,E,M1,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.tst.TestingFrameworkE2ETest
 TST-04,E,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.tst.TestingFrameworkE2ETest
@@ -226,15 +226,15 @@ CLI-01,D,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.cli.CliDiffTe
 CLI-02,I,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.cli.CliIntegrationTest
 CLI-03,U,M2,pending,NotImplemented,3,me.tbsten.analysiscodegen.e2e.cli.CliUnitTest
 VER-01,E,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.ver.VersionCompatibilityE2ETest
-VER-02,I,M2,missing,,0,
+VER-02,I,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.enginetests.ver.ProcessorApiCompatibilityIntegrationTest
 VER-03,E,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.ver.VersionCompatibilityE2ETest
 VER-04,U,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.ver.VersionListUnitTest
 VER-05,D,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.ver.VersionOutputDiffTest
 VER-06,E,M3,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.ver.VersionCompatibilityE2ETest
-MEM-01,I,M2,missing,,0,
+MEM-01,I,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.enginetests.mem.MemoryIntegrationTest
 MEM-02,B,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.mem.MemoryBenchTest
 MEM-03,B,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.mem.MemoryBenchTest
-MEM-04,I,M2,missing,,0,
+MEM-04,I,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.enginetests.mem.MemoryIntegrationTest
 PERF-01,B,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.perf.PerformanceBenchTest
 PERF-02,B,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.perf.PerformanceBenchTest
 PERF-03,B,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.perf.PerformanceBenchTest
@@ -260,12 +260,12 @@ XD-01,U,M1,enabled,,1,me.tbsten.analysiscodegen.pbt.catalog.CatalogArbTest
 XD-02,E,M1,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.xd.DifferentialE2ETest
 XD-03,E,M1,enabled,,1,me.tbsten.analysiscodegen.differential.DifferentialRunnerTest
 XD-04,D,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.xd.DifferentialDiffTest
-XD-05,D,M2,missing,,0,
+XD-05,D,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.enginetests.xd.XdStage1DiffTest
 XD-06,D,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.xd.DifferentialDiffTest
 XD-07,D,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.xd.DifferentialDiffTest
 XD-08,D,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.xd.DifferentialDiffTest
 XD-09,P,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.xd.XdIncrementalPbtTest
-XD-10,P,M2,missing,,0,
+XD-10,P,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.enginetests.xd.XdStage1IncrementalPbtTest
 XD-11,U,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.xd.XdCoverageTest
 XD-12,D,M3,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.xd.DifferentialDiffTest
 XD-13,D,M3,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.xd.DifferentialDiffTest
