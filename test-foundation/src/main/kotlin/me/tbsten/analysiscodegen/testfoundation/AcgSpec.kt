@@ -46,7 +46,7 @@ abstract class AcgSpec(
         pending: PendingCase? = null,
         test: suspend TestScope.() -> Unit,
     ) {
-        require(CaseDeclaration.ID_PATTERN.matches(id)) { "ケース ID の書式が違う: '$id'（例: INC-14, RW-ALL-I1, INC-14a）" }
+        require(CaseDeclaration.ID_PATTERN.matches(id)) { "ケース ID の書式が違う: '$id'（例: INC-14, RW-ALL-I1, INC-14a, KSPT-Hello）" }
         require(title.isNotBlank()) { "ケース $id のタイトルが空" }
         val declaration = CaseDeclaration(id, title, kind, pending, this::class.java.name)
         declarationsInternal += declaration

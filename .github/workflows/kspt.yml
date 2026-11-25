@@ -1,0 +1,39 @@
+# KSP 公式テスト（KSPT）が公式 KSP2 で全件通ることを確かめる（ADR-024）
+# - 取り込み直し（porting/ksp）やランナーの変更を PR で、上流の版の変化に備えて毎日 1 回
+# - 期待値は JDK 17 前提（上流の CI と同じ）。JDK 17 を jdkHome に渡し、Gradle 自体は JDK 21 で動かす
+name: kspt
+
+on:
+  pull_request:
+    paths:
+      - "ksp-compatibility-tests/**"
+      - "porting/ksp/**"
+      - "gradle/libs.versions.toml"
+      - ".github/workflows/kspt.yml"
+  schedule:
+    - cron: "30 19 * * *" # 04:30 JST
+  workflow_dispatch:
+
+jobs:
+  ksp2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          # 最後に書いたものが JAVA_HOME になる。17 は JAVA_HOME_17_X64 で渡る
+          java-version: |
+            17
+            21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: KSPT を KSP2 で全件流す
+        run: ./gradlew :ksp-compatibility-tests:test --tests '*KsptKsp2Test*' -Pacg.kspt.k=true -Pacg.kspt.jdkHome="$JAVA_HOME_17_X64" --console=plain
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kspt-reports
+          path: ksp-compatibility-tests/build/test-results/**/*.xml
+          if-no-files-found: ignore

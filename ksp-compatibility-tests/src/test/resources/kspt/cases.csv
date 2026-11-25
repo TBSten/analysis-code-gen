@@ -1,0 +1,166 @@
+id,method,test_data,milestone,category,mode
+KSPT-AliasedAnnotations,testAliasedAnnotations,getSymbolsWithAnnotation/aliasedAnnotation.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-AnnotatedUtil,testAnnotatedUtil,annotatedUtil.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-JavaAnnotatedUtil,testJavaAnnotatedUtil,javaAnnotatedUtil.kt,M2,Java ソース,positive
+KSPT-AbstractFunctions,testAbstractFunctions,abstractFunctions.kt,M2,Java ソース,positive
+KSPT-AllFunctions_java_inherits_kt,testAllFunctions_java_inherits_kt,allFunctions_java_inherits_kt.kt,M2,Java ソース,positive
+KSPT-AllFunctions_kotlin,testAllFunctions_kotlin,allFunctions_kotlin.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-AllFunctions_kt_inherits_java,testAllFunctions_kt_inherits_java,allFunctions_kt_inherits_java.kt,M2,Java ソース,positive
+KSPT-AnnotationsInDependencies,testAnnotationsInDependencies,annotationsInDependencies.kt,M2,Java ソース,positive
+KSPT-AnnotationOnConstructorParameter,testAnnotationOnConstructorParameter,annotationOnConstructorParameter.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-AnnotationOnReceiver,testAnnotationOnReceiver,annotationOnReceiver.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-AnnotationsRepeatable,testAnnotationsRepeatable,annotationsRepeatable.kt,M2,Java ソース,positive
+KSPT-AnnotationTargets,testAnnotationTargets,annotationTargets.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-AnnotationWithArbitraryClassValue,testAnnotationWithArbitraryClassValue,annotationWithArbitraryClassValue.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-AnnotationWithNestedClassValue,testAnnotationWithNestedClassValue,annotationWithNestedClassValue.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-AnnotationValue_defaultKClassValue,testAnnotationValue_defaultKClassValue,annotationValue/defaultKClassValue.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-AnnotationValue_java,testAnnotationValue_java,annotationValue/annotationValue_java.kt,M2,Java ソース,positive
+KSPT-AnnotationValue_java2,testAnnotationValue_java2,annotationValue/annotationValue_java2.kt,M2,Java ソース,positive
+KSPT-AnnotationValue_kt,testAnnotationValue_kt,annotationValue/annotationValue_kt.kt,M2,Java ソース,positive
+KSPT-AnnotationWithArrayValue,testAnnotationWithArrayValue,annotationWithArrayValue.kt,M2,Java ソース,positive
+KSPT-AnnotationArrayValueType,testAnnotationArrayValueType,annotationArrayValueType.kt,M2,Java ソース,positive
+KSPT-AnnotationWithDefault,testAnnotationWithDefault,annotationWithDefault.kt,M2,Java ソース,positive
+KSPT-AnnotationWithDefaultValues,testAnnotationWithDefaultValues,annotationWithDefaultValues.kt,M2,Java ソース,positive
+KSPT-AnnotationWithJavaTypeValue,testAnnotationWithJavaTypeValue,annotationWithJavaTypeValue.kt,M2,Java ソース,positive
+KSPT-AsMemberOf,testAsMemberOf,asMemberOf.kt,M2,Java ソース,positive
+KSPT-BackingFields,testBackingFields,backingFields.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-BackingFieldsSignatureMapper,testBackingFieldsSignatureMapper,backingFieldsSignatureMapper.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-BackingFieldsLateinit,testBackingFieldsLateinit,getSymbolsWithAnnotation/backingFieldsLateinit.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-BuiltInTypes,testBuiltInTypes,builtInTypes.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-ObjCacheA,testObjCacheA,objCacheA.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-ObjCacheB,testObjCacheB,objCacheB.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-ChangingBehavior,testChangingBehavior,changingBehavior.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-RegisterProcessorForNewFeatures,testRegisterProcessorForNewFeatures,registerProcessorForNewFeatures.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-CheckOverride,testCheckOverride,checkOverride.kt,M2,Java ソース,positive
+KSPT-ClassKinds,testClassKinds,classKinds.kt,M2,Java ソース,positive
+KSPT-Companion,testCompanion,companion.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-ConstProperties,testConstProperties,constProperties.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-ConstructorDeclarations,testConstructorDeclarations,constructorDeclarations.kt,M2,Java ソース,positive
+KSPT-CrossModuleTypeAlias,testCrossModuleTypeAlias,crossModuleTypeAlias.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-ContextParameters,testContextParameters,getSymbolsWithAnnotation/contextParameters.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-ContextParameterIdentity,testContextParameterIdentity,contextParameterIdentity.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-ContextParameterTypes,testContextParameterTypes,contextParameterTypes.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-ContextParameterTypeAlias,testContextParameterTypeAlias,contextParameterTypeAlias.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-ContextParameterNames,testContextParameterNames,contextParameterNames.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-NativeContextParameterNames,testNativeContextParameterNames,native/contextParameterNames.kt,M3,Kotlin/Native,positive
+KSPT-ContextParameterDangling,testContextParameterDangling,getSymbolsWithAnnotation/negative/contextParameterDangling.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-DeclarationInconsistency,testDeclarationInconsistency,declarationInconsistency.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-DeclarationPackageName,testDeclarationPackageName,declarationPackageName.kt,M2,Java ソース,positive
+KSPT-DeclarationsInAccessor,testDeclarationsInAccessor,declarationsInAccessor.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-DeclarationsInClass,testDeclarationsInClass,declarationsInClass.kt,M2,Java ソース,positive
+KSPT-DeclarationOrder,testDeclarationOrder,declarationOrder.kt,M2,Java ソース,positive
+KSPT-DeclarationUtil,testDeclarationUtil,declarationUtil.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-Declared,testDeclared,declared.kt,M2,Java ソース,positive
+KSPT-DocString,testDocString,docString.kt,M2,Java ソース,positive
+KSPT-Equals,testEquals,equals.kt,M2,Java ソース,positive
+KSPT-EquivalentJavaWildcards,testEquivalentJavaWildcards,equivalentJavaWildcards.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-ErrorTypes,testErrorTypes,errorTypes.kt,M2,Java ソース,positive
+KSPT-ExplicitBackingFields,testExplicitBackingFields,getSymbolsWithAnnotation/explicitBackingFields.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-BackingFieldsPackageName,testBackingFieldsPackageName,getSymbolsWithAnnotation/backingFieldsPackageName.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-FieldAndPropertyUseSiteTargetOnConstructorParameters,testFieldAndPropertyUseSiteTargetOnConstructorParameters,getSymbolsWithAnnotation/negative/fieldAndPropertyUseSiteTargetOnConstructorParameters.kt,M3,エッジケース（不正な入力）,positive
+KSPT-ExplicitBackingFieldsSubtyping,testExplicitBackingFieldsSubtyping,explicitBackingFieldsSubtyping.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-FunctionTypeAlias,testFunctionTypeAlias,functionTypeAlias.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-FunctionTypeAnnotation,testFunctionTypeAnnotation,functionTypeAnnotation.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-FunctionTypes,testFunctionTypes,functionTypes.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-FunctionKinds,testFunctionKinds,functionKinds.kt,M2,Java ソース,positive
+KSPT-GetAnnotationByTypeWithInnerDefault,testGetAnnotationByTypeWithInnerDefault,getAnnotationByTypeWithInnerDefault.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-GetPackage,testGetPackage,getPackage.kt,M2,Java ソース,positive
+KSPT-GetByName,testGetByName,getByName.kt,M2,Java ソース,positive
+KSPT-GetSymbolsFromAnnotation,testGetSymbolsFromAnnotation,getSymbolsFromAnnotation.kt,M2,Java ソース,positive
+KSPT-GetSymbolsFromAnnotationInLib,testGetSymbolsFromAnnotationInLib,getSymbolsFromAnnotationInLib.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-GroupedAnnotations,testGroupedAnnotations,getSymbolsWithAnnotation/groupedAnnotations.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-GroupedAnnotationsWithUseSiteTargets,testGroupedAnnotationsWithUseSiteTargets,getSymbolsWithAnnotation/groupedAnnotationsWithUseSiteTargets.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-Hello,testHello,hello.kt,M2,Java ソース,positive
+KSPT-ImplicitElements,testImplicitElements,implicitElements.kt,M2,Java ソース,positive
+KSPT-ImplicitPropertyAccessors,testImplicitPropertyAccessors,implicitPropertyAccessors.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-InternalOfFriends,testInternalOfFriends,internalOfFriends.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-InheritedTypeAlias,testInheritedTypeAlias,inheritedTypeAlias.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-InnerTypes,testInnerTypes,innerTypes.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-InterfaceWithDefault,testInterfaceWithDefault,interfaceWithDefault.kt,M2,Java ソース,positive
+KSPT-IsMutable,testIsMutable,isMutable.kt,M2,Java ソース,positive
+KSPT-JavaBackingFieldUsedInKotlin,testJavaBackingFieldUsedInKotlin,javaBackingFieldUsedInKotlin.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-JavaModifiers,testJavaModifiers,javaModifiers.kt,M2,Java ソース,positive
+KSPT-JavaModifiersJvmStaticAnnotation,testJavaModifiersJvmStaticAnnotation,javaModifiersJvmStaticAnnotation.kt,M3,JVM シグネチャ・名前の細部,positive
+KSPT-JavaNonNullTypes,testJavaNonNullTypes,javaNonNullTypes.kt,M2,Java ソース,positive
+KSPT-JavaBackingFieldsParents,testJavaBackingFieldsParents,getSymbolsWithAnnotation/javaBackingFieldsParents.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-JavaSubtype,testJavaSubtype,javaSubtype.kt,M2,Java ソース,positive
+KSPT-JavaSubtypeOfKotlinInterface,testJavaSubtypeOfKotlinInterface,javaSubtypeOfKotlinInterface.kt,M2,Java ソース,positive
+KSPT-JavaToKotlinMapper,testJavaToKotlinMapper,javaToKotlinMapper.kt,M3,JVM シグネチャ・名前の細部,positive
+KSPT-JavaTypes,testJavaTypes,javaTypes.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-JavaTypes2,testJavaTypes2,javaTypes2.kt,M2,Java ソース,positive
+KSPT-JavaWildcards2,testJavaWildcards2,javaWildcards2.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-JvmName,testJvmName,jvmName.kt,M3,JVM シグネチャ・名前の細部,positive
+KSPT-JvmNameRecord,testJvmNameRecord,jvmNameRecord.kt,M3,JVM シグネチャ・名前の細部,positive
+KSPT-JvmModifiersCompanionObject,testJvmModifiersCompanionObject,jvmModifiersCompanionObject.kt,M3,JVM シグネチャ・名前の細部,positive
+KSPT-LateinitProperties,testLateinitProperties,lateinitProperties.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-LibOrigins,testLibOrigins,libOrigins.kt,M2,Java ソース,positive
+KSPT-LocalAnnotationClass,testLocalAnnotationClass,getSymbolsWithAnnotation/localAnnotationClass.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-LocalClasses,testLocalClasses,getSymbolsWithAnnotation/localClasses.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-Locations,testLocations,locations.kt,M2,Java ソース,positive
+KSPT-MakeNullable,testMakeNullable,makeNullable.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-MangledNames,testMangledNames,mangledNames.kt,M3,JVM シグネチャ・名前の細部,positive
+KSPT-MetaAnnotations,testMetaAnnotations,getSymbolsWithAnnotation/metaAnnotations.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-MultipleModules,testMultipleModules,multipleModules.kt,M2,Java ソース,positive
+KSPT-NestedAnnotations,testNestedAnnotations,nestedAnnotations.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-NestedClassType,testNestedClassType,nestedClassType.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-NullableTypes,testNullableTypes,nullableTypes.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-ConflictingOverride,testConflictingOverride,overridee/conflictingOverride.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-JavaAccessor,testJavaAccessor,overridee/javaAccessor.kt,M2,Java ソース,positive
+KSPT-JavaAnno,testJavaAnno,overridee/javaAnno.kt,M2,Java ソース,positive
+KSPT-JavaOverrideInSource,testJavaOverrideInSource,overridee/javaOverrideInSource.kt,M2,Java ソース,positive
+KSPT-JavaBackingFields,testJavaBackingFields,javaBackingFields.kt,M3,試験的な API 機能（backing field・context parameter）,positive
+KSPT-NoOverride,testNoOverride,overridee/noOverride.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-OverrideInLib,testOverrideInLib,overridee/overrideInLib.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-OverrideInSource,testOverrideInSource,overridee/overrideInSource.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-OverrideOrder,testOverrideOrder,overridee/overrideOrder.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-PackageAnnotation,testPackageAnnotation,packageAnnotations.kt,M2,Java ソース,positive
+KSPT-PrimaryConstructorOverride,testPrimaryConstructorOverride,overridee/primaryConstructorOverride.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-ParameterTypes,testParameterTypes,parameterTypes.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-Parent,testParent,parent.kt,M2,Java ソース,positive
+KSPT-RawTypes,testRawTypes,rawTypes.kt,M2,Java ソース,positive
+KSPT-RecordJavaAnnotationTypes,testRecordJavaAnnotationTypes,recordJavaAnnotationTypes.kt,M2,増分（lookup の記録）,positive
+KSPT-RecordJavaAsMemberOf,testRecordJavaAsMemberOf,recordJavaAsMemberOf.kt,M2,増分（lookup の記録）,positive
+KSPT-RecordJavaGetAllMembers,testRecordJavaGetAllMembers,recordJavaGetAllMembers.kt,M2,増分（lookup の記録）,positive
+KSPT-RecordJavaOverrides,testRecordJavaOverrides,recordJavaOverrides.kt,M2,増分（lookup の記録）,positive
+KSPT-RecordJavaResolutions,testRecordJavaResolutions,recordJavaResolutions.kt,M2,増分（lookup の記録）,positive
+KSPT-RecordJavaSupertypes,testRecordJavaSupertypes,recordJavaSupertypes.kt,M2,増分（lookup の記録）,positive
+KSPT-ReferenceElement,testReferenceElement,referenceElement.kt,M2,Java ソース,positive
+KSPT-RepeatedNonRepeatableAnnotations,testRepeatedNonRepeatableAnnotations,getSymbolsWithAnnotation/repeatedNonRepeatableAnnotations.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-ReplaceWithErrorTypeArgs,testReplaceWithErrorTypeArgs,replaceWithErrorTypeArgs.kt,M2,Java ソース,positive
+KSPT-ResolveJavaType,testResolveJavaType,resolveJavaType.kt,M2,Java ソース,positive
+KSPT-SealedClass,testSealedClass,sealedClass.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-JavaWildcardsSelfReferencing,testJavaWildcardsSelfReferencing,javaWildcardsSelfReferencing.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-ShadowingAnnotations,testShadowingAnnotations,getSymbolsWithAnnotation/shadowingAnnotations.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-SignatureMapper,testSignatureMapper,signatureMapper.kt,M3,JVM シグネチャ・名前の細部,positive
+KSPT-SuperTypes,testSuperTypes,superTypes.kt,M2,Java ソース,positive
+KSPT-ThrowList,testThrowList,throwList.kt,M2,Java ソース,positive
+KSPT-TopLevelMembers,testTopLevelMembers,topLevelMembers.kt,M2,Java ソース,positive
+KSPT-TypeAlias,testTypeAlias,typeAlias.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-NestedTypeAlias,testNestedTypeAlias,nestedTypeAlias.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-TypeAliasComparison,testTypeAliasComparison,typeAliasComparison.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-TypeComposure,testTypeComposure,typeComposure.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-TypeComparison2,testTypeComparison2,typeComparison2.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-TypeParameterReference,testTypeParameterReference,typeParameterReference.kt,M2,Java ソース,positive
+KSPT-TypeParameterVariance,testTypeParameterVariance,typeParameterVariance.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-UseSiteTargets,testUseSiteTargets,getSymbolsWithAnnotation/useSiteTargets.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-ValueParameter,testValueParameter,valueParameter.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-VarargAnnotationApplication,testVarargAnnotationApplication,varargAnnotationApplication.kt,M2,Java ソース,positive
+KSPT-VarianceTypeCheck,testVarianceTypeCheck,varianceTypeCheck.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-ValidateTypes,testValidateTypes,validateTypes.kt,M2,Java ソース,positive
+KSPT-Vararg,testVararg,vararg.kt,M2,Java ソース,positive
+KSPT-Visibilities,testVisibilities,visibilities.kt,M2,Java ソース,positive
+KSPT-Multipleround,testMultipleround,multipleround.kt,M2,マルチラウンド・deferred,positive
+KSPT-DeferredSymbols,testDeferredSymbols,deferredSymbols.kt,M2,マルチラウンド・deferred,positive
+KSPT-DeferredJavaSymbols,testDeferredJavaSymbols,deferredJavaSymbols.kt,M2,マルチラウンド・deferred,positive
+KSPT-ExitCode,testExitCode,exitCode.kt,M2,マルチラウンド・deferred,positive
+KSPT-PackageProviderForGenerated,testPackageProviderForGenerated,packageProviderForGenerated.kt,M2,マルチラウンド・deferred,positive
+KSPT-TypeAnnotationClassReference,testTypeAnnotationClassReference,typeAnnotationClassReference.kt,M2,Java ソース,positive
+KSPT-TypeParameterBoundTypeAlias,testTypeParameterBoundTypeAlias,typeParameterBoundTypeAlias.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-NativeTest,testNativeTest,native/nativeTest.kt,M3,Kotlin/Native,positive
+KSPT-NativePackageDeclarations,testNativePackageDeclarations,native/packageDeclarations.kt,M3,Kotlin/Native,positive
+KSPT-NativePackageDeclarationsMultiRound,testNativePackageDeclarationsMultiRound,native/packageDeclarationsMultiRound.kt,M3,Kotlin/Native,positive
+KSPT-NativeAnnotationDefaultValue,testNativeAnnotationDefaultValue,native/annotationDefaultValue.kt,M3,Kotlin/Native,positive
+KSPT-NativeAnnotationDefaultValueTypes,testNativeAnnotationDefaultValueTypes,native/annotationDefaultValueTypes.kt,M3,Kotlin/Native,positive
+KSPT-AnnotationDefaultValueTypes,testAnnotationDefaultValueTypes,annotationDefaultValueTypes.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-PackageDeclarations,testPackageDeclarations,packageDeclarations.kt,M2,ライブラリ（バイナリの宣言）,positive
+KSPT-PluginProblemReporter,testPluginProblemReporter,pluginProblemReporter.kt,M3,エッジケース（Processor の例外の報告）,positive
