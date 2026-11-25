@@ -1,0 +1,5 @@
+# ビルド出力・生成された型
+dist/
+.astro/
+node_modules/
+.DS_Store
