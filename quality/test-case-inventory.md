@@ -621,6 +621,198 @@ KSP2 の AA 実装のテスト（対象リビジョンで固定）を取り込�
 - 合格ラインは本体と同じ（その M までの KSPT が 100%）。
 - KSP2 自身が通らないテスト、KSP1 専用のテストは取り込み時に除外してよい。除外は一覧に理由付きで残す。
 - 取り込んだあとの除外は、本体と同じく ADR + 報告が必要。
+- 1 ケースは上流の 1 テストメソッド。ID は `KSPT-` + メソッド名から `test` を除いたもの（ADR-024）。4 つの API 機能の組（backing field・context parameter の有無）すべてで期待値どおりになったら通過
+
+<!-- kspt:start -->
+取り込み元: google/ksp 2.3.14（`a3aaaabae570`）の `kotlin-analysis-api/src/test/kotlin/com/google/devtools/ksp/test/KSPUnitTestSuite.kt`（AA 構成）。取り込み 165 件・除外 12 件。この節は `porting/ksp/import_kspt.py` が書く（手で直さない）。
+
+### 6.1 取り込んだテスト（KSPT）
+
+| ID | ケース | 種別 | M | 備考 |
+|---|---|---|---|---|
+| KSPT-AliasedAnnotations | KSP 公式テスト `testAliasedAnnotations`（`getSymbolsWithAnnotation/aliasedAnnotation.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-AnnotatedUtil | KSP 公式テスト `testAnnotatedUtil`（`annotatedUtil.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-JavaAnnotatedUtil | KSP 公式テスト `testJavaAnnotatedUtil`（`javaAnnotatedUtil.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AbstractFunctions | KSP 公式テスト `testAbstractFunctions`（`abstractFunctions.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AllFunctions_java_inherits_kt | KSP 公式テスト `testAllFunctions_java_inherits_kt`（`allFunctions_java_inherits_kt.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AllFunctions_kotlin | KSP 公式テスト `testAllFunctions_kotlin`（`allFunctions_kotlin.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-AllFunctions_kt_inherits_java | KSP 公式テスト `testAllFunctions_kt_inherits_java`（`allFunctions_kt_inherits_java.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationsInDependencies | KSP 公式テスト `testAnnotationsInDependencies`（`annotationsInDependencies.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationOnConstructorParameter | KSP 公式テスト `testAnnotationOnConstructorParameter`（`annotationOnConstructorParameter.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-AnnotationOnReceiver | KSP 公式テスト `testAnnotationOnReceiver`（`annotationOnReceiver.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-AnnotationsRepeatable | KSP 公式テスト `testAnnotationsRepeatable`（`annotationsRepeatable.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationTargets | KSP 公式テスト `testAnnotationTargets`（`annotationTargets.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-AnnotationWithArbitraryClassValue | KSP 公式テスト `testAnnotationWithArbitraryClassValue`（`annotationWithArbitraryClassValue.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-AnnotationWithNestedClassValue | KSP 公式テスト `testAnnotationWithNestedClassValue`（`annotationWithNestedClassValue.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-AnnotationValue_defaultKClassValue | KSP 公式テスト `testAnnotationValue_defaultKClassValue`（`annotationValue/defaultKClassValue.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-AnnotationValue_java | KSP 公式テスト `testAnnotationValue_java`（`annotationValue/annotationValue_java.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationValue_java2 | KSP 公式テスト `testAnnotationValue_java2`（`annotationValue/annotationValue_java2.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationValue_kt | KSP 公式テスト `testAnnotationValue_kt`（`annotationValue/annotationValue_kt.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationWithArrayValue | KSP 公式テスト `testAnnotationWithArrayValue`（`annotationWithArrayValue.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationArrayValueType | KSP 公式テスト `testAnnotationArrayValueType`（`annotationArrayValueType.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationWithDefault | KSP 公式テスト `testAnnotationWithDefault`（`annotationWithDefault.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationWithDefaultValues | KSP 公式テスト `testAnnotationWithDefaultValues`（`annotationWithDefaultValues.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AnnotationWithJavaTypeValue | KSP 公式テスト `testAnnotationWithJavaTypeValue`（`annotationWithJavaTypeValue.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-AsMemberOf | KSP 公式テスト `testAsMemberOf`（`asMemberOf.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-BackingFields | KSP 公式テスト `testBackingFields`（`backingFields.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-BackingFieldsSignatureMapper | KSP 公式テスト `testBackingFieldsSignatureMapper`（`backingFieldsSignatureMapper.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-BackingFieldsLateinit | KSP 公式テスト `testBackingFieldsLateinit`（`getSymbolsWithAnnotation/backingFieldsLateinit.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-BuiltInTypes | KSP 公式テスト `testBuiltInTypes`（`builtInTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-ObjCacheA | KSP 公式テスト `testObjCacheA`（`objCacheA.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-ObjCacheB | KSP 公式テスト `testObjCacheB`（`objCacheB.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-ChangingBehavior | KSP 公式テスト `testChangingBehavior`（`changingBehavior.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-RegisterProcessorForNewFeatures | KSP 公式テスト `testRegisterProcessorForNewFeatures`（`registerProcessorForNewFeatures.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-CheckOverride | KSP 公式テスト `testCheckOverride`（`checkOverride.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-ClassKinds | KSP 公式テスト `testClassKinds`（`classKinds.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-Companion | KSP 公式テスト `testCompanion`（`companion.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-ConstProperties | KSP 公式テスト `testConstProperties`（`constProperties.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-ConstructorDeclarations | KSP 公式テスト `testConstructorDeclarations`（`constructorDeclarations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-CrossModuleTypeAlias | KSP 公式テスト `testCrossModuleTypeAlias`（`crossModuleTypeAlias.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-ContextParameters | KSP 公式テスト `testContextParameters`（`getSymbolsWithAnnotation/contextParameters.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-ContextParameterIdentity | KSP 公式テスト `testContextParameterIdentity`（`contextParameterIdentity.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-ContextParameterTypes | KSP 公式テスト `testContextParameterTypes`（`contextParameterTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-ContextParameterTypeAlias | KSP 公式テスト `testContextParameterTypeAlias`（`contextParameterTypeAlias.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-ContextParameterNames | KSP 公式テスト `testContextParameterNames`（`contextParameterNames.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-NativeContextParameterNames | KSP 公式テスト `testNativeContextParameterNames`（`native/contextParameterNames.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | Kotlin/Native |
+| KSPT-ContextParameterDangling | KSP 公式テスト `testContextParameterDangling`（`getSymbolsWithAnnotation/negative/contextParameterDangling.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-DeclarationInconsistency | KSP 公式テスト `testDeclarationInconsistency`（`declarationInconsistency.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-DeclarationPackageName | KSP 公式テスト `testDeclarationPackageName`（`declarationPackageName.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-DeclarationsInAccessor | KSP 公式テスト `testDeclarationsInAccessor`（`declarationsInAccessor.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-DeclarationsInClass | KSP 公式テスト `testDeclarationsInClass`（`declarationsInClass.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-DeclarationOrder | KSP 公式テスト `testDeclarationOrder`（`declarationOrder.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-DeclarationUtil | KSP 公式テスト `testDeclarationUtil`（`declarationUtil.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-Declared | KSP 公式テスト `testDeclared`（`declared.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-DocString | KSP 公式テスト `testDocString`（`docString.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-Equals | KSP 公式テスト `testEquals`（`equals.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-EquivalentJavaWildcards | KSP 公式テスト `testEquivalentJavaWildcards`（`equivalentJavaWildcards.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-ErrorTypes | KSP 公式テスト `testErrorTypes`（`errorTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-ExplicitBackingFields | KSP 公式テスト `testExplicitBackingFields`（`getSymbolsWithAnnotation/explicitBackingFields.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-BackingFieldsPackageName | KSP 公式テスト `testBackingFieldsPackageName`（`getSymbolsWithAnnotation/backingFieldsPackageName.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-FieldAndPropertyUseSiteTargetOnConstructorParameters | KSP 公式テスト `testFieldAndPropertyUseSiteTargetOnConstructorParameters`（`getSymbolsWithAnnotation/negative/fieldAndPropertyUseSiteTargetOnConstructorParameters.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | エッジケース（不正な入力） |
+| KSPT-ExplicitBackingFieldsSubtyping | KSP 公式テスト `testExplicitBackingFieldsSubtyping`（`explicitBackingFieldsSubtyping.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-FunctionTypeAlias | KSP 公式テスト `testFunctionTypeAlias`（`functionTypeAlias.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-FunctionTypeAnnotation | KSP 公式テスト `testFunctionTypeAnnotation`（`functionTypeAnnotation.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-FunctionTypes | KSP 公式テスト `testFunctionTypes`（`functionTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-FunctionKinds | KSP 公式テスト `testFunctionKinds`（`functionKinds.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-GetAnnotationByTypeWithInnerDefault | KSP 公式テスト `testGetAnnotationByTypeWithInnerDefault`（`getAnnotationByTypeWithInnerDefault.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-GetPackage | KSP 公式テスト `testGetPackage`（`getPackage.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-GetByName | KSP 公式テスト `testGetByName`（`getByName.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-GetSymbolsFromAnnotation | KSP 公式テスト `testGetSymbolsFromAnnotation`（`getSymbolsFromAnnotation.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-GetSymbolsFromAnnotationInLib | KSP 公式テスト `testGetSymbolsFromAnnotationInLib`（`getSymbolsFromAnnotationInLib.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-GroupedAnnotations | KSP 公式テスト `testGroupedAnnotations`（`getSymbolsWithAnnotation/groupedAnnotations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-GroupedAnnotationsWithUseSiteTargets | KSP 公式テスト `testGroupedAnnotationsWithUseSiteTargets`（`getSymbolsWithAnnotation/groupedAnnotationsWithUseSiteTargets.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-Hello | KSP 公式テスト `testHello`（`hello.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-ImplicitElements | KSP 公式テスト `testImplicitElements`（`implicitElements.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-ImplicitPropertyAccessors | KSP 公式テスト `testImplicitPropertyAccessors`（`implicitPropertyAccessors.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-InternalOfFriends | KSP 公式テスト `testInternalOfFriends`（`internalOfFriends.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-InheritedTypeAlias | KSP 公式テスト `testInheritedTypeAlias`（`inheritedTypeAlias.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-InnerTypes | KSP 公式テスト `testInnerTypes`（`innerTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-InterfaceWithDefault | KSP 公式テスト `testInterfaceWithDefault`（`interfaceWithDefault.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-IsMutable | KSP 公式テスト `testIsMutable`（`isMutable.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-JavaBackingFieldUsedInKotlin | KSP 公式テスト `testJavaBackingFieldUsedInKotlin`（`javaBackingFieldUsedInKotlin.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-JavaModifiers | KSP 公式テスト `testJavaModifiers`（`javaModifiers.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-JavaModifiersJvmStaticAnnotation | KSP 公式テスト `testJavaModifiersJvmStaticAnnotation`（`javaModifiersJvmStaticAnnotation.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | JVM シグネチャ・名前の細部 |
+| KSPT-JavaNonNullTypes | KSP 公式テスト `testJavaNonNullTypes`（`javaNonNullTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-JavaBackingFieldsParents | KSP 公式テスト `testJavaBackingFieldsParents`（`getSymbolsWithAnnotation/javaBackingFieldsParents.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-JavaSubtype | KSP 公式テスト `testJavaSubtype`（`javaSubtype.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-JavaSubtypeOfKotlinInterface | KSP 公式テスト `testJavaSubtypeOfKotlinInterface`（`javaSubtypeOfKotlinInterface.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-JavaToKotlinMapper | KSP 公式テスト `testJavaToKotlinMapper`（`javaToKotlinMapper.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | JVM シグネチャ・名前の細部 |
+| KSPT-JavaTypes | KSP 公式テスト `testJavaTypes`（`javaTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-JavaTypes2 | KSP 公式テスト `testJavaTypes2`（`javaTypes2.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-JavaWildcards2 | KSP 公式テスト `testJavaWildcards2`（`javaWildcards2.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-JvmName | KSP 公式テスト `testJvmName`（`jvmName.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | JVM シグネチャ・名前の細部 |
+| KSPT-JvmNameRecord | KSP 公式テスト `testJvmNameRecord`（`jvmNameRecord.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | JVM シグネチャ・名前の細部 |
+| KSPT-JvmModifiersCompanionObject | KSP 公式テスト `testJvmModifiersCompanionObject`（`jvmModifiersCompanionObject.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | JVM シグネチャ・名前の細部 |
+| KSPT-LateinitProperties | KSP 公式テスト `testLateinitProperties`（`lateinitProperties.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-LibOrigins | KSP 公式テスト `testLibOrigins`（`libOrigins.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-LocalAnnotationClass | KSP 公式テスト `testLocalAnnotationClass`（`getSymbolsWithAnnotation/localAnnotationClass.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-LocalClasses | KSP 公式テスト `testLocalClasses`（`getSymbolsWithAnnotation/localClasses.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-Locations | KSP 公式テスト `testLocations`（`locations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-MakeNullable | KSP 公式テスト `testMakeNullable`（`makeNullable.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-MangledNames | KSP 公式テスト `testMangledNames`（`mangledNames.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | JVM シグネチャ・名前の細部 |
+| KSPT-MetaAnnotations | KSP 公式テスト `testMetaAnnotations`（`getSymbolsWithAnnotation/metaAnnotations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-MultipleModules | KSP 公式テスト `testMultipleModules`（`multipleModules.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-NestedAnnotations | KSP 公式テスト `testNestedAnnotations`（`nestedAnnotations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-NestedClassType | KSP 公式テスト `testNestedClassType`（`nestedClassType.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-NullableTypes | KSP 公式テスト `testNullableTypes`（`nullableTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-ConflictingOverride | KSP 公式テスト `testConflictingOverride`（`overridee/conflictingOverride.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-JavaAccessor | KSP 公式テスト `testJavaAccessor`（`overridee/javaAccessor.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-JavaAnno | KSP 公式テスト `testJavaAnno`（`overridee/javaAnno.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-JavaOverrideInSource | KSP 公式テスト `testJavaOverrideInSource`（`overridee/javaOverrideInSource.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-JavaBackingFields | KSP 公式テスト `testJavaBackingFields`（`javaBackingFields.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | 試験的な API 機能（backing field・context parameter） |
+| KSPT-NoOverride | KSP 公式テスト `testNoOverride`（`overridee/noOverride.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-OverrideInLib | KSP 公式テスト `testOverrideInLib`（`overridee/overrideInLib.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-OverrideInSource | KSP 公式テスト `testOverrideInSource`（`overridee/overrideInSource.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-OverrideOrder | KSP 公式テスト `testOverrideOrder`（`overridee/overrideOrder.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-PackageAnnotation | KSP 公式テスト `testPackageAnnotation`（`packageAnnotations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-PrimaryConstructorOverride | KSP 公式テスト `testPrimaryConstructorOverride`（`overridee/primaryConstructorOverride.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-ParameterTypes | KSP 公式テスト `testParameterTypes`（`parameterTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-Parent | KSP 公式テスト `testParent`（`parent.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-RawTypes | KSP 公式テスト `testRawTypes`（`rawTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-RecordJavaAnnotationTypes | KSP 公式テスト `testRecordJavaAnnotationTypes`（`recordJavaAnnotationTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | 増分（lookup の記録） |
+| KSPT-RecordJavaAsMemberOf | KSP 公式テスト `testRecordJavaAsMemberOf`（`recordJavaAsMemberOf.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | 増分（lookup の記録） |
+| KSPT-RecordJavaGetAllMembers | KSP 公式テスト `testRecordJavaGetAllMembers`（`recordJavaGetAllMembers.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | 増分（lookup の記録） |
+| KSPT-RecordJavaOverrides | KSP 公式テスト `testRecordJavaOverrides`（`recordJavaOverrides.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | 増分（lookup の記録） |
+| KSPT-RecordJavaResolutions | KSP 公式テスト `testRecordJavaResolutions`（`recordJavaResolutions.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | 増分（lookup の記録） |
+| KSPT-RecordJavaSupertypes | KSP 公式テスト `testRecordJavaSupertypes`（`recordJavaSupertypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | 増分（lookup の記録） |
+| KSPT-ReferenceElement | KSP 公式テスト `testReferenceElement`（`referenceElement.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-RepeatedNonRepeatableAnnotations | KSP 公式テスト `testRepeatedNonRepeatableAnnotations`（`getSymbolsWithAnnotation/repeatedNonRepeatableAnnotations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-ReplaceWithErrorTypeArgs | KSP 公式テスト `testReplaceWithErrorTypeArgs`（`replaceWithErrorTypeArgs.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-ResolveJavaType | KSP 公式テスト `testResolveJavaType`（`resolveJavaType.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-SealedClass | KSP 公式テスト `testSealedClass`（`sealedClass.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-JavaWildcardsSelfReferencing | KSP 公式テスト `testJavaWildcardsSelfReferencing`（`javaWildcardsSelfReferencing.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-ShadowingAnnotations | KSP 公式テスト `testShadowingAnnotations`（`getSymbolsWithAnnotation/shadowingAnnotations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-SignatureMapper | KSP 公式テスト `testSignatureMapper`（`signatureMapper.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | JVM シグネチャ・名前の細部 |
+| KSPT-SuperTypes | KSP 公式テスト `testSuperTypes`（`superTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-ThrowList | KSP 公式テスト `testThrowList`（`throwList.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-TopLevelMembers | KSP 公式テスト `testTopLevelMembers`（`topLevelMembers.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-TypeAlias | KSP 公式テスト `testTypeAlias`（`typeAlias.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-NestedTypeAlias | KSP 公式テスト `testNestedTypeAlias`（`nestedTypeAlias.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-TypeAliasComparison | KSP 公式テスト `testTypeAliasComparison`（`typeAliasComparison.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-TypeComposure | KSP 公式テスト `testTypeComposure`（`typeComposure.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-TypeComparison2 | KSP 公式テスト `testTypeComparison2`（`typeComparison2.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-TypeParameterReference | KSP 公式テスト `testTypeParameterReference`（`typeParameterReference.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-TypeParameterVariance | KSP 公式テスト `testTypeParameterVariance`（`typeParameterVariance.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-UseSiteTargets | KSP 公式テスト `testUseSiteTargets`（`getSymbolsWithAnnotation/useSiteTargets.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-ValueParameter | KSP 公式テスト `testValueParameter`（`valueParameter.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-VarargAnnotationApplication | KSP 公式テスト `testVarargAnnotationApplication`（`varargAnnotationApplication.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-VarianceTypeCheck | KSP 公式テスト `testVarianceTypeCheck`（`varianceTypeCheck.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M1 | シンボル・アノテーション・型の基本 |
+| KSPT-ValidateTypes | KSP 公式テスト `testValidateTypes`（`validateTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-Vararg | KSP 公式テスト `testVararg`（`vararg.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-Visibilities | KSP 公式テスト `testVisibilities`（`visibilities.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-Multipleround | KSP 公式テスト `testMultipleround`（`multipleround.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | マルチラウンド・deferred |
+| KSPT-DeferredSymbols | KSP 公式テスト `testDeferredSymbols`（`deferredSymbols.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | マルチラウンド・deferred |
+| KSPT-DeferredJavaSymbols | KSP 公式テスト `testDeferredJavaSymbols`（`deferredJavaSymbols.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | マルチラウンド・deferred |
+| KSPT-ExitCode | KSP 公式テスト `testExitCode`（`exitCode.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | マルチラウンド・deferred |
+| KSPT-PackageProviderForGenerated | KSP 公式テスト `testPackageProviderForGenerated`（`packageProviderForGenerated.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | マルチラウンド・deferred |
+| KSPT-TypeAnnotationClassReference | KSP 公式テスト `testTypeAnnotationClassReference`（`typeAnnotationClassReference.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | Java ソース |
+| KSPT-TypeParameterBoundTypeAlias | KSP 公式テスト `testTypeParameterBoundTypeAlias`（`typeParameterBoundTypeAlias.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-NativeTest | KSP 公式テスト `testNativeTest`（`native/nativeTest.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | Kotlin/Native |
+| KSPT-NativePackageDeclarations | KSP 公式テスト `testNativePackageDeclarations`（`native/packageDeclarations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | Kotlin/Native |
+| KSPT-NativePackageDeclarationsMultiRound | KSP 公式テスト `testNativePackageDeclarationsMultiRound`（`native/packageDeclarationsMultiRound.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | Kotlin/Native |
+| KSPT-NativeAnnotationDefaultValue | KSP 公式テスト `testNativeAnnotationDefaultValue`（`native/annotationDefaultValue.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | Kotlin/Native |
+| KSPT-NativeAnnotationDefaultValueTypes | KSP 公式テスト `testNativeAnnotationDefaultValueTypes`（`native/annotationDefaultValueTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | Kotlin/Native |
+| KSPT-AnnotationDefaultValueTypes | KSP 公式テスト `testAnnotationDefaultValueTypes`（`annotationDefaultValueTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-PackageDeclarations | KSP 公式テスト `testPackageDeclarations`（`packageDeclarations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M2 | ライブラリ（バイナリの宣言） |
+| KSPT-PluginProblemReporter | KSP 公式テスト `testPluginProblemReporter`（`pluginProblemReporter.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる | D | M3 | エッジケース（Processor の例外の報告） |
+
+### 6.2 取り込まなかったテスト
+
+| 上流のテスト | 理由 |
+|---|---|
+| `testAllUseSiteTargetAppliedToAnnotationList` | KSP2（AA 構成）自身が通らない（既知のバグ google/ksp#2912） |
+| `testEnumModifiers` | KSP2 自身が通らない（既知のバグ google/ksp#2271。例外を期待する形で固定） |
+| `testFakeOverrideProperties` | KSP2 自身が通らない（既知のバグ google/ksp#2420。不一致を期待する形で固定） |
+| `testFunctionKindsJavaInheritsKotlin` | KSP2（AA 構成）自身が通らない（既知のバグ google/ksp#2496。例外を期待する形で固定） |
+| `testParentOfJavaMethodOverridingKotlinProperty` | KSP2 自身が通らない（既知のバグ google/ksp#2498。不一致を期待する形で固定） |
+| `testPlatformDeclaration` | KSP2 自身で @Disabled（通らない） |
+| `testDeferredTypeRefs` | KSP2 自身で @Disabled（通らない） |
+| `testExpectDifferentOutput` | テスト基盤（期待値の書き分け）自体の自己テスト。KSP の挙動を見ていない |
+| `testExpectDifferentOutputFailingOnCurrent` | テスト基盤の自己テスト（構成ごとにわざと失敗させる） |
+| `testExpectDifferentOutputFailingOnBackingFields` | テスト基盤の自己テスト（構成ごとにわざと失敗させる） |
+| `testExpectDifferentOutputFailingOnContextParameters` | テスト基盤の自己テスト（構成ごとにわざと失敗させる） |
+| `testExpectDifferentOutputFailingOnNext` | テスト基盤の自己テスト（構成ごとにわざと失敗させる） |
+<!-- kspt:end -->
 
 ## 7. まとめ
 
@@ -629,9 +821,9 @@ KSP2 の AA 実装のテスト（対象リビジョンで固定）を取り込�
 <!-- summary:start -->
 | マイルストーン | 新たに通すケース | 累計（合格ライン） |
 |---|---|---|
-| M1 | 100 | 100 |
-| M2 | 134 | 234 |
-| M3 | 37 | 271 |
+| M1 | 142 | 142 |
+| M2 | 225 | 367 |
+| M3 | 69 | 436 |
 
 ほかに「任意」（余力があれば作る。合格ラインに含めない）が 4 件。
 
@@ -640,11 +832,11 @@ KSP2 の AA 実装のテスト（対象リビジョンで固定）を取り込�
 | U | 16 |
 | I | 68 |
 | E | 137 |
-| D | 30 |
+| D | 195 |
 | P | 11 |
 | B | 13 |
 
-合計 275 件（KSPT は取り込み時に追加）。E2E 系（E / D / P）は 178 件で全体の 64%。
+合計 440 件（うち KSPT 165 件）。E2E 系（E / D / P）は 343 件で全体の 77%。
 
 備考: BRG-07（KSPT）と RW-ALL-I1・RW-ALL-P1 は M が分かれるため、最初の M で数えている。
 <!-- summary:end -->
