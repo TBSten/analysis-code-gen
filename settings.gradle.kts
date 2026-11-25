@@ -35,6 +35,8 @@ include(
     ":ksp-bridge-gradle-plugin",
     ":ksp-compatibility-tests",
     ":e2e-tests",
+    // AA の型に触れる I / U の保留テスト（ACG-45、ADR-034）。e2e-tests は AA なしでコンパイルできるままにする
+    ":engine-tests",
     // テスト基盤（ACG-37、ADR-030）。:quality はケース ID 整合チェックを持つ（quality/ 直下）
     ":test-foundation",
     ":quality",
