@@ -1,0 +1,36 @@
+# LIC-01: 移植ファイルの出所記録・著作権表示・NOTICE の検査（ADR-018）
+name: LIC-01 provenance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lic-01:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Self-test of the checker
+        run: python3 scripts/lic01/test_check_provenance.py
+      - name: Fetch pinned upstream when ported files exist
+        id: upstream
+        run: |
+          if grep -rIl --include='*.kt' --include='*.kts' --include='*.java' 'Ported-From:' . \
+               --exclude-dir=.git --exclude-dir=porting --exclude-dir=lic01 --exclude-dir=build | grep -q .; then
+            commit=$(grep '^commit=' porting/ksp/UPSTREAM.properties | cut -d= -f2)
+            prev=$(grep '^previous_commits=' porting/ksp/UPSTREAM.properties | cut -d= -f2 | tr ',' ' ')
+            git init -q "$RUNNER_TEMP/ksp"
+            git -C "$RUNNER_TEMP/ksp" remote add origin https://github.com/google/ksp.git
+            for c in $commit $prev; do git -C "$RUNNER_TEMP/ksp" fetch -q --depth 1 --filter=blob:none origin "$c"; done
+            echo "args=--upstream-dir ksp=$RUNNER_TEMP/ksp" >> "$GITHUB_OUTPUT"
+          fi
+      - name: LIC-01
+        run: python3 scripts/lic01/check_provenance.py ${{ steps.upstream.outputs.args }}
