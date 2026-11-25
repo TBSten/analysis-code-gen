@@ -46,6 +46,22 @@ export default defineConfig({
 					],
 				},
 				{
+					// 1 要素 1 ページ（ADR-033）。読む順に並べる
+					label: 'ガイド',
+					items: [
+						{ label: 'Processor と Provider', slug: 'guides/processor' },
+						{ label: 'ラウンドとファイル集合', slug: 'guides/rounds' },
+						{ label: '生成と出力の管理', slug: 'guides/code-generator' },
+						{ label: '増分処理と依存の宣言', slug: 'guides/incremental' },
+						{ label: 'Deferred', slug: 'guides/deferred' },
+						{ label: 'SourceSet First と KMP', slug: 'guides/kmp' },
+						{ label: 'Gradle DSL', slug: 'guides/gradle-dsl' },
+						{ label: 'KSP Bridge', slug: 'guides/ksp-bridge' },
+						{ label: 'Hybrid Processor', slug: 'guides/hybrid' },
+						{ label: '対応バージョン', slug: 'guides/versions' },
+					],
+				},
+				{
 					label: 'テスト',
 					items: [
 						{ label: 'Processor をテストする', slug: 'testing' },
