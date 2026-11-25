@@ -1,0 +1,366 @@
+# 入力値空間の次元（ADR-020）
+#
+# 各次元の値には、パターンのソースから自動で付けるための正規表現 `match` を書く。
+# `match` が無い値は、パターン先頭の `// TAGS:` で手で付ける。
+# `required = true` の値は、網羅表でパターン 0 件だと catalog.py check が失敗する。
+# `scope` はその次元を数える対象（"all" は全 Processor 共通、"cream" などはその Processor のパターンだけ）。
+#
+# 正規表現は Python の re（MULTILINE）。ソースのコメント行（// で始まる行）は取り除いてから当てる。
+
+# ---------------------------------------------------------------- 共通: Kotlin の言語要素
+
+[dim."kt.decl"]
+title = "宣言の種類"
+scope = "all"
+values = [
+  { id = "class", match = '(?<![\w.])(?<!data )(?<!value )(?<!enum )(?<!sealed )(?<!annotation )(?<!abstract )(?<!inner )class\s+\w', required = true },
+  { id = "data-class", match = '\bdata\s+class\b', required = true },
+  { id = "value-class", match = '\bvalue\s+class\b|@JvmInline', required = true },
+  { id = "enum-class", match = '\benum\s+class\b', required = true },
+  { id = "sealed-class", match = '\bsealed\s+class\b', required = true },
+  { id = "sealed-interface", match = '\bsealed\s+interface\b', required = true },
+  { id = "interface", match = '(?<!sealed )(?<!fun )\binterface\s+\w', required = true },
+  { id = "fun-interface", match = '\bfun\s+interface\b' },
+  { id = "abstract-class", match = '\babstract\s+class\b', required = true },
+  { id = "object", match = '(?<!companion )(?<!data )\bobject\s+\w', required = true },
+  { id = "data-object", match = '\bdata\s+object\b' },
+  { id = "companion-object", match = '\bcompanion\s+object\b', required = true },
+  { id = "annotation-class", match = '\bannotation\s+class\b' },
+  { id = "typealias", match = '^\s*(public |internal |private )?typealias\s', required = true },
+  { id = "top-level-fun", match = '^(public |internal |private )?(suspend )?fun\s+(<[^>]+>\s*)?\w+\s*\(', required = true },
+  { id = "top-level-property", match = '^(public |internal |private )?(const )?va[lr]\s+\w' },
+  { id = "extension-fun", match = '\bfun\s+(<[^>]+>\s*)?[\w.<>?, ]+\.\w+\s*\(' },
+  { id = "extension-property", match = '\bva[lr]\s+(<[^>]+>\s*)?[A-Z][\w<>?, ]*\.\w+\s*:' },
+  { id = "local-class", match = '\bfun\s+\w+\s*\([^)]*\)[^{]*\{[^}]*\bclass\s+\w' },
+  { id = "object-expression", match = '=\s*object\s*:' },
+]
+
+[dim."kt.vis"]
+title = "可視性"
+scope = "all"
+values = [
+  { id = "public-implicit", match = '^(?!.*\b(private|internal|protected|public)\b).*\b(class|interface|object|fun)\s+\w', required = true },
+  { id = "public-explicit", match = '\bpublic\s+(data |sealed |abstract |open |value |enum |inner )?(class|interface|object|fun|val|var)\b' },
+  { id = "internal", match = '\binternal\s', required = true },
+  { id = "private", match = '\bprivate\s', required = true },
+  { id = "protected", match = '\bprotected\s' },
+]
+
+[dim."kt.nest"]
+title = "入れ子"
+scope = "all"
+values = [
+  { id = "nested", match = '^\s{2,}(public |internal |private )?(data |sealed |enum |value |abstract )?(class|interface|object)\s+\w', required = true },
+  { id = "inner", match = '\binner\s+class\b' },
+  { id = "deep-nested", match = '^\s{6,}(public |internal |private )?(data |sealed |enum |value |abstract )?(class|interface|object)\s+\w', required = true },
+]
+
+[dim."kt.generics"]
+title = "ジェネリクス"
+scope = "all"
+values = [
+  { id = "type-param", match = '(class|interface|fun)\s+(<[^>]+>\s*)?\w*<\s*\w+\s*[,>]|fun\s*<\w', required = true },
+  { id = "upper-bound", match = '<\s*\w+\s*:\s*\w', required = true },
+  { id = "multiple-bounds", match = '\bwhere\s+\w+\s*:' },
+  { id = "variance-out", match = '<\s*out\s+\w|,\s*out\s+\w', required = true },
+  { id = "variance-in", match = '<\s*in\s+\w|,\s*in\s+\w' },
+  { id = "star-projection", match = '<\s*\*\s*>|<\s*\*\s*,|,\s*\*\s*>', required = true },
+  { id = "recursive-bound", match = '<\s*(\w+)\s*:\s*\w+<\s*\1\s*>' },
+  { id = "nested-generic", match = '\w<[^<>]*\w<[^<>]+>[^<>]*>', required = true },
+  { id = "reified", match = '\breified\s' },
+]
+
+[dim."kt.types"]
+title = "型の形"
+scope = "all"
+values = [
+  { id = "nullable", match = '\w\?(\s|,|\)|>|=)', required = true },
+  { id = "list", match = '\b(List|MutableList)<', required = true },
+  { id = "set", match = '\b(Set|MutableSet)<' },
+  { id = "map", match = '\b(Map|MutableMap)<', required = true },
+  { id = "array", match = '\b(Array<|IntArray|ByteArray|LongArray)' },
+  { id = "function-type", match = ':\s*(suspend\s*)?\([^)]*\)\s*->', required = true },
+  { id = "primitive", match = ':\s*(Int|Long|Double|Float|Boolean|Char|Short|Byte)\b', required = true },
+  { id = "unsigned", match = ':\s*U(Int|Long|Short|Byte)\b' },
+  { id = "string", match = ':\s*String\b', required = true },
+  { id = "platform-type", tag_only = true },
+]
+
+[dim."kt.ctor"]
+title = "コンストラクタ・引数"
+scope = "all"
+values = [
+  { id = "primary", match = '\bclass\s+\w+(<[^>]*>)?\s*(\w+\s+)*\(', required = true },
+  { id = "no-arg", match = '\bclass\s+\w+\s*(\{|$|:)' },
+  { id = "secondary", match = '\bconstructor\s*\([^)]*\)\s*:\s*this\(' },
+  { id = "private-ctor", match = '\bprivate\s+constructor\b' },
+  { id = "default-arg", match = '\b(va[lr]\s+)?\w+\s*:\s*[\w<>?., ]+\s*=\s*[^=>]', required = true },
+  { id = "vararg", match = '\bvararg\s' },
+  { id = "non-property-param", match = '\bclass\s+\w+\s*\(\s*\w+\s*:' },
+]
+
+[dim."kt.prop"]
+title = "プロパティ"
+scope = "all"
+values = [
+  { id = "val", match = '\bval\s+\w', required = true },
+  { id = "var", match = '\bvar\s+\w', required = true },
+  { id = "lateinit", match = '\blateinit\s' },
+  { id = "delegated", match = '\bva[lr]\s+\w+(\s*:[^=]+)?\s+by\s' },
+  { id = "const", match = '\bconst\s+val\b' },
+  { id = "custom-getter", match = '^\s*get\(\)\s*[={]' },
+  { id = "body-property", match = '^\s{2,}(override\s+)?va[lr]\s+\w+\s*:\s*[\w<>?]+\s*=' },
+  { id = "jvm-field", match = '@JvmField' },
+  { id = "override", match = '\boverride\s+va[lr]\b' },
+]
+
+[dim."kt.annot"]
+title = "アノテーションの書き方"
+scope = "all"
+values = [
+  { id = "use-site-target", match = '@(field|param|get|set|property|file|receiver|setparam|delegate):', required = true },
+  { id = "array-arg", match = '@\w+\([^)]*\[[^\]]*\]', required = true },
+  { id = "class-literal-arg", match = '@\w+\([^)]*::class', required = true },
+  { id = "named-arg", match = '@\w+\(\s*\w+\s*=', required = true },
+  { id = "repeated", match = '(@(\w+)\b[^\n]*\n\s*@\2\b)' },
+  { id = "meta-annotation", match = 'annotation\s+class(?s:.*)@' },
+  { id = "fqn-annotation", match = '@[a-z]+\.[a-z.]+\.[A-Z]\w*' },
+]
+
+[dim."kt.misc"]
+title = "その他の言語要素"
+scope = "all"
+values = [
+  { id = "kdoc", match = '/\*\*', required = true },
+  { id = "deprecated", match = '@Deprecated\b' },
+  { id = "backtick-name", match = '`[^`]+`' },
+  { id = "suspend", match = '\bsuspend\s+fun\b' },
+  { id = "expect-actual", match = '\b(expect|actual)\s+(class|fun|val|object|interface)\b' },
+  { id = "context-parameters", match = '\bcontext\(' },
+  { id = "inheritance", match = '\)\s*:\s*[A-Z]\w*(<[^>]*>)?\s*(\(|\{|$|,)', required = true },
+  { id = "opt-in", match = '@OptIn\(|@RequiresOptIn' },
+  { id = "jvm-name", match = '@JvmName|@JvmStatic|@JvmOverloads' },
+]
+
+[dim."kt.layout"]
+title = "ファイル・モジュールの配置"
+scope = "all"
+values = [
+  { id = "single-file", tag_only = true, required = true },
+  { id = "multi-file", tag_only = true, required = true },
+  { id = "multi-package", tag_only = true, required = true },
+  { id = "java-source", tag_only = true, required = true },
+  { id = "default-package", tag_only = true },
+  { id = "multi-module", tag_only = true, required = true },
+  { id = "kmp-common", tag_only = true, required = true },
+  { id = "kmp-intermediate", tag_only = true },
+  { id = "kmp-platform", tag_only = true, required = true },
+  { id = "android", tag_only = true, required = true },
+  { id = "test-source-set", tag_only = true },
+]
+
+[dim."kt.outcome"]
+title = "期待する結果"
+scope = "all"
+values = [
+  { id = "ok", tag_only = true, required = true },
+  { id = "processor-error", tag_only = true, required = true },
+  { id = "processor-warning", tag_only = true },
+  { id = "compile-error", tag_only = true },
+]
+
+[dim."proc.combo"]
+title = "Processor の組み合わせ"
+scope = "all"
+values = [
+  { id = "single", tag_only = true, required = true },
+  { id = "multi", tag_only = true, required = true },
+]
+
+# ---------------------------------------------------------------- cream.kt
+
+[dim."cream.annotation"]
+title = "cream.kt のアノテーション"
+scope = "cream"
+values = [
+  { id = "CopyTo", match = '@CopyTo\b(?!Children)', required = true },
+  { id = "CopyFrom", match = '@CopyFrom\b', required = true },
+  { id = "CopyToChildren", match = '@CopyToChildren\b', required = true },
+  { id = "CombineTo", match = '@CombineTo\b', required = true },
+  { id = "CombineFrom", match = '@CombineFrom\b', required = true },
+  { id = "CopyMapping", match = '@CopyMapping\b', required = true },
+  { id = "CombineMapping", match = '@CombineMapping\b', required = true },
+  { id = "SealedCopy", match = '@SealedCopy\b', required = true },
+  { id = "ParentOptional", match = '@ParentOptional\b', required = true },
+  { id = "ChildOptionals", match = '@ChildOptionals\b', required = true },
+  { id = "Map", match = '@(CopyTo|CopyFrom|CombineTo|CombineFrom)\.Map\b|@\w+\.Map\(', required = true },
+  { id = "Exclude", match = '\.Exclude\b|exclude\s*=', required = true },
+]
+
+[dim."cream.family"]
+title = "cream.kt の網羅軸（cream の snapshot テストの scenario 族）"
+scope = "cream"
+values = [
+  { id = "sourceKind", tag_only = true, required = true },
+  { id = "targetKind", tag_only = true, required = true },
+  { id = "generics", tag_only = true, required = true },
+  { id = "propertyShape", tag_only = true, required = true },
+  { id = "matching", tag_only = true, required = true },
+  { id = "map", tag_only = true, required = true },
+  { id = "exclude", tag_only = true, required = true },
+  { id = "visibility", tag_only = true, required = true },
+  { id = "funName", tag_only = true, required = true },
+  { id = "kdoc", tag_only = true, required = true },
+  { id = "valueClassMapping", tag_only = true, required = true },
+  { id = "nesting", tag_only = true },
+  { id = "constructor", tag_only = true },
+  { id = "multiSource", tag_only = true },
+  { id = "repeatable", tag_only = true },
+  { id = "hierarchyShape", tag_only = true },
+  { id = "deprecated", tag_only = true },
+  { id = "escaping", tag_only = true },
+  { id = "useCase", tag_only = true },
+  { id = "sealedParentKind", tag_only = true },
+  { id = "propertyFiltering", tag_only = true },
+  { id = "propertyName", tag_only = true },
+  { id = "parentOptionalInterop", tag_only = true },
+  { id = "sourceKindValidation", tag_only = true },
+  { id = "canReverse", tag_only = true },
+  { id = "merge", tag_only = true },
+  { id = "notCopyToObject", tag_only = true },
+  { id = "nonCopyableStrategy", tag_only = true },
+  { id = "invalidUsage", tag_only = true, required = true },
+  { id = "options", tag_only = true, required = true },
+]
+
+[dim."cream.option"]
+title = "cream.kt のオプション（既定値以外を使うパターン）"
+scope = "cream"
+values = [
+  { id = "copyFunNamePrefix", tag_only = true },
+  { id = "copyFunNamingStrategy", tag_only = true, required = true },
+  { id = "escapeDot", tag_only = true },
+  { id = "notCopyToObject", tag_only = true, required = true },
+  { id = "defaultVisibility", tag_only = true, required = true },
+  { id = "autoValueClassMapping", tag_only = true, required = true },
+]
+
+# ---------------------------------------------------------------- Moshi
+
+[dim."moshi.annotation"]
+title = "Moshi のアノテーション・機能"
+scope = "moshi"
+values = [
+  { id = "JsonClass", match = '@JsonClass\(', required = true },
+  { id = "JsonClass-generator", match = '@JsonClass\([^)]*generator\s*=', required = true },
+  { id = "JsonClass-inline", match = '@JsonClass\([^)]*inline\s*=\s*true' },  # 1.15.2 には無い（固定版より新しい機能）
+  { id = "Json-name", match = '@(field:|param:|property:)?Json\(\s*name\s*=', required = true },
+  { id = "Json-ignore", match = '@(field:|param:|property:)?Json\([^)]*ignore\s*=\s*true', required = true },
+  { id = "Transient", match = '@(field:)?Transient\b', required = true },
+  { id = "JsonQualifier", match = '@JsonQualifier\b', required = true },
+  { id = "ToJson-FromJson", match = '@(ToJson|FromJson)\b' },
+  { id = "generateAdapter-false", match = '@JsonClass\(\s*generateAdapter\s*=\s*false' },
+]
+
+[dim."moshi.shape"]
+title = "Moshi で効く入力の形"
+scope = "moshi"
+values = [
+  { id = "default-values", tag_only = true, required = true },
+  { id = "generic-class", tag_only = true, required = true },
+  { id = "inheritance", tag_only = true, required = true },
+  { id = "many-properties", tag_only = true, required = true },
+  { id = "nullable-props", tag_only = true, required = true },
+  { id = "nested-adapter", tag_only = true, required = true },
+  { id = "unsupported-kind", tag_only = true, required = true },
+  { id = "private-api", tag_only = true, required = true },
+]
+
+[dim."moshi.option"]
+title = "Moshi のオプション（既定値以外）"
+scope = "moshi"
+values = [
+  { id = "moshi.generated", tag_only = true, required = true },
+  { id = "moshi.generateProguardRules", tag_only = true, required = true },
+  { id = "moshi.instantiateAnnotations", tag_only = true, required = true },
+]
+
+# ---------------------------------------------------------------- Koin Annotations
+
+[dim."koin.definition"]
+title = "Koin の定義アノテーション"
+scope = "koin"
+values = [
+  { id = "Single", match = '@Single\b', required = true },
+  { id = "Singleton", match = '@Singleton\b' },
+  { id = "Factory", match = '@Factory\b', required = true },
+  { id = "Scoped", match = '@Scoped\b', required = true },
+  { id = "KoinViewModel", match = '@KoinViewModel\b', required = true },
+  { id = "KoinWorker", match = '@KoinWorker\b' },
+  { id = "function-definition", match = '@(Single|Factory|Scoped|KoinViewModel)\b[^\n]*\n\s*(internal |public )?fun\s', required = true },
+  { id = "class-definition", match = '@(Single|Factory|Scoped|KoinViewModel)\b[^\n]*\n\s*(internal |public |private )?(data |abstract |open )?class\s', required = true },
+]
+
+[dim."koin.module"]
+title = "Koin のモジュール構成"
+scope = "koin"
+values = [
+  { id = "Module", match = '@Module\b', required = true },
+  { id = "ComponentScan", match = '@ComponentScan\b', required = true },
+  { id = "ComponentScan-package", match = '@ComponentScan\(\s*"', required = true },
+  { id = "includes", match = '@Module\([^)]*includes\s*=', required = true },
+  { id = "Configuration", match = '@Configuration\b', required = true },
+  { id = "KoinApplication", match = '@KoinApplication\b', required = true },
+  { id = "createdAtStart", match = 'createdAtStart\s*=\s*true' },
+  { id = "default-module", tag_only = true, required = true },
+]
+
+[dim."koin.binding"]
+title = "Koin のバインド・引数"
+scope = "koin"
+values = [
+  { id = "auto-bind-interface", tag_only = true, required = true },
+  { id = "explicit-binds", match = 'binds\s*=\s*\[', required = true },
+  { id = "Named", match = '@Named\b', required = true },
+  { id = "Qualifier", match = '@Qualifier\b', required = true },
+  { id = "InjectedParam", match = '@InjectedParam\b', required = true },
+  { id = "Property", match = '@Property\b', required = true },
+  { id = "PropertyValue", match = '@PropertyValue\b' },
+  { id = "Provided", match = '@Provided\b' },
+  { id = "lazy-param", match = ':\s*Lazy<', required = true },
+  { id = "list-param", match = ':\s*List<', required = true },
+  { id = "nullable-param", tag_only = true, required = true },
+]
+
+[dim."koin.scope"]
+title = "Koin のスコープ"
+scope = "koin"
+values = [
+  { id = "Scope", match = '@Scope\(', required = true },
+  { id = "ScopeId", match = '@ScopeId\b' },
+  { id = "archetype", match = '@(ViewModelScope|ActivityScope|ActivityRetainedScope|FragmentScope)\b', required = true },
+]
+
+[dim."koin.other"]
+title = "Koin のその他"
+scope = "koin"
+values = [
+  { id = "Monitor", match = '@Monitor\b' },
+  { id = "jsr330-Inject", match = '@(jakarta|javax)\.inject\.Inject|import (jakarta|javax)\.inject' },
+  { id = "external-definition", match = '@ExternalDefinition\b' },
+  { id = "meta", match = '@Meta(Definition|Module|Application)\b' },
+  { id = "config-check-error", tag_only = true, required = true },
+  { id = "cycle", tag_only = true },
+]
+
+[dim."koin.option"]
+title = "Koin のオプション（既定値以外）"
+scope = "koin"
+values = [
+  { id = "KOIN_CONFIG_CHECK", tag_only = true, required = true },
+  { id = "KOIN_LOG_TIMES", tag_only = true },
+  { id = "KOIN_DEFAULT_MODULE", tag_only = true, required = true },
+  { id = "KOIN_GENERATION_PACKAGE", tag_only = true, required = true },
+  { id = "KOIN_USE_COMPOSE_VIEWMODEL", tag_only = true, required = true },
+  { id = "KOIN_EXPORT_DEFINITIONS", tag_only = true },
+]
