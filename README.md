@@ -19,7 +19,9 @@ Kotlin Analysis API を直接使うコード生成基盤（KSP2 の代替を目�
 | `ksp-bridge` | 内部 | KSP API の AA 実装（KSP2 から移植） |
 | `cli` | 内部 | Gradle に依存しない実行 |
 | `benchmarks` / `e2e-tests` / `ksp-compatibility-tests` | テスト | 性能・E2E・KSP 互換 |
+| `engine-tests` | テスト | エンジン内部（AA の型）に触れる I / U テスト。CI でだけコンパイルできる（ADR-034） |
 | `pbt` | テスト | PBT 基盤（Arb・縮小・seed・試行数の自動調整、ADR-022） |
+| `differential` | テスト | 三者差分ハーネス（K / B / N・正規化・K 結果キャッシュ、ADR-023） |
 | `test-processors:core` / `:ksp` / `:native` | テスト | テスト用 Processor TP-*（`test-processors/README.md`） |
 
 境界は ADR-012〜017 で確定する（設計文書 16 章の案が元）。
