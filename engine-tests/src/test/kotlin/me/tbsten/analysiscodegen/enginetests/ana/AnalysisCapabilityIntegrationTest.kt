@@ -297,7 +297,7 @@ class AnalysisCapabilityIntegrationTest : IntegrationSpec({
                 val dir = findClass(cid("a.Dir")) as KaNamedClassSymbol
                 listOf(
                     id.isInline,
-                    shape.classKind == KaClassKind.INTERFACE && shape.modality == org.jetbrains.kotlin.descriptors.Modality.SEALED,
+                    shape.classKind == KaClassKind.INTERFACE && shape.modality == org.jetbrains.kotlin.analysis.api.symbols.KaSymbolModality.SEALED,
                     shape.sealedClassInheritors.map { it.classId!!.shortClassName.asString() }.sorted() == listOf("Circle", "Empty"),
                     empty.classKind == KaClassKind.OBJECT && empty.isData,
                     dir.staticDeclaredMemberScope
