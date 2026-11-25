@@ -1,0 +1,9 @@
+{
+"workflow": "ci",
+"runId": "45673345366",
+"sha": "3e0d63d84d027d6b1829477c8d11fa65e670a156",
+"event": "push",
+"conclusion": "failure",
+"finishedAt": "2026-11-25T18:18:50Z",
+"cases": {}
+}
