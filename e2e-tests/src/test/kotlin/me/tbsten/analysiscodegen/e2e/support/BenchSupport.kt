@@ -58,7 +58,16 @@ internal val benchInitScript: File by lazy {
 /** 計測結果。[samplesMillis] は計測した回（ウォームアップを除く）の壁時計。 */
 internal data class Timing(val label: String, val samplesMillis: List<Long>) {
     val medianMillis: Double
-        get() = samplesMillis.sorted().let { s -> if (s.size % 2 == 1) s[s.size / 2].toDouble() else (s[s.size / 2 - 1] + s[s.size / 2]) / 2.0 }
+        get() =
+            samplesMillis.sorted().let { s ->
+                if (s.size % 2 ==
+                    1
+                ) {
+                    s[s.size / 2].toDouble()
+                } else {
+                    (s[s.size / 2 - 1] + s[s.size / 2]) / 2.0
+                }
+            }
 }
 
 internal const val WARMUP_RUNS = 3
@@ -87,13 +96,18 @@ internal fun benchRunner(
     engine: SampleEngine,
     vararg tasks: String,
 ): GradleRunner =
-    GradleRunner.create()
+    GradleRunner
+        .create()
         .withProjectDir(projectDir)
         .withArguments(tasks.toList() + listOf("--init-script", benchInitScript.absolutePath, "--no-build-cache") + gradleArgs(engine))
 
 /** daemon を止める。次のビルドは新しい daemon で始まる（Cold start の計測。依存のキャッシュは残る）。 */
 internal fun stopDaemons(projectDir: File) {
-    GradleRunner.create().withProjectDir(projectDir).withArguments("--stop").build()
+    GradleRunner
+        .create()
+        .withProjectDir(projectDir)
+        .withArguments("--stop")
+        .build()
 }
 
 /** 全件処理の時間: `clean acgCodegen` を計測する。 */
@@ -111,7 +125,9 @@ internal fun shouldNotBeSlowerThan(
 ) {
     val ratio = subject.medianMillis / baseline.medianMillis
     recordBench(caseId, subject, baseline, ratio)
-    withClue("$caseId: ${subject.label} ${subject.medianMillis}ms / ${baseline.label} ${baseline.medianMillis}ms = ${"%.3f".format(ratio)}") {
+    withClue(
+        "$caseId: ${subject.label} ${subject.medianMillis}ms / ${baseline.label} ${baseline.medianMillis}ms = ${"%.3f".format(ratio)}",
+    ) {
         ratio shouldBeLessThanOrEqual 1.0
     }
 }
@@ -126,7 +142,9 @@ internal fun recordBench(
     val file = repoRoot.resolve("build/acg/bench/results.tsv")
     file.parentFile.mkdirs()
     if (!file.exists()) file.writeText("case\tsubject\tbaseline\tsubjectMedianMs\tbaselineMedianMs\tratio\n")
-    file.appendText("$caseId\t${subject.label}\t${baseline.label}\t${subject.medianMillis}\t${baseline.medianMillis}\t${"%.4f".format(ratio)}\n")
+    file.appendText(
+        "$caseId\t${subject.label}\t${baseline.label}\t${subject.medianMillis}\t${baseline.medianMillis}\t${"%.4f".format(ratio)}\n",
+    )
 }
 
 /** `acgHeap` の出力から（使用中, ピーク）のバイト数を読む。 */

@@ -29,7 +29,8 @@ import java.nio.file.Files
 // Processor はテスト用 Processor（TP-*、ADR-027）の KSP 版。TestEngine.AnalysisCodegen では Bridge 経由で動く
 // TST-01（Native Processor）は AA の型に触れるので :engine-tests に置く
 
-private const val USER_SOURCE = "package fixture\n\nimport me.tbsten.analysiscodegen.tp.Mapped\n\n@Mapped class User(val name: String, val age: Int)"
+private const val USER_SOURCE =
+    "package fixture\n\nimport me.tbsten.analysiscodegen.tp.Mapped\n\n@Mapped class User(val name: String, val age: Int)"
 
 private fun CodegenTestSpec.mapperInput() {
     kotlin("me/tbsten/analysiscodegen/tp/${TpAnnotationsSource.FILE_NAME}", TpAnnotationsSource.content)
@@ -39,7 +40,12 @@ private fun CodegenTestSpec.mapperInput() {
 }
 
 private fun acgVersion(): String =
-    repoRoot.resolve("gradle.properties").readLines().first { it.startsWith("acg.version=") }.substringAfter("=").trim()
+    repoRoot
+        .resolve("gradle.properties")
+        .readLines()
+        .first { it.startsWith("acg.version=") }
+        .substringAfter("=")
+        .trim()
 
 class TestingFrameworkE2ETest : E2ESpec({
     case("TST-02", "同じ API で KSP Processor（Bridge）もテストできる", pending = PendingCase(Milestone.M1)) {
@@ -97,21 +103,29 @@ class TestingFrameworkE2ETest : E2ESpec({
                     ksp(RegistryKspProvider())
                     options["tp.processors"] = "Chain,Registry"
                 }
-                step("B を足す") { kotlin("fixture/B.kt", "package fixture\n\nimport me.tbsten.analysiscodegen.tp.Registered\n\n@Registered class B") }
-                step("A の段数を変える") { kotlin("fixture/A.kt", "package fixture\n\nimport me.tbsten.analysiscodegen.tp.Chain\n\n@Chain(depth = 1) class A") }
+                step(
+                    "B を足す",
+                ) { kotlin("fixture/B.kt", "package fixture\n\nimport me.tbsten.analysiscodegen.tp.Registered\n\n@Registered class B") }
+                step(
+                    "A の段数を変える",
+                ) { kotlin("fixture/A.kt", "package fixture\n\nimport me.tbsten.analysiscodegen.tp.Chain\n\n@Chain(depth = 1) class A") }
                 step("B を消す") { delete("fixture/B.kt") }
             }
 
         val incremental = scenario(TestEngine.AnalysisCodegen)
         val clean = scenario(TestEngine.Ksp2)
         incremental.map { it.stepName } shouldBe listOf("initial", "B を足す", "A の段数を変える", "B を消す")
-        incremental.first().result.generatedFiles.keys shouldContain "kotlin/fixture/AChain3.kt"
+        incremental
+            .first()
+            .result.generatedFiles.keys shouldContain "kotlin/fixture/AChain3.kt"
         // 各ステップの増分の結果 = 同じ状態をクリーンに回した KSP2 の結果
         incremental.zip(clean).forEach { (i, c) ->
             i.result.isSuccess shouldBe true
             i.result.generatedFiles shouldBe c.result.generatedFiles
         }
-        incremental[2].result.generatedFiles.keys.none { it.endsWith("AChain2.kt") } shouldBe true
+        incremental[2]
+            .result.generatedFiles.keys
+            .none { it.endsWith("AChain2.kt") } shouldBe true
     }
 
     case("TST-06", "Gradle TestKit でフィクスチャプロジェクトを作ってビルドする補助がある", pending = PendingCase(Milestone.M2)) {
@@ -203,14 +217,23 @@ class TestingFrameworkE2ETest : E2ESpec({
             listOf("before", "after").associateWith { name ->
                 val dir = Files.createTempDirectory("acg-migrate-kct-$name").toFile()
                 copyProject(docs.resolve(name), dir)
-                val result = GradleRunner.create().withProjectDir(dir).withArguments("test", "--stacktrace").forwardOutput().build()
+                val result =
+                    GradleRunner
+                        .create()
+                        .withProjectDir(dir)
+                        .withArguments("test", "--stacktrace")
+                        .forwardOutput()
+                        .build()
                 result.task(":test")?.outcome shouldBe TaskOutcome.SUCCESS
                 TestReport.read(dir.resolve("build/test-results"))
             }
         counts.getValue("after").tests shouldBeGreaterThan 0
         counts.getValue("after") shouldBe counts.getValue("before")
         // after は本家への依存を残していない
-        docs.resolve("after").walkTopDown().filter { it.isFile && it.name.endsWith(".kts") }
+        docs
+            .resolve("after")
+            .walkTopDown()
+            .filter { it.isFile && it.name.endsWith(".kts") }
             .none { "com.github.tschuchortdev" in it.readText() || "dev.zacsweers.kctfork" in it.readText() } shouldBe true
     }
 })

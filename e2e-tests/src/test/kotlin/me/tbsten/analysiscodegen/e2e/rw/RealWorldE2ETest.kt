@@ -211,7 +211,13 @@ class RealWorldE2ETest : E2ESpec({
         val sample = RealWorldSample.open("ROM", "android")
         sample.shouldPassRuntimeTests(SampleEngine.Bridge, module = "app", testTask = "testDebugUnitTest")
         // Room は @Database ごとに <Database>_Impl を作る
-        sample.generated(SampleEngine.Bridge, "debug", module = "app").keys.any { it.endsWith("_Impl.kt") || it.endsWith("_Impl.java") } shouldBe
+        sample
+            .generated(
+                SampleEngine.Bridge,
+                "debug",
+                module = "app",
+            ).keys
+            .any { it.endsWith("_Impl.kt") || it.endsWith("_Impl.java") } shouldBe
             true
     }
 

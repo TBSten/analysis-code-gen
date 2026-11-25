@@ -46,7 +46,8 @@ internal object TargetProcessors {
     internal fun parse(toml: String): List<TargetProcessor> =
         toml.split("[[processor]]").drop(1).map { block ->
             val values =
-                block.lines()
+                block
+                    .lines()
                     .map { it.substringBefore(" #").trim() }
                     .filter { "=" in it && !it.startsWith("#") }
                     .associate { it.substringBefore("=").trim() to it.substringAfter("=").trim() }
@@ -168,11 +169,17 @@ internal data class TestReport(val tests: Int, val failures: Int, val errors: In
         private fun attr(
             tag: String,
             name: String,
-        ) = Regex("""\b$name="(\d+)"""").find(tag)?.groupValues?.get(1)?.toInt() ?: 0
+        ) = Regex("""\b$name="(\d+)"""")
+            .find(tag)
+            ?.groupValues
+            ?.get(1)
+            ?.toInt() ?: 0
 
         fun read(dir: File): TestReport {
             val tags =
-                dir.walkTopDown().filter { it.isFile && it.name.startsWith("TEST-") && it.extension == "xml" }
+                dir
+                    .walkTopDown()
+                    .filter { it.isFile && it.name.startsWith("TEST-") && it.extension == "xml" }
                     .flatMap { SUITE.findAll(it.readText()).map { m -> m.value } }
                     .toList()
             return TestReport(
@@ -222,7 +229,12 @@ internal object UpstreamSuite {
                 if (engine != SampleEngine.Ksp2) addAll(listOf("--init-script", init.absolutePath))
                 addAll(gradleArgs(engine))
             }
-        return GradleRunner.create().withProjectDir(dir).withArguments(args).forwardOutput().build()
+        return GradleRunner
+            .create()
+            .withProjectDir(dir)
+            .withArguments(args)
+            .forwardOutput()
+            .build()
     }
 
     private fun git(
@@ -244,14 +256,22 @@ internal fun copyProject(
     target: File,
 ) {
     source.copyRecursively(target, overwrite = true)
-    target.walkTopDown()
+    target
+        .walkTopDown()
         .filter { it.isFile && it.name.startsWith("settings") && it.name.endsWith(".gradle.kts") }
         .forEach { file ->
             val origin = source.resolve(file.relativeTo(target).path).parentFile
             val text =
                 Regex("""includeBuild\("([^"]+)"\)""").replace(file.readText()) { m ->
                     val path = m.groupValues[1]
-                    if (File(path).isAbsolute) m.value else "includeBuild(\"${origin.resolve(path).canonicalFile.invariantSeparatorsPath}\")"
+                    if (File(
+                            path,
+                        ).isAbsolute
+                    ) {
+                        m.value
+                    } else {
+                        "includeBuild(\"${origin.resolve(path).canonicalFile.invariantSeparatorsPath}\")"
+                    }
                 }
             file.writeText(text)
         }
@@ -263,7 +283,8 @@ internal fun copyProject(
  */
 internal fun publicAbi(classesDir: File): Map<String, List<String>> {
     val javap = File(System.getProperty("java.home"), "bin/javap").takeIf { it.isFile }?.path ?: "javap"
-    return classesDir.walkTopDown()
+    return classesDir
+        .walkTopDown()
         .filter { it.isFile && it.extension == "class" }
         .sortedBy { it.relativeTo(classesDir).invariantSeparatorsPath }
         .associate { file ->
@@ -271,6 +292,7 @@ internal fun publicAbi(classesDir: File): Map<String, List<String>> {
             val lines = process.inputStream.bufferedReader().readLines()
             check(process.waitFor() == 0) { "javap が失敗: $file\n${lines.joinToString("\n")}" }
             // 1 行目の "Compiled from ..." はソースファイル名なので比べない
-            file.relativeTo(classesDir).invariantSeparatorsPath to lines.filterNot { it.startsWith("Compiled from") }.map { it.trim() }.sorted()
+            file.relativeTo(classesDir).invariantSeparatorsPath to
+                lines.filterNot { it.startsWith("Compiled from") }.map { it.trim() }.sorted()
         }
 }

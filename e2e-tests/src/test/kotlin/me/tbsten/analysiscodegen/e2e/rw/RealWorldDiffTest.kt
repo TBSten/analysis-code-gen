@@ -70,13 +70,24 @@ class RealWorldDiffTest : DiffSpec({
         // Room はスキーマ JSON（room.schemaLocation）も出す。サンプルはスキーマを build/ 以下に出し、生成物と一緒に比べる
         val sample = RealWorldSample.open("ROM", "android")
         sample.generatedShouldMatchKsp2(task = "assembleDebug", module = "app", sourceSets = listOf("debug"))
-        val schemas = { e: SampleEngine -> sample.projectDir.resolve("app/build/schemas-${e.property}").walkTopDown().filter { it.isFile }.map { it.readText() }.toList() }
+        val schemas = { e: SampleEngine ->
+            sample.projectDir
+                .resolve("app/build/schemas-${e.property}")
+                .walkTopDown()
+                .filter { it.isFile }
+                .map { it.readText() }
+                .toList()
+        }
         schemas(SampleEngine.Bridge) shouldBe schemas(SampleEngine.Ksp2)
     }
 
     case("RW-DAG-B3", "Dagger / Hilt（Bridge）: 生成物が KSP2 と一致する", pending = PendingCase(Milestone.M3)) {
         RealWorldSample.open("DAG", "jvm").generatedShouldMatchKsp2()
-        RealWorldSample.open("DAG", "hilt-android").generatedShouldMatchKsp2(task = "assembleDebug", module = "app", sourceSets = listOf("debug"))
+        RealWorldSample
+            .open(
+                "DAG",
+                "hilt-android",
+            ).generatedShouldMatchKsp2(task = "assembleDebug", module = "app", sourceSets = listOf("debug"))
     }
 
     case(

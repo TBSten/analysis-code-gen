@@ -44,7 +44,14 @@ private fun applyHistory(
 ) {
     val random = Random(seed)
     val root = sourceRoot(projectDir)
-    val originals = root.walkTopDown().filter { it.isFile && it.extension == "kt" }.map { it.relativeTo(root).invariantSeparatorsPath }.sorted().toList()
+    val originals =
+        root
+            .walkTopDown()
+            .filter {
+                it.isFile && it.extension == "kt"
+            }.map { it.relativeTo(root).invariantSeparatorsPath }
+            .sorted()
+            .toList()
     check(originals.isNotEmpty()) { "サンプルに src/main/kotlin のソースが無い: $projectDir" }
     val added = mutableListOf<String>()
     repeat(STEPS_PER_HISTORY) { step ->
@@ -81,7 +88,8 @@ private data class HistoryTarget(
     val sourceSet: String = "main",
 )
 
-private val ROOM_ANDROID = HistoryTarget("ROM", sample = "android", module = "app", compileTask = ":app:compileDebugKotlin", sourceSet = "debug")
+private val ROOM_ANDROID =
+    HistoryTarget("ROM", sample = "android", module = "app", compileTask = ":app:compileDebugKotlin", sourceSet = "debug")
 
 /** [engine] でサンプルに 20 履歴を当て、各履歴の最後で「増分の生成物 = 同じ状態のクリーンビルドの生成物」を確かめる。 */
 private fun incrementalShouldEqualClean(
@@ -98,10 +106,17 @@ private fun incrementalShouldEqualClean(
         // 最終状態のソースだけを写した別ディレクトリで、クリーンにビルドする
         val cleanDir = Files.createTempDirectory("acg-rw-clean").toFile()
         copyProject(incremental.projectDir, cleanDir)
-        cleanDir.walkTopDown().filter { it.isDirectory && (it.name == "build" || it.name == ".gradle") }.toList().forEach { it.deleteRecursively() }
-        GradleRunner.create().withProjectDir(cleanDir)
+        cleanDir
+            .walkTopDown()
+            .filter { it.isDirectory && (it.name == "build" || it.name == ".gradle") }
+            .toList()
+            .forEach { it.deleteRecursively() }
+        GradleRunner
+            .create()
+            .withProjectDir(cleanDir)
             .withArguments(listOf(target.compileTask) + gradleArgs(engine))
-            .forwardOutput().build()
+            .forwardOutput()
+            .build()
 
         withClue("${target.processorId} / $engine / seed=$seed") {
             incrementalOutput shouldBe generatedFiles(cleanDir.resolve(target.module), engine, target.sourceSet)
@@ -125,6 +140,8 @@ class RealWorldIncrementalPbtTest : PbtSpec({
         "Bridge 版（6 つすべて。Room は Android サンプル）: 代表的な変更履歴（20 履歴）のあとの増分結果がクリーンビルドと一致する",
         pending = PendingCase(Milestone.M2),
     ) {
-        (listOf("CRM", "MSH", "KOI", "KIN", "DAG").map(::HistoryTarget) + ROOM_ANDROID).forEach { incrementalShouldEqualClean(it, SampleEngine.Bridge) }
+        (listOf("CRM", "MSH", "KOI", "KIN", "DAG").map(::HistoryTarget) + ROOM_ANDROID).forEach {
+            incrementalShouldEqualClean(it, SampleEngine.Bridge)
+        }
     }
 })

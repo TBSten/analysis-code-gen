@@ -55,7 +55,9 @@ private fun measureIncremental(
 
 /** F-LARGE の中の 1 ファイル（決まった位置のもの）。 */
 private fun File.someSource(): File =
-    walkTopDown().filter { it.isFile && it.extension == "kt" && "/src/main/" in it.invariantSeparatorsPath }.sortedBy { it.path }.elementAt(7)
+    walkTopDown().filter { it.isFile && it.extension == "kt" && "/src/main/" in it.invariantSeparatorsPath }.sortedBy { it.path }.elementAt(
+        7,
+    )
 
 class PerformanceBenchTest : BenchSpec({
     case("PERF-01", "Cold start（プロセス・ClassLoader・AA 環境の初期化）が KSP2 以下", pending = PendingCase(Milestone.M2)) {
@@ -88,7 +90,16 @@ class PerformanceBenchTest : BenchSpec({
         bridgeShouldNotBeSlowerThanKsp2("PERF-04") { engine ->
             val timing = measureFullCodegen(dir, engine, "F-JVM chain5/$engine")
             // 本当に 5 段できている（連鎖が途中で止まって速く見えるのを防ぐ）
-            val generated = dir.walkTopDown().filter { it.isFile && it.name.startsWith("PerfChainRoot1Chain") }.map { it.nameWithoutExtension }.toSet()
+            val generated =
+                dir
+                    .walkTopDown()
+                    .filter {
+                        it.isFile &&
+                            it.name.startsWith(
+                                "PerfChainRoot1Chain",
+                            )
+                    }.map { it.nameWithoutExtension }
+                    .toSet()
             generated shouldBe (1..5).map { "PerfChainRoot1Chain$it" }.toSet()
             timing
         }
@@ -101,14 +112,24 @@ class PerformanceBenchTest : BenchSpec({
         val added = target.resolveSibling("PerfAdded.kt")
 
         bridgeShouldNotBeSlowerThanKsp2("PERF-05") { engine ->
-            measureIncremental(large, engine, "modify", apply = { target.appendText("\nfun perfModified() = 1\n") }, revert = { target.writeText(original) })
+            measureIncremental(large, engine, "modify", apply = {
+                target.appendText("\nfun perfModified() = 1\n")
+            }, revert = { target.writeText(original) })
         }
         bridgeShouldNotBeSlowerThanKsp2("PERF-05") { engine ->
             measureIncremental(
                 large,
                 engine,
                 "add",
-                apply = { added.writeText("package ${original.lineSequence().first { it.startsWith("package ") }.removePrefix("package ")}\n\nclass PerfAdded\n") },
+                apply = {
+                    added.writeText(
+                        "package ${original.lineSequence().first {
+                            it.startsWith(
+                                "package ",
+                            )
+                        }.removePrefix("package ")}\n\nclass PerfAdded\n",
+                    )
+                },
                 revert = { added.delete() },
             )
         }
@@ -188,7 +209,13 @@ class PerformanceBenchTest : BenchSpec({
 
         fun check(currentMs: Int): Int {
             val current = work.resolve("current-$currentMs.tsv").apply { writeText(header + "PERF-03\tB\tK\t$currentMs\t1100\t0\n") }
-            val process = ProcessBuilder("python3", script.absolutePath, base.absolutePath, current.absolutePath).redirectErrorStream(true).start()
+            val process =
+                ProcessBuilder(
+                    "python3",
+                    script.absolutePath,
+                    base.absolutePath,
+                    current.absolutePath,
+                ).redirectErrorStream(true).start()
             process.inputStream.bufferedReader().readText()
             return process.waitFor()
         }
@@ -197,6 +224,12 @@ class PerformanceBenchTest : BenchSpec({
         check(1100) shouldBe 1 // ちょうど 10% 遅い
         check(1500) shouldBe 1
         // CI の定期ベンチがこの script を呼んでいる（呼ばれていなければ検出は動いていない）
-        repoRoot.resolve(".github/workflows").listFiles().orEmpty().any { it.readText().contains("scripts/bench/check_regression.py") } shouldBe true
+        repoRoot
+            .resolve(
+                ".github/workflows",
+            ).listFiles()
+            .orEmpty()
+            .any { it.readText().contains("scripts/bench/check_regression.py") } shouldBe
+            true
     }
 })
