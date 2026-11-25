@@ -1,0 +1,102 @@
+---
+title: 3. Native Processor に書き換える
+description: KSP の API を外し、AnalysisCodegenProcessor として書き直します。
+fixture: fixtures/docs/migration
+---
+
+:::note[レビューで判断してほしいこと]
+- `getSymbolsWithAnnotation` に当たる API を用意せず、`newFiles` を AA で絞ってもらう形でよいか
+:::
+
+KSP の API をすべて外し、Analysis API（AA）と PSI だけで書きます。Bridge が要らなくなり、生成物の依存も細かく書けます。
+
+## 依存を替える
+
+`symbol-processing-api` と `ksp-bridge-api` を外し、`processor-api` に替えます。
+
+```kotlin title="hello-native-processor/build.gradle.kts"
+dependencies {
+    // symbol-processing-api と ksp-bridge-api は要らなくなる
+    compileOnly("me.tbsten.analysiscodegen:processor-api:0.1.0")
+}
+```
+
+使う側は plugin を `me.tbsten.analysiscodegen` に戻せます。ほかの KSP Processor を使っていなければ Bridge は要りません。
+
+## Provider を替える
+
+`SymbolProcessorProvider` を `AnalysisCodegenProcessorProvider` に替えます。オプションとロガーは環境から受け取ります。
+
+```kotlin title="hello-native-processor/src/main/kotlin/com/example/hello/HelloProcessorProvider.kt"
+class HelloProcessorProvider : AnalysisCodegenProcessorProvider {
+    override fun create(environment: AnalysisCodegenProcessorEnvironment): AnalysisCodegenProcessor =
+        HelloProcessor(
+            logger = environment.logger,
+            verbose = environment.options["hello.verbose"] == "true",
+        )
+}
+```
+
+`META-INF/services` のファイル名も `me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessorProvider` に替えます。
+
+## 注釈の付いたクラスを探す
+
+`getSymbolsWithAnnotation` の代わりに、`newFiles` を AA で解析して絞ります。
+
+```kotlin title="hello-native-processor/src/main/kotlin/com/example/hello/HelloProcessor.kt"
+override fun process(context: AnalysisCodegenRoundContext) {
+    for (file in context.newFiles) {
+        analyze(file) {
+            file.declarations.filterIsInstance<KtClassOrObject>()
+                .filter { it.classSymbol?.annotations?.contains(HELLO) == true }
+                .forEach { generateHello(context, file, it.name!!, greeting(it)) }
+        }
+    }
+}
+```
+
+Hybrid で `withAnalysis` の中に書いていた処理は、`analyze` の中にそのまま移せます。
+
+## 生成する
+
+`createNewFile` と `Dependencies(false, file)` は、`generateKotlin` と `Dependencies.isolating(file)` に替えます。
+
+```kotlin title="hello-native-processor/src/main/kotlin/com/example/hello/HelloProcessor.kt"
+context.codeGenerator.generateKotlin(
+    packageName = pkg,
+    fileName = "${name}Hello",
+    dependencies = Dependencies.isolating(file),
+    content = "package $pkg\n\nfun $name.hello(): String = \"${greeting ?: "Hello"}, $name!\"\n",
+)
+```
+
+## API の対応表
+
+| KSP | Native |
+|---|---|
+| `SymbolProcessor.process(resolver)` | `AnalysisCodegenProcessor.process(context)` |
+| `resolver.getNewFiles()` / `getAllFiles()` | `context.newFiles` / `context.allFiles` |
+| `getSymbolsWithAnnotation(...)` | `newFiles` を `analyze` して注釈で絞る |
+| `process` の戻り値（持ち越し） | `context.defer(pointer)` |
+| `Dependencies(false, file)` | `Dependencies.isolating(file)` |
+| `Dependencies(true, ...)` | `Dependencies.aggregating(...)` |
+| `KSClassDeclaration` | `KtClassOrObject` と `KaClassSymbol` |
+
+```kotlin
+// 持ち越すときは KaSymbol ではなく Pointer を渡す
+context.defer(classSymbol.createPointer())
+```
+
+## まとめ
+
+| やること | 移行前 → 移行後 |
+|---|---|
+| 依存 | `symbol-processing-api` → `processor-api` |
+| Provider | `SymbolProcessorProvider` → `AnalysisCodegenProcessorProvider` |
+| 探し方 | `getSymbolsWithAnnotation` → `newFiles` + `analyze` |
+| 生成 | `createNewFile` → `generateKotlin` |
+
+## 次のステップ
+
+- [Processor をテストする](/analysis-code-gen/testing/): 書き換えた Processor をテストする
+- [クイックスタート](/analysis-code-gen/start/quick-start/): Native Processor の全体

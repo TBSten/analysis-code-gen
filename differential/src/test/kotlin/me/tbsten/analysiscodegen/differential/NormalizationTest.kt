@@ -5,11 +5,12 @@ import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
+import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
-import io.kotest.property.checkAll
+import me.tbsten.analysiscodegen.pbt.run.acgCheckAll
 import me.tbsten.analysiscodegen.testfoundation.UnitSpec
 
 private val normalizer = Normalizer.default()
@@ -41,7 +42,8 @@ class NormalizationTest : UnitSpec({
         // ---- 消す: 非本質的な差 ----
 
         // 改行コード・行末の空白・末尾の空行
-        checkAll(200, linesArb) { lines ->
+        // 固定 seed・回帰の再生は PBT 基盤（ADR-022）に任せる
+        acgCheckAll("XD-16 改行と行末の空白の違いは消える", linesArb, prIterations = 200) { lines ->
             val lf = lines.joinToString("\n", postfix = "\n")
             val crlf = lines.joinToString("\r\n") { "$it  " } + "\r\n\r\n"
             same(output(mapOf("kotlin/A.kt" to lf)), output(mapOf("kotlin/A.kt" to crlf))) shouldBe true
@@ -100,7 +102,7 @@ class NormalizationTest : UnitSpec({
         // ---- 残す: 本質的な差 ----
 
         // 中身の 1 文字の違い（行頭のインデントを含む）
-        checkAll(200, linesArb, Arb.int(0..1000)) { lines, seed ->
+        acgCheckAll("XD-16 中身の 1 文字の違いは残る", Arb.bind(linesArb, Arb.int(0..1000)) { l, i -> l to i }, prIterations = 200) { (lines, seed) ->
             val text = lines.joinToString("\n", postfix = "\n")
             val positions = text.indices.filter { text[it] != '\n' }
             if (positions.isNotEmpty()) {

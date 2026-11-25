@@ -251,12 +251,12 @@ DOC-03,E,M2,missing,,0,
 DOC-04,U,M2,missing,,0,
 DOC-05,E,M3,missing,,0,
 LIC-01,U,M1,missing,,0,
-PBT-01,U,M1,missing,,0,
+PBT-01,U,M1,enabled,,1,me.tbsten.analysiscodegen.pbt.source.GeneratedProjectCompilesTest
 PBT-03,P,M2,missing,,0,
 PBT-04,P,M2,missing,,0,
 PBT-05,P,M2,missing,,0,
-PBT-06,U,M1,missing,,0,
-XD-01,U,M1,missing,,0,
+PBT-06,U,M1,enabled,,1,me.tbsten.analysiscodegen.pbt.run.ShrinkAndSeedTest
+XD-01,U,M1,enabled,,1,me.tbsten.analysiscodegen.pbt.catalog.CatalogArbTest
 XD-02,E,M1,missing,,0,
 XD-03,E,M1,enabled,,1,me.tbsten.analysiscodegen.differential.DifferentialRunnerTest
 XD-04,D,M2,missing,,0,

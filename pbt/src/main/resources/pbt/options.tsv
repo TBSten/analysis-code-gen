@@ -1,0 +1,26 @@
+# Processor ごとのオプション表（ACG-40 初版、ADR-022 の 7 節）。列: Processor（ADR-019 の ID）・名前・値（カンマ区切り、先頭が既定値）
+# 出所: カタログの index.json で実際に使われていた値（cream・Koin・Moshi）と各 Processor の README。
+# 差分ハーネス（ACG-42）が K で全値を回し、受け付けない値が見つかったらここを直す。
+CRM	cream.copyFunNamePrefix	copyTo,to,into
+CRM	cream.copyFunNamingStrategy	under-package,full-name,inner-name,simple-name
+CRM	cream.escapeDot	lower-camel-case,replace-to-underscore
+CRM	cream.defaultVisibility	PUBLIC,INTERNAL
+CRM	cream.notCopyToObject	false,true
+CRM	cream.autoValueClassMapping	false,true
+MSH	moshi.generated	javax.annotation.processing.Generated,javax.annotation.Generated
+MSH	moshi.generateProguardRules	true,false
+MSH	moshi.instantiateAnnotations	true,false
+KOI	KOIN_CONFIG_CHECK	false,true
+KOI	KOIN_DEFAULT_MODULE	false,true
+KOI	KOIN_LOG_TIMES	false,true
+KOI	KOIN_USE_COMPOSE_VIEWMODEL	false,true
+KIN	me.tatarka.inject.generateCompanionExtensions	false,true
+KIN	me.tatarka.inject.enableJavaxAnnotations	false,true
+KIN	me.tatarka.inject.dumpGraph	false,true
+DAG	dagger.fastInit	disabled,enabled
+DAG	dagger.formatGeneratedSource	enabled,disabled
+DAG	dagger.useBindingGraphFix	disabled,enabled
+ROM	room.incremental	true,false
+ROM	room.generateKotlin	true,false
+ROM	room.expandProjection	false,true
+ROM	room.schemaLocation	(unset),schemas
