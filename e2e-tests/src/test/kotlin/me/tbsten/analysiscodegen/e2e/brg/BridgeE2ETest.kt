@@ -25,7 +25,7 @@ import me.tbsten.analysiscodegen.e2e.support.codegenTask
 import me.tbsten.analysiscodegen.e2e.support.mappedClass
 import me.tbsten.analysiscodegen.e2e.support.probeArray
 import me.tbsten.analysiscodegen.e2e.support.probeValue
-import me.tbsten.analysiscodegen.e2e.support.readProbe
+import me.tbsten.analysiscodegen.e2e.support.readProbeLines
 import me.tbsten.analysiscodegen.testfoundation.DiffSpec
 import me.tbsten.analysiscodegen.testfoundation.E2ESpec
 import me.tbsten.analysiscodegen.testfoundation.Milestone
@@ -122,7 +122,7 @@ class BridgeE2ETest : E2ESpec({
                 kotlin("src/main/kotlin/com/example/A.kt", "package com.example\n\nclass A")
             }
         fixture.build(codegenTask(Acg45Engine.Bridge)).task(codegenTask(Acg45Engine.Bridge))?.outcome shouldBe TaskOutcome.SUCCESS
-        val create = readProbe(probe).first { probeValue(it, "event") == "create" }
+        val create = readProbeLines(probe).first { probeValue(it, "event") == "create" }
         probeValue(create, "frontend") shouldBe "ksp"
         create shouldContain "\"brg13.key\":\"hello world\""
         create shouldContain "\"tp.processors\":\"Probe\""
@@ -151,7 +151,7 @@ class BridgeE2ETest : E2ESpec({
         fixture.build(task)
         fixture.kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A", props = "val id: Int, val name: String"))
         fixture.build(task)
-        val lastProcess = readProbe(probe).last { probeValue(it, "event") == "process" && probeValue(it, "round") == "1" }
+        val lastProcess = readProbeLines(probe).last { probeValue(it, "event") == "process" && probeValue(it, "round") == "1" }
         probeArray(
             lastProcess,
             "newFiles",

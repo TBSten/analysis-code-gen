@@ -6,7 +6,7 @@ import io.kotest.matchers.shouldBe
 import me.tbsten.analysiscodegen.e2e.support.Acg45Repo
 import me.tbsten.analysiscodegen.e2e.support.mappedClass
 import me.tbsten.analysiscodegen.e2e.support.probeValue
-import me.tbsten.analysiscodegen.e2e.support.readProbe
+import me.tbsten.analysiscodegen.e2e.support.readProbeLines
 import me.tbsten.analysiscodegen.testfoundation.DiffSpec
 import me.tbsten.analysiscodegen.testfoundation.E2ESpec
 import me.tbsten.analysiscodegen.testfoundation.Milestone
@@ -177,7 +177,7 @@ class BridgeKmpModeE2ETest : E2ESpec({
         outputs.keys shouldContain "jsMain/OnJsMapper.kt"
         // Common.kt を処理した Processor は 1 つ（commonMain）だけ
         val processedCommon =
-            readProbe(probe).filter {
+            readProbeLines(probe).filter {
                 probeValue(it, "event") == "process" &&
                     it.contains("Common.kt") &&
                     it.contains("\"newFiles\":[\"")

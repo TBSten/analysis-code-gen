@@ -157,7 +157,7 @@ fun codegenTask(
     }
 
 /** TP-Probe の記録（JSON Lines）を 1 行ずつ返す。 */
-fun readProbe(file: File): List<String> = if (file.isFile) file.readLines().filter { it.isNotBlank() } else emptyList()
+fun readProbeLines(file: File): List<String> = if (file.isFile) file.readLines().filter { it.isNotBlank() } else emptyList()
 
 /** TP-Probe の 1 行から、配列のフィールド（`newFiles` など）を取り出す。値は JSON の文字列のまま（エスケープは戻さない）。 */
 fun probeArray(

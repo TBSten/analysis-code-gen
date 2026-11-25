@@ -17,7 +17,7 @@ import me.tbsten.analysiscodegen.e2e.support.generatedNames
 import me.tbsten.analysiscodegen.e2e.support.mappedClass
 import me.tbsten.analysiscodegen.e2e.support.probeArray
 import me.tbsten.analysiscodegen.e2e.support.probeValue
-import me.tbsten.analysiscodegen.e2e.support.readProbe
+import me.tbsten.analysiscodegen.e2e.support.readProbeLines
 import me.tbsten.analysiscodegen.testfoundation.E2ESpec
 import me.tbsten.analysiscodegen.testfoundation.Milestone
 import me.tbsten.analysiscodegen.testfoundation.PendingCase
@@ -36,7 +36,7 @@ private fun probeFile(): File = Files.createTempFile("acg-probe", ".jsonl").toFi
 
 /** 最後の実行（最後の create 以降）のラウンド 1 で処理したファイル名。 */
 private fun lastRound1Files(probe: File): Set<String> {
-    val lines = readProbe(probe)
+    val lines = readProbeLines(probe)
     val lastCreate = lines.indexOfLast { probeValue(it, "event") == "create" }
     return lines
         .drop(lastCreate + 1)

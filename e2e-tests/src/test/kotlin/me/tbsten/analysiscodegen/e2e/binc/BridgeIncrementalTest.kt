@@ -14,7 +14,7 @@ import me.tbsten.analysiscodegen.e2e.support.codegenTask
 import me.tbsten.analysiscodegen.e2e.support.mappedClass
 import me.tbsten.analysiscodegen.e2e.support.probeArray
 import me.tbsten.analysiscodegen.e2e.support.probeValue
-import me.tbsten.analysiscodegen.e2e.support.readProbe
+import me.tbsten.analysiscodegen.e2e.support.readProbeLines
 import me.tbsten.analysiscodegen.testfoundation.DiffSpec
 import me.tbsten.analysiscodegen.testfoundation.E2ESpec
 import me.tbsten.analysiscodegen.testfoundation.Milestone
@@ -31,7 +31,7 @@ private fun probeFile(): File = Files.createTempFile("acg-probe", ".jsonl").toFi
 
 /** 最後の実行のラウンド 1 の newFiles（ファイル名、TpAnnotations.kt を除く）。 */
 private fun lastDirty(probe: File): Set<String> {
-    val lines = readProbe(probe)
+    val lines = readProbeLines(probe)
     val lastCreate = lines.indexOfLast { probeValue(it, "event") == "create" }
     return lines
         .drop(lastCreate + 1)
