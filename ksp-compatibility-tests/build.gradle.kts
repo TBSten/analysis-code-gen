@@ -14,8 +14,9 @@ dependencies {
     "ksptImplementation"(libs.ksp.aa.embeddable)
     "ksptImplementation"(kotlin("reflect"))
 
-    testImplementation(project(":ksp-bridge"))
-    testImplementation(project(":testing"))
+    // K 側はコンパイラ（kct fork が持つ kotlin-compiler-embeddable）と KSP2 だけで動く。
+    // :ksp-bridge（AA 本体に依存）は Bridge を KsptEngine.Bridge につなぐとき（P2）に足す
+    testImplementation(project(":testing-kct"))
     testImplementation(kspt.output)
     testImplementation(libs.ksp.api)
     testImplementation(libs.ksp.aa.embeddable)
