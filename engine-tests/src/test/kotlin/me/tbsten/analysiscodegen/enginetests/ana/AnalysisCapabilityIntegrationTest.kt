@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.analysis.api.annotations.KaAnnotationValue
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassKind
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.KaNamedClassSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolModality
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbolOrigin
 import org.jetbrains.kotlin.analysis.api.types.KaClassType
 import org.jetbrains.kotlin.analysis.api.types.KaErrorType
@@ -297,7 +298,7 @@ class AnalysisCapabilityIntegrationTest : IntegrationSpec({
                 val dir = findClass(cid("a.Dir")) as KaNamedClassSymbol
                 listOf(
                     id.isInline,
-                    shape.classKind == KaClassKind.INTERFACE && shape.modality == org.jetbrains.kotlin.analysis.api.symbols.KaSymbolModality.SEALED,
+                    shape.classKind == KaClassKind.INTERFACE && shape.modality == KaSymbolModality.SEALED,
                     shape.sealedClassInheritors.map { it.classId!!.shortClassName.asString() }.sorted() == listOf("Circle", "Empty"),
                     empty.classKind == KaClassKind.OBJECT && empty.isData,
                     dir.staticDeclaredMemberScope
