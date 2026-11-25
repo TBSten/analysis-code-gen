@@ -19,7 +19,7 @@ Processor が使う Analysis API（AA）は、プロジェクトの Kotlin Gradl
 plugins {
     // 利用者の Kotlin。analysisCodeGen は同じ版の Analysis API を読み込む
     kotlin("jvm") version "2.4.21"
-    id("me.tbsten.analysiscodegen") version "0.1.0"
+    id("me.tbsten.analysis.code.gen") version "0.1.0"
 }
 ```
 
@@ -56,7 +56,9 @@ analysisCodeGen {
 
 ## Processor を作るとき
 
-Processor は `processor-api` を通して、2.4.0 の AA でコンパイルされます。実行時の版は `environment.kotlinVersion` で分かります。
+Processor は `analysis-code-gen-processor-api` を通して、2.4.0 の AA でコンパイルされます。
+
+実行時の版は `environment.kotlinVersion` で分かります。
 
 ```kotlin title="greeting-processor/src/main/kotlin/com/example/greeting/KotlinVersionCheck.kt"
 fun supportsNewSyntax(environment: AnalysisCodegenProcessorEnvironment): Boolean {
@@ -66,7 +68,7 @@ fun supportsNewSyntax(environment: AnalysisCodegenProcessorEnvironment): Boolean
 
 2.4.0 の AA でコンパイルした Processor が対応範囲のすべての版で動くことは、互換テストで確かめます。
 
-`processor-api` と合わない Processor は、Processor 名付きのエラーで止まります。
+`analysis-code-gen-processor-api` と合わない Processor は、Processor 名付きのエラーで止まります。
 
 ## まとめ
 
