@@ -1,9 +1,9 @@
 package fixture.kmp
 
-import me.tbsten.analysiscodegen.tp.Chain
-import me.tbsten.analysiscodegen.tp.DeferUntil
-import me.tbsten.analysiscodegen.tp.GenerateActual
-import me.tbsten.analysiscodegen.tp.Mapped
+import me.tbsten.analysis.code.gen.tp.Chain
+import me.tbsten.analysis.code.gen.tp.DeferUntil
+import me.tbsten.analysis.code.gen.tp.GenerateActual
+import me.tbsten.analysis.code.gen.tp.Mapped
 
 /** commonMain に 1 回だけ SharedMapper を作り、全ターゲットから使う（KMP-01）。 */
 @Mapped

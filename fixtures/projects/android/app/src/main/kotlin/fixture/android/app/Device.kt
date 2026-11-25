@@ -1,8 +1,8 @@
 package fixture.android.app
 
 import fixture.android.lib.LibModel
-import me.tbsten.analysiscodegen.tp.Mapped
-import me.tbsten.analysiscodegen.tp.Registered
+import me.tbsten.analysis.code.gen.tp.Mapped
+import me.tbsten.analysis.code.gen.tp.Registered
 
 /** android.jar の型を持つ。型表記に android.content.Context が出れば boot classpath を解析できている（GRD-12）。 */
 @Mapped

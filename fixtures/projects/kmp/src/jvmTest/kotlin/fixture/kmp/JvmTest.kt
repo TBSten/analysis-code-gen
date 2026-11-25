@@ -1,6 +1,6 @@
 package fixture.kmp
 
-import me.tbsten.analysiscodegen.tp.generated.TpRegistry
+import me.tbsten.analysis.code.gen.tp.generated.TpRegistry
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

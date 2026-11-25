@@ -1,6 +1,6 @@
 package com.example.greeting
 
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessorEnvironment
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorEnvironment
 
 /** 実行中の Analysis API（= 利用者の Kotlin）の版で、使う機能を切り替える例。 */
 fun supportsNewSyntax(environment: AnalysisCodegenProcessorEnvironment): Boolean {

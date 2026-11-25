@@ -1,9 +1,9 @@
 package fixture.java
 
-import me.tbsten.analysiscodegen.tp.DeferUntil
-import me.tbsten.analysiscodegen.tp.GenerateJava
-import me.tbsten.analysiscodegen.tp.Mapped
-import me.tbsten.analysiscodegen.tp.TpResourceMarker
+import me.tbsten.analysis.code.gen.tp.DeferUntil
+import me.tbsten.analysis.code.gen.tp.GenerateJava
+import me.tbsten.analysis.code.gen.tp.Mapped
+import me.tbsten.analysis.code.gen.tp.TpResourceMarker
 
 /** Java の型を持つ。Mapper の型表記に fixture.java.JavaPerson が出れば Java の宣言を解決できている。 */
 @Mapped

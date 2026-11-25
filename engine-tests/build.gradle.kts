@@ -1,7 +1,7 @@
 // エンジン内部（analysis-code-gen-analysis-engine・analysis-code-gen-processing-engine・
 // analysis-code-gen-incremental-engine の @InternalAnalysisCodegenApi）や
 // AA の型に触れる I / U のケースを置く（ADR-034）。e2e-tests は AA なしでコンパイルできるままにする。
-// パッケージは観点ごとに分ける（me.tbsten.analysiscodegen.enginetests.<観点>）。support パッケージは ACG-44 が持つ
+// パッケージは観点ごとに分ける（me.tbsten.analysis.code.gen.enginetests.<観点>）。support パッケージは ACG-44 が持つ
 // AA のリポジトリにクラウドの Agent 環境から届かないため、このモジュールの判定は CI に任せる
 plugins {
     id("acg.tests")

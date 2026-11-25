@@ -1,9 +1,0 @@
-me.tbsten.analysiscodegen.testprocessors.native.MapperNativeProvider
-me.tbsten.analysiscodegen.testprocessors.native.RegistryNativeProvider
-me.tbsten.analysiscodegen.testprocessors.native.ChainNativeProvider
-me.tbsten.analysiscodegen.testprocessors.native.ActualNativeProvider
-me.tbsten.analysiscodegen.testprocessors.native.BodyNativeProvider
-me.tbsten.analysiscodegen.testprocessors.native.DeferNativeProvider
-me.tbsten.analysiscodegen.testprocessors.native.ResourceNativeProvider
-me.tbsten.analysiscodegen.testprocessors.native.BadNativeProvider
-me.tbsten.analysiscodegen.testprocessors.native.ProbeNativeProvider

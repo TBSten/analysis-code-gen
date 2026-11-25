@@ -7,8 +7,8 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import me.tbsten.analysiscodegen.ksp.hybrid.isAnalysisCodegenBridge
-import me.tbsten.analysiscodegen.ksp.hybrid.withAnalysis
+import me.tbsten.analysis.code.gen.ksp.hybrid.isAnalysisCodegenBridge
+import me.tbsten.analysis.code.gen.ksp.hybrid.withAnalysis
 import org.jetbrains.kotlin.analysis.api.base.KaConstantValue
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtProperty

@@ -1,7 +1,7 @@
 package fixture.android.app
 
-import me.tbsten.analysiscodegen.tp.Mapped
-import me.tbsten.analysiscodegen.tp.Registered
+import me.tbsten.analysis.code.gen.tp.Mapped
+import me.tbsten.analysis.code.gen.tp.Registered
 
 /** src/paid だけにあるクラス。paid の Variant でだけ解析される（GRD-11）。 */
 @Mapped

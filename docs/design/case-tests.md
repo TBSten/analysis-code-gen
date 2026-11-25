@@ -6,8 +6,8 @@
 
 | 種別 | モジュール | パッケージ |
 |---|---|---|
-| E・P（Gradle TestKit） | `:e2e-tests` | `me.tbsten.analysiscodegen.e2e.<観点小文字>` |
-| I・U（AA の型に触れる） | `:engine-tests` | `me.tbsten.analysiscodegen.enginetests.<観点小文字>` |
+| E・P（Gradle TestKit） | `:e2e-tests` | `me.tbsten.analysis.code.gen.e2e.<観点小文字>` |
+| I・U（AA の型に触れる） | `:engine-tests` | `me.tbsten.analysis.code.gen.enginetests.<観点小文字>` |
 
 1 クラス 1 種別。同じ観点で E と I があればクラスを分ける。
 

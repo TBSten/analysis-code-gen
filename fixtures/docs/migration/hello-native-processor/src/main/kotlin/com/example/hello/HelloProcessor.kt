@@ -1,9 +1,9 @@
 package com.example.hello
 
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessor
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenRoundContext
-import me.tbsten.analysiscodegen.processor.CodegenLogger
-import me.tbsten.analysiscodegen.processor.Dependencies
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessor
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenRoundContext
+import me.tbsten.analysis.code.gen.processor.CodegenLogger
+import me.tbsten.analysis.code.gen.processor.Dependencies
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.base.KaConstantValue

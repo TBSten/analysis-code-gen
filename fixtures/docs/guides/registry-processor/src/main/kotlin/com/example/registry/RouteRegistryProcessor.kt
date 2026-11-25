@@ -1,11 +1,11 @@
 package com.example.registry
 
 import java.io.File
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessor
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessorEnvironment
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessorProvider
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenRoundContext
-import me.tbsten.analysiscodegen.processor.Dependencies
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessor
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorEnvironment
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorProvider
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenRoundContext
+import me.tbsten.analysis.code.gen.processor.Dependencies
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName

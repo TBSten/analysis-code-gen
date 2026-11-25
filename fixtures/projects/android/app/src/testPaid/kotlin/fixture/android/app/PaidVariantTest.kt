@@ -1,6 +1,6 @@
 package fixture.android.app
 
-import me.tbsten.analysiscodegen.tp.generated.TpRegistry
+import me.tbsten.analysis.code.gen.tp.generated.TpRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

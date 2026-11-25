@@ -1,7 +1,7 @@
 package com.example.hello
 
-import me.tbsten.analysiscodegen.testing.TestEngine
-import me.tbsten.analysiscodegen.testing.runCodegenTest
+import me.tbsten.analysis.code.gen.testing.TestEngine
+import me.tbsten.analysis.code.gen.testing.runCodegenTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

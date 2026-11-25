@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "2.4.21"
-    // Bridge の plugin。本体の me.tbsten.analysiscodegen も自動で適用される
+    // Bridge の plugin。本体の me.tbsten.analysis.code.gen も自動で適用される
     id("me.tbsten.analysis.code.gen.ksp-bridge") version "0.1.0"
 }
 

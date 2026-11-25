@@ -14,7 +14,7 @@ gradlePlugin {
         // ADR-016
         create("analysisCodegen") {
             id = "me.tbsten.analysis.code.gen"
-            implementationClass = "me.tbsten.analysiscodegen.gradle.AnalysisCodegenPlugin"
+            implementationClass = "me.tbsten.analysis.code.gen.gradle.AnalysisCodegenPlugin"
         }
     }
 }

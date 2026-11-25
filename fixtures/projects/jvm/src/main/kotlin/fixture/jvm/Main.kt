@@ -1,6 +1,6 @@
 package fixture.jvm
 
-import me.tbsten.analysiscodegen.tp.generated.TpRegistry
+import me.tbsten.analysis.code.gen.tp.generated.TpRegistry
 
 /** 生成物を使う。KSP 版がある TP の生成物だけを参照する（両方のエンジンで同じソースをビルドするため）。 */
 fun describe(): List<String> =

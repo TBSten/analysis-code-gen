@@ -9,7 +9,7 @@ UPSTREAM.properties の tag / commit を書き換えてからこのスクリプ�
 
 やること
   - core/src/main と ksp/src/main の .kt を analysis-code-gen-testing-kct/src/main/kotlin/... へコピーする
-  - パッケージを me.tbsten.analysiscodegen.testing.kct（kapt は .kapt）へ移す
+  - パッケージを me.tbsten.analysis.code.gen.testing.kct（kapt は .kapt）へ移す
   - @AutoService を外す（サービス登録は analysis-code-gen-testing-kct/src/main/resources/META-INF/services に手書き）
   - コンパイラプラグイン ID を本家と衝突しないものに変える
   - 先頭に MPL-2.0 の表示と Ported-From / Modified-By / Modifications を書く（LIC-01）
@@ -27,8 +27,8 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-TARGET_ROOT = ROOT / "analysis-code-gen-testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct"
-NEW_PKG = "me.tbsten.analysiscodegen.testing.kct"
+TARGET_ROOT = ROOT / "analysis-code-gen-testing-kct/src/main/kotlin/me/tbsten/analysis/code/gen/testing/kct"
+NEW_PKG = "me.tbsten.analysis.code.gen.testing.kct"
 
 # 長いものから置き換える
 PACKAGE_REWRITES = [
@@ -88,7 +88,7 @@ def transform(text: str) -> str:
         text = text.replace(old, new)
     text = re.sub(r"^import com\.google\.auto\.service\.AutoService\n", "", text, flags=re.MULTILINE)
     text = re.sub(r"^@AutoService\([^)]*\)\n", "", text, flags=re.MULTILINE)
-    text = text.replace('"dev.zacsweers.kotlincompiletesting"', '"me.tbsten.analysiscodegen.testing.kct"')
+    text = text.replace('"dev.zacsweers.kotlincompiletesting"', '"me.tbsten.analysis.code.gen.testing.kct"')
     return text
 
 
