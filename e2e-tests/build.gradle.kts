@@ -22,6 +22,12 @@ tasks.withType<Test>().configureEach {
     providers.gradleProperty("acg.kotlin").orNull?.let { systemProperty("acg.kotlin", it) }
     providers.gradleProperty("acg.mavenMirror").orNull?.let { systemProperty("acg.mavenMirror", it) }
     // ACG-46: CLI の実行時 classpath（ADR-040）
-    inputs.files(acgCliRuntime).withPropertyName("acgCliRuntime").withNormalizer(ClasspathNormalizer::class)
-    jvmArgumentProviders += CommandLineArgumentProvider { listOf("-Dacg.cli.classpath=${acgCliRuntime.asPath}") }
+    jvmArgumentProviders += CliClasspathArgument(acgCliRuntime)
+}
+
+/** CLI の実行時 classpath を system property で渡す。構成キャッシュに載るよう、スクリプトを参照しないクラスにする。 */
+class CliClasspathArgument(
+    @get:Classpath val classpath: FileCollection,
+) : CommandLineArgumentProvider {
+    override fun asArguments(): Iterable<String> = listOf("-Dacg.cli.classpath=${classpath.asPath}")
 }
