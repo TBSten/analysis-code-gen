@@ -357,7 +357,7 @@ class GradleJvmE2ETest : E2ESpec({
                                     if (context.round != 1) return
                                     // Processor の ClassLoader から見える Guava の版を出力する
                                     val version = com.google.common.base.Strings::class.java.`package`.implementationVersion ?: "unknown"
-                                    context.codeGenerator.generateKotlin("gen", "GuavaVersion", Dependencies.all(), "package gen\nconst val GUAVA = \"${'$'}version\"\n")
+                                    context.codeGenerator.generateKotlin("gen", "GuavaVersion", Dependencies.all, "package gen\nconst val GUAVA = \"${'$'}version\"\n")
                                 }
                             }
                     }
@@ -498,7 +498,7 @@ class GradleJvmE2ETest : E2ESpec({
                         override fun create(environment: AnalysisCodegenProcessorEnvironment) =
                             object : AnalysisCodegenProcessor {
                                 override fun process(context: AnalysisCodegenRoundContext) {
-                                    if (context.round == 1) context.codeGenerator.generateKotlin("gen", "Hello", Dependencies.all(), "package gen\nobject Hello")
+                                    if (context.round == 1) context.codeGenerator.generateKotlin("gen", "Hello", Dependencies.all, "package gen\nobject Hello")
                                 }
                             }
                     }
@@ -562,7 +562,7 @@ class GradleJvmE2ETest : E2ESpec({
                                     if (context.round != 1) return
                                     val max = Runtime.getRuntime().maxMemory()
                                     val marker = System.getProperty("acg.e2e.marker") ?: "none"
-                                    context.codeGenerator.generateKotlin("gen", "JvmInfo", Dependencies.all(), "package gen\nconst val MAX = ${'$'}{max}L\nconst val MARKER = \"${'$'}marker\"\n")
+                                    context.codeGenerator.generateKotlin("gen", "JvmInfo", Dependencies.all, "package gen\nconst val MAX = ${'$'}{max}L\nconst val MARKER = \"${'$'}marker\"\n")
                                 }
                             }
                     }
