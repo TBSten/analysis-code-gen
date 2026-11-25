@@ -19,43 +19,45 @@ import javax.inject.Inject
  * }
  * ```
  */
-public abstract class AnalysisCodegenExtension @Inject constructor(
-    objects: ObjectFactory,
-) {
-    /** 実行する AA のバージョン。省略時は利用者の KGP と同じ（ADR-011）。 */
-    public abstract val analysisApiVersion: Property<String>
+public abstract class AnalysisCodegenExtension
+    @Inject
+    constructor(
+        objects: ObjectFactory,
+    ) {
+        /** 実行する AA のバージョン。省略時は利用者の KGP と同じ（ADR-011）。 */
+        public abstract val analysisApiVersion: Property<String>
 
-    /** 既定 100（ADR-014）。 */
-    public abstract val maxRounds: Property<Int>
+        /** 既定 100（ADR-014）。 */
+        public abstract val maxRounds: Property<Int>
 
-    /** 最終ラウンドで Deferred が残ったときの扱い。既定 [DeferredSeverity.Error]。 */
-    public abstract val unresolvedDeferred: Property<DeferredSeverity>
+        /** 最終ラウンドで Deferred が残ったときの扱い。既定 [DeferredSeverity.Error]。 */
+        public abstract val unresolvedDeferred: Property<DeferredSeverity>
 
-    /** 全実行単位に渡すオプション。実行単位の指定が優先する。 */
-    public abstract val args: MapProperty<String, String>
+        /** 全実行単位に渡すオプション。実行単位の指定が優先する。 */
+        public abstract val args: MapProperty<String, String>
 
-    public fun arg(
-        key: String,
-        value: String,
-    ): Unit = TODO()
+        public fun arg(
+            key: String,
+            value: String,
+        ): Unit = TODO()
 
-    @get:Nested
-    public abstract val worker: WorkerSpec
+        @get:Nested
+        public abstract val worker: WorkerSpec
 
-    public fun worker(action: Action<in WorkerSpec>): Unit = TODO()
+        public fun worker(action: Action<in WorkerSpec>): Unit = TODO()
 
-    /** Kotlin の SourceSet を遅延で写したもの。Android（AGP 単体）の SourceSet は含まない。 */
-    public val sourceSets: NamedDomainObjectContainer<AnalysisCodegenSourceSetSpec> =
-        objects.domainObjectContainer(AnalysisCodegenSourceSetSpec::class.java)
+        /** Kotlin の SourceSet を遅延で写したもの。Android（AGP 単体）の SourceSet は含まない。 */
+        public val sourceSets: NamedDomainObjectContainer<AnalysisCodegenSourceSetSpec> =
+            objects.domainObjectContainer(AnalysisCodegenSourceSetSpec::class.java)
 
-    public fun sourceSets(action: Action<in NamedDomainObjectContainer<AnalysisCodegenSourceSetSpec>>): Unit = TODO()
+        public fun sourceSets(action: Action<in NamedDomainObjectContainer<AnalysisCodegenSourceSetSpec>>): Unit = TODO()
 
-    /** Compilation（`<target><Compilation>`、Android は Variant）を遅延で写したもの。 */
-    public val compilations: NamedDomainObjectContainer<AnalysisCodegenCompilationSpec> =
-        objects.domainObjectContainer(AnalysisCodegenCompilationSpec::class.java)
+        /** Compilation（`<target><Compilation>`、Android は Variant）を遅延で写したもの。 */
+        public val compilations: NamedDomainObjectContainer<AnalysisCodegenCompilationSpec> =
+            objects.domainObjectContainer(AnalysisCodegenCompilationSpec::class.java)
 
-    public fun compilations(action: Action<in NamedDomainObjectContainer<AnalysisCodegenCompilationSpec>>): Unit = TODO()
-}
+        public fun compilations(action: Action<in NamedDomainObjectContainer<AnalysisCodegenCompilationSpec>>): Unit = TODO()
+    }
 
 public enum class DeferredSeverity { Error, Warning }
 
