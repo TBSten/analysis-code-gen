@@ -157,7 +157,7 @@ public class BodyNativeProvider : TpNativeProvider(TpId.Body) {
                                 .map { fn ->
                                     val callees =
                                         fn.bodyExpression?.collectDescendantsOfType<KtCallExpression>().orEmpty().mapNotNull { call ->
-                                            when (val callee = call.resolveToCall()?.successfulFunctionCallOrNull()?.partiallyAppliedSymbol?.symbol) {
+                                            when (val callee = call.resolveToCall()?.successfulFunctionCallOrNull()?.partiallyAppliedSymbol?.signature?.symbol) {
                                                 is KaConstructorSymbol -> callee.containingClassId?.asFqNameString()?.let { "$it.<init>" }
                                                 is KaNamedFunctionSymbol -> callee.callableId?.asSingleFqName()?.asString()
                                                 else -> null
