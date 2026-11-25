@@ -5,7 +5,7 @@ fixture: fixtures/docs/install
 ---
 
 :::note[レビューで判断してほしいこと]
-- AA が Maven Central に無いため、使う側にも JetBrains のリポジトリを 3 つ足してもらう案でよいか（plugin 側で吸収する案もある）
+- AA が Maven Central に無いため、使う側にも JetBrains のリポジトリを 2 つ足してもらう案でよいか（plugin 側で吸収する案もある）
 - 版の `0.1.0` は仮の値（まだ公開していない）
 - Android は Variant ごとの実行だけにして、Android の SourceSet ごとの実行は出さない
 :::
@@ -26,9 +26,8 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         // Analysis API と IntelliJ Platform の置き場（Maven Central に無いため）
-        maven("https://redirector.kotlinlang.org/maven/kotlin-ide-plugin-dependencies")
+        maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
         maven("https://www.jetbrains.com/intellij-repository/releases")
-        maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
     }
 }
 ```
