@@ -1,0 +1,21 @@
+# 入力パターンカタログの検査（ADR-020）
+name: catalog
+on:
+  pull_request:
+    paths: ["quality/catalog/**", "fixtures/processors/**", ".github/workflows/catalog.yml"]
+  push:
+    branches: [main]
+    paths: ["quality/catalog/**", "fixtures/processors/**", ".github/workflows/catalog.yml"]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: カタログの形式・ID・必須の網羅・生成物が最新か
+        run: python3 quality/catalog/scripts/catalog.py check

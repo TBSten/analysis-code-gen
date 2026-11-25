@@ -141,6 +141,18 @@ license = "MIT"
 uses = ["KOI", "ROM"]
 
 [[project]]
+repo = "darriousliu/PiPixiv"
+commit = "1a2e76353cc3d864dc904d44aed2fb8f5090296e"
+license = "Apache-2.0"
+uses = ["KOI"]
+
+[[project]]
+repo = "MythicDrops/MythicDrops"
+commit = "b4ee6c605f6488935132c8ab55e2852645296271"
+license = "MIT"
+uses = ["KOI"]
+
+[[project]]
 repo = "slackhq/circuit"
 commit = "c9aa9c7730d8d465103042cccff6e1db017f84b9"
 license = "Apache-2.0"

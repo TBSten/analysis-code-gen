@@ -9,14 +9,28 @@ analysis-api = "2.4.21"
 # AA が前提とする IntelliJ Platform の版（KSP2 の aa-intellij に当たる）
 aa-intellij = "251.27812.49"
 kotlinx-serialization = "1.9.0"
+okio = "3.18.2"
+classgraph = "4.8.200"
+dokka = "2.3.0"
+# フィクスチャ（fixtures/projects/*）だけが使う Android Gradle Plugin（ADR-027）
+agp = "9.0.0"
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+dokka-gradle-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 ktlint-gradle-plugin = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlint-gradle" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+# kct fork（testing-kct、ADR-021）が使うもの。Kotlin コンパイラの版は -Pacg.kotlin で差し替える（testing-kct/build.gradle.kts）
+ksp-impl = { module = "com.google.devtools.ksp:symbol-processing", version.ref = "ksp" }
+ksp-aa-embeddable = { module = "com.google.devtools.ksp:symbol-processing-aa-embeddable", version.ref = "ksp" }
+ksp-common-deps = { module = "com.google.devtools.ksp:symbol-processing-common-deps", version.ref = "ksp" }
+kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
 
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
@@ -35,3 +49,9 @@ ij-java-frontback-psi = { module = "com.jetbrains.intellij.java:java-frontback-p
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+# 以下はフィクスチャ（fixtures/projects/*）が使う（ADR-027）
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }

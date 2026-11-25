@@ -1,0 +1,81 @@
+# 共通フィクスチャ（fixtures/projects/*）が KSP2 + テスト用 Processor の KSP 版でビルド・テストできることを確かめる（ADR-027）。
+# 公開 DSL 版（build.gradle.kts）は Gradle plugin とエンジンの実装後に E2E（ACG-38・44〜46）が使う
+name: fixtures
+
+on:
+  pull_request:
+    paths: &paths
+      - "fixtures/**"
+      - "test-processors/**"
+      - "gradle/**"
+      - "build-logic/**"
+      - "settings.gradle.kts"
+      - "build.gradle.kts"
+      - ".github/workflows/fixtures.yml"
+  push:
+    branches: [main]
+    paths: *paths
+  schedule:
+    # 毎週月曜 04:00 JST（日曜 19:00 UTC）に F-LARGE の大きい版も回す
+    - cron: "0 19 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  group: fixtures-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ksp2:
+    name: KSP2 / ${{ matrix.fixture }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { fixture: jvm, os: ubuntu-latest, tasks: build }
+          - { fixture: jvm-multi, os: ubuntu-latest, tasks: build }
+          - { fixture: java, os: ubuntu-latest, tasks: build }
+          - { fixture: android, os: ubuntu-latest, tasks: "build assembleAndroidTest" }
+          - { fixture: kmp, os: ubuntu-latest, tasks: build }
+          - { fixture: kmp-custom, os: ubuntu-latest, tasks: build }
+          # iOS ターゲットは macOS でしかコンパイル・テストできない
+          - { fixture: kmp, os: macos-latest, tasks: "iosSimulatorArm64Test compileKotlinIosArm64" }
+          - { fixture: large-1000, os: ubuntu-latest, tasks: build, generate: "--files 1000" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: テスト用 Processor を build/fixture-repo に publish
+        run: ./gradlew publishFixtureDeps --console=plain
+      - name: F-LARGE を生成
+        if: matrix.generate
+        run: python3 fixtures/scripts/gen_large.py ${{ matrix.generate }} --out fixtures/projects/${{ matrix.fixture }}
+      - name: KSP2 でビルド
+        run: ./gradlew -p fixtures/projects/${{ matrix.fixture }} -Pacg.fixture.engine=ksp ${{ matrix.tasks }} --console=plain
+      - name: 生成物を保存
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-${{ matrix.fixture }}-${{ matrix.os }}
+          path: fixtures/projects/${{ matrix.fixture }}/**/build/generated/ksp/**
+          if-no-files-found: ignore
+
+  large-5000:
+    name: KSP2 / large-5000-deps300
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew publishFixtureDeps --console=plain
+      - run: python3 fixtures/scripts/gen_large.py --files 5000 --deps 300 --out fixtures/projects/large-5000-deps300
+      - run: ./gradlew -p fixtures/projects/large-5000-deps300 -Pacg.fixture.engine=ksp build --console=plain

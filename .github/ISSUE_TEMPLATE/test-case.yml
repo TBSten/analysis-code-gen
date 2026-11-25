@@ -1,0 +1,31 @@
+name: テストケースの提案
+description: まだ一覧に無い利用ケース（取り込みはマイルストーンの区切りで判断する）
+labels: ["test-case"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提案は quality/case-backlog.md の候補として扱い、マイルストーン達成時か振り返りで取り込みを判断します。
+        すでに通っているケースが壊れている場合は「不具合」で出してください。
+  - type: textarea
+    id: case
+    attributes:
+      label: ケースの内容
+      description: 入力と、満たすべき結果
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 種類
+      options:
+        - E2E
+        - PBT の入力パターン
+        - 差分テスト（KSP2 / Bridge / Native）
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: きっかけ
+      description: 実プロジェクトでの使われ方、関係する Processor など

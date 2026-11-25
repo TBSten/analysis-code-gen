@@ -1,0 +1,25 @@
+name: PoC P-01
+
+on:
+  pull_request:
+    paths:
+      - "poc/p01/**"
+      - ".github/workflows/poc-p01.yml"
+  workflow_dispatch:
+
+jobs:
+  p01:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Run P-01 (KGP oracle vs Standalone AA)
+        run: ./poc/p01/run-all.sh
+      - name: Summary
+        if: always()
+        run: cat poc/p01/build/p01-result.md >> "$GITHUB_STEP_SUMMARY" || true
