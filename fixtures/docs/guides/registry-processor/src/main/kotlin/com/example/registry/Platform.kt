@@ -1,7 +1,7 @@
 package com.example.registry
 
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenRoundContext
-import me.tbsten.analysiscodegen.processor.ExecutionUnit
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenRoundContext
+import me.tbsten.analysis.code.gen.processor.ExecutionUnit
 
 /** 一覧のコメントに書く、どの実行単位で作ったかの説明。 */
 fun describeUnit(context: AnalysisCodegenRoundContext): String =

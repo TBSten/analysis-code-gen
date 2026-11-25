@@ -1,6 +1,6 @@
 package fixture.custom
 
-import me.tbsten.analysiscodegen.tp.Mapped
+import me.tbsten.analysis.code.gen.tp.Mapped
 
 /**
  * 中間 SourceSet のクラス。生成物 JvmJsModelMapper は jvm と js の両方から使う（KMP-17）。

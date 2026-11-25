@@ -1,8 +1,8 @@
-me.tbsten.analysiscodegen.testprocessors.ksp.MapperKspProvider
-me.tbsten.analysiscodegen.testprocessors.ksp.RegistryKspProvider
-me.tbsten.analysiscodegen.testprocessors.ksp.ChainKspProvider
-me.tbsten.analysiscodegen.testprocessors.ksp.ActualKspProvider
-me.tbsten.analysiscodegen.testprocessors.ksp.DeferKspProvider
-me.tbsten.analysiscodegen.testprocessors.ksp.ResourceKspProvider
-me.tbsten.analysiscodegen.testprocessors.ksp.BadKspProvider
-me.tbsten.analysiscodegen.testprocessors.ksp.ProbeKspProvider
+me.tbsten.analysis.code.gen.testprocessors.ksp.MapperKspProvider
+me.tbsten.analysis.code.gen.testprocessors.ksp.RegistryKspProvider
+me.tbsten.analysis.code.gen.testprocessors.ksp.ChainKspProvider
+me.tbsten.analysis.code.gen.testprocessors.ksp.ActualKspProvider
+me.tbsten.analysis.code.gen.testprocessors.ksp.DeferKspProvider
+me.tbsten.analysis.code.gen.testprocessors.ksp.ResourceKspProvider
+me.tbsten.analysis.code.gen.testprocessors.ksp.BadKspProvider
+me.tbsten.analysis.code.gen.testprocessors.ksp.ProbeKspProvider

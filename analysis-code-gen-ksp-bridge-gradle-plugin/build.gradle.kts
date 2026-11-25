@@ -12,7 +12,7 @@ gradlePlugin {
         // ADR-016・017
         create("analysisCodegenKspBridge") {
             id = "me.tbsten.analysis.code.gen.ksp-bridge"
-            implementationClass = "me.tbsten.analysiscodegen.ksp.gradle.KspBridgePlugin"
+            implementationClass = "me.tbsten.analysis.code.gen.ksp.gradle.KspBridgePlugin"
         }
     }
 }

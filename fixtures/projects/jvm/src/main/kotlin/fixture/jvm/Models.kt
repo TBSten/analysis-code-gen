@@ -1,7 +1,7 @@
 package fixture.jvm
 
-import me.tbsten.analysiscodegen.tp.Mapped
-import me.tbsten.analysiscodegen.tp.Registered
+import me.tbsten.analysis.code.gen.tp.Mapped
+import me.tbsten.analysis.code.gen.tp.Registered
 
 @Mapped
 @Registered

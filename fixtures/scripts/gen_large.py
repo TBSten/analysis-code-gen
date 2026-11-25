@@ -26,7 +26,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-ANNOTATIONS = ROOT / "fixtures/projects/jvm/src/main/kotlin/me/tbsten/analysiscodegen/tp/TpAnnotations.kt"
+ANNOTATIONS = ROOT / "fixtures/projects/jvm/src/main/kotlin/me/tbsten/analysis/code/gen/tp/TpAnnotations.kt"
 BUILD_SUPPORT = ROOT / "fixtures/projects/build-support"
 DEPS_FILE = ROOT / "fixtures/large/deps-300.txt"
 FILES_PER_PACKAGE = 50
@@ -54,13 +54,13 @@ def model_name(i: int) -> str:
 def kotlin_file(i: int, deps: list[str]) -> str:
     pkg = package_of(i)
     name = model_name(i)
-    lines = [f"package {pkg}", "", "import me.tbsten.analysiscodegen.tp.Mapped"]
+    lines = [f"package {pkg}", "", "import me.tbsten.analysis.code.gen.tp.Mapped"]
     registered = i % 10 == 0
     call_graph = i % 100 == 0
     if registered:
-        lines.append("import me.tbsten.analysiscodegen.tp.Registered")
+        lines.append("import me.tbsten.analysis.code.gen.tp.Registered")
     if call_graph:
-        lines.append("import me.tbsten.analysiscodegen.tp.CallGraph")
+        lines.append("import me.tbsten.analysis.code.gen.tp.CallGraph")
     lines.append("")
     props = ["    val id: Int", "    val name: String", "    val tags: List<String>"]
     if i > 0:
@@ -153,7 +153,7 @@ def main() -> None:
     deps = read_deps(args.deps)
 
     src = out / "src/main/kotlin"
-    ann_dir = src / "me/tbsten/analysiscodegen/tp"
+    ann_dir = src / "me/tbsten/analysis/code/gen/tp"
     ann_dir.mkdir(parents=True)
     shutil.copy(ANNOTATIONS, ann_dir / ANNOTATIONS.name)
     for i in range(args.files):

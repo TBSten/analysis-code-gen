@@ -1,6 +1,6 @@
 package fixture.jvm
 
-import me.tbsten.analysiscodegen.tp.CallGraph
+import me.tbsten.analysis.code.gen.tp.CallGraph
 
 /** TP-Body が関数本体の呼び出し先を解決する（Native 版だけ）。 */
 class Service {

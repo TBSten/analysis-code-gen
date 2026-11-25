@@ -1,6 +1,6 @@
 package com.example.hello
 
-import me.tbsten.analysiscodegen.testing.gradle.gradleFixture
+import me.tbsten.analysis.code.gen.testing.gradle.gradleFixture
 import org.gradle.testkit.runner.TaskOutcome
 import kotlin.test.Test
 import kotlin.test.assertEquals

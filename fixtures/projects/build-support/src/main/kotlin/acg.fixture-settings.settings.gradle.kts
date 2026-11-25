@@ -4,7 +4,7 @@
 // と書いて使う。やること:
 // - リポジトリ: build/fixture-repo（./gradlew publishFixtureDeps で作る）・Maven Central・Google
 // - version catalog: libs（リポジトリの gradle/libs.versions.toml）と acg（テスト用 Processor の座標）
-// - plugin `me.tbsten.analysiscodegen*` の版をリポジトリの acg.version にそろえる
+// - plugin `me.tbsten.analysis.code.gen*` の版をリポジトリの acg.version にそろえる
 // - -Pacg.fixture.engine=ksp のとき、各プロジェクトのビルドスクリプトを build.ksp.gradle.kts に切り替える
 //
 // プロパティ:

@@ -30,7 +30,7 @@ val qualityDir = layout.projectDirectory
 fun JavaExec.configureCaseCheck(write: Boolean) {
     group = "verification"
     classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("me.tbsten.analysiscodegen.testfoundation.check.Main")
+    mainClass.set("me.tbsten.analysis.code.gen.testfoundation.check.Main")
     jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8")
     // 構成キャッシュのため、ラムダはスクリプトのトップレベルを参照せずローカル値だけを掴む
     val manifests = files(acgCasesFiles)

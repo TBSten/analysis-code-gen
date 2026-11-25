@@ -1,8 +1,8 @@
 package com.example.hello
 
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessor
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessorEnvironment
-import me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessorProvider
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessor
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorEnvironment
+import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorProvider
 
 class HelloProcessorProvider : AnalysisCodegenProcessorProvider {
     override fun create(environment: AnalysisCodegenProcessorEnvironment): AnalysisCodegenProcessor =

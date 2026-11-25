@@ -48,7 +48,7 @@ KSP2 などの上流から写したコードの出所・著作権表示・改変
 ## 移植の手順
 
 1. `port-map.csv` で対象の行を探し、`target_module` と `strategy` を確認する
-2. 上流の固定コミットからファイルを写し、パッケージ名を `me.tbsten.analysiscodegen.<モジュール>` 配下へ変える（ADR-012。KSP 本体と同じクラスパスに載っても衝突させない）。モジュールの依存方向（ADR-012）を破る import が残るなら `adapt` として直す
+2. 上流の固定コミットからファイルを写し、パッケージ名を `me.tbsten.analysis.code.gen.<モジュール>` 配下へ変える（ADR-012。KSP 本体と同じクラスパスに載っても衝突させない）。モジュールの依存方向（ADR-012）を破る import が残るなら `adapt` として直す
 3. 先頭に上の 3 行を足し、改変したら `Modifications` に書く
 4. `port-map.csv` の行を `status=ported`、`target_paths` に移植先のパスを書く（分割したら `;` 区切り）
 5. `python3 scripts/lic01/check_provenance.py` を通す

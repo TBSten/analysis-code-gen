@@ -9,9 +9,9 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
-import me.tbsten.analysiscodegen.processor.ExperimentalAnalysisCodegenApi
-import me.tbsten.analysiscodegen.ksp.hybrid.isAnalysisCodegenBridge
-import me.tbsten.analysiscodegen.ksp.hybrid.withAnalysis
+import me.tbsten.analysis.code.gen.processor.ExperimentalAnalysisCodegenApi
+import me.tbsten.analysis.code.gen.ksp.hybrid.isAnalysisCodegenBridge
+import me.tbsten.analysis.code.gen.ksp.hybrid.withAnalysis
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
 class DescribeProcessorProvider : SymbolProcessorProvider {

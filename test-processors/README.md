@@ -17,7 +17,7 @@ E2E・PBT・三者差分で繰り返し使う、振る舞いが分かってい�
 | オプション | 意味 |
 |---|---|
 | `tp.processors` | `Mapper,Registry,...`。`all` は TP-Bad 以外の全部 |
-| `tp.registry.package` / `tp.registry.name` | TP-Registry の出力先（既定 `me.tbsten.analysiscodegen.tp.generated.TpRegistry`） |
+| `tp.registry.package` / `tp.registry.name` | TP-Registry の出力先（既定 `me.tbsten.analysis.code.gen.tp.generated.TpRegistry`） |
 | `tp.bad.modes` | TP-Bad の壊れ方（下表） |
 | `tp.probe.out` | TP-Probe が JSON Lines を追記するファイル |
 | `tp.probe.log` | TP-Probe がラウンド 1 で出すログ。`warn:文;error:文` |

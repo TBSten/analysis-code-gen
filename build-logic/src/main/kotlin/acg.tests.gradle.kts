@@ -19,7 +19,7 @@ val collectCases =
         group = "verification"
         description = "テストのケース宣言（ID・種別・保留）を集めて build/acg/cases.csv に書く"
         classpath = testSourceSet.runtimeClasspath
-        mainClass.set("me.tbsten.analysiscodegen.testfoundation.check.Main")
+        mainClass.set("me.tbsten.analysis.code.gen.testfoundation.check.Main")
         jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8")
         val classDirs = testSourceSet.output.classesDirs
         val out = casesFile

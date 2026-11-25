@@ -4,9 +4,9 @@ import fixture.multi.lib.LibService
 import fixture.multi.lib.LibUser
 import fixture.multi.lib.LibUserMapper
 import fixture.multi.lib.generated.LibRegistryHolder
-import me.tbsten.analysiscodegen.tp.DeferUntil
-import me.tbsten.analysiscodegen.tp.Mapped
-import me.tbsten.analysiscodegen.tp.Registered
+import me.tbsten.analysis.code.gen.tp.DeferUntil
+import me.tbsten.analysis.code.gen.tp.Mapped
+import me.tbsten.analysis.code.gen.tp.Registered
 
 /** :lib の型をプロパティに持つ（GRD-09: :app の Processor が :lib の宣言を解析する）。 */
 @Mapped
