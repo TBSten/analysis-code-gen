@@ -525,7 +525,7 @@ KSP では難しく、analysisCodeGen の存在理由にあたる部分。
 | ID | ケース | 種別 | M | 備考 |
 |---|---|---|---|---|
 | VER-01 | 対応表に無い Kotlin / KGP の組み合わせでは、原因と対応バージョンが分かる診断が出る | E | M2 | |
-| VER-02 | 非互換な processor-api バージョンでビルドされた Native Processor では、原因が分かる診断が出る | I | M2 | |
+| VER-02 | 非互換な analysis-code-gen-processor-api バージョンでビルドされた Native Processor では、原因が分かる診断が出る | I | M2 | |
 | VER-03 | 対応表の最小と最新の AGP でビルドが通る | E | M2 | |
 | VER-04 | Kotlin の新しい stable / プレリリースが出たら、対応バージョンの一覧と CI のマトリクスが自動で更新される（更新の PR が作られる） | U | M2 | |
 | VER-05 | 同じ入力に対して、対応するすべての Kotlin バージョンで生成物が一致する（言語機能の差が出ない入力に限る） | D | M2 | |

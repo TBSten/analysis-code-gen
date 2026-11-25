@@ -33,7 +33,7 @@ fun RepositoryHandler.fixtureRepositories() {
     maven {
         name = "fixtureRepo"
         url = fixtureRepo.toURI()
-        content { includeGroupAndSubgroups("me.tbsten.analysiscodegen") }
+        content { includeGroupAndSubgroups("me.tbsten.analysis.code.gen") }
     }
     mavenCentral()
     google()
@@ -45,7 +45,7 @@ pluginManagement {
         gradlePluginPortal()
     }
     resolutionStrategy.eachPlugin {
-        if (requested.id.id.startsWith("me.tbsten.analysiscodegen")) useVersion(acgVersion)
+        if (requested.id.id.startsWith("me.tbsten.analysis.code.gen")) useVersion(acgVersion)
     }
 }
 
@@ -60,8 +60,8 @@ dependencyResolutionManagement {
         }
         create("acg") {
             version("acg", acgVersion)
-            library("testProcessors-native", "me.tbsten.analysiscodegen", "test-processors-native").versionRef("acg")
-            library("testProcessors-ksp", "me.tbsten.analysiscodegen", "test-processors-ksp").versionRef("acg")
+            library("testProcessors-native", "me.tbsten.analysis.code.gen", "test-processors-native").versionRef("acg")
+            library("testProcessors-ksp", "me.tbsten.analysis.code.gen", "test-processors-ksp").versionRef("acg")
         }
     }
 }

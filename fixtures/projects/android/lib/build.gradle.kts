@@ -1,7 +1,7 @@
 // 公開 DSL で書いた F-AND の :lib
 plugins {
     alias(libs.plugins.android.library)
-    id("me.tbsten.analysiscodegen")
+    id("me.tbsten.analysis.code.gen")
 }
 
 android {

@@ -78,7 +78,7 @@ public class BridgeRunner : EngineRunner {
 }
 
 /**
- * N: analysisCodeGen + Native 移植版。processor-api（ACG-34）と Native の TestProcessor（ADR-021）が入るまでは
+ * N: analysisCodeGen + Native 移植版。analysis-code-gen-processor-api（ACG-34）と Native の TestProcessor（ADR-021）が入るまでは
  * いつも [EngineRun.Unavailable]。入ったら [DiffProcessor.nativeProviderClass] を読み込んで動かす。
  */
 public class NativeRunner : EngineRunner {
@@ -87,7 +87,7 @@ public class NativeRunner : EngineRunner {
     override fun run(input: DiffInput): EngineRun {
         val missing = input.processors.filter { it.nativeProviderClass == null }.map { it.id }
         if (missing.isNotEmpty()) return EngineRun.Unavailable(engine, "Native 版の無い Processor がある: $missing")
-        return EngineRun.Unavailable(engine, "Native Processor を testing から動かす口が未実装（processor-api 待ち、ADR-021）")
+        return EngineRun.Unavailable(engine, "Native Processor を testing から動かす口が未実装（analysis-code-gen-processor-api 待ち、ADR-021）")
     }
 }
 

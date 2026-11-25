@@ -139,13 +139,13 @@ class TestingFrameworkE2ETest : E2ESpec({
                     """
                     plugins {
                         kotlin("jvm") version "{{kotlinVersion}}"
-                        id("me.tbsten.analysiscodegen") version "${acgVersion()}"
+                        id("me.tbsten.analysis.code.gen") version "${acgVersion()}"
                     }
 
                     analysisCodeGen {
                         arg("tp.processors", "Mapper")
                         sourceSets {
-                            main { processor("me.tbsten.analysiscodegen:test-processors-native:${acgVersion()}") }
+                            main { processor("me.tbsten.analysis.code.gen:test-processors-native:${acgVersion()}") }
                         }
                     }
                     """.trimIndent()
@@ -171,8 +171,8 @@ class TestingFrameworkE2ETest : E2ESpec({
                 kotlinJvm(
                     """
                     dependencies {
-                        testImplementation("me.tbsten.analysiscodegen:testing:$version")
-                        testImplementation("me.tbsten.analysiscodegen:test-processors-ksp:$version")
+                        testImplementation("me.tbsten.analysis.code.gen:analysis-code-gen-testing:$version")
+                        testImplementation("me.tbsten.analysis.code.gen:test-processors-ksp:$version")
                         testImplementation(kotlin("test"))
                     }
                     tasks.test { useJUnitPlatform() }

@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies {
-    // symbol-processing-api と ksp-bridge-api は要らなくなる
-    compileOnly("me.tbsten.analysiscodegen:processor-api:0.1.0")
+    // symbol-processing-api と analysis-code-gen-ksp-bridge-api は要らなくなる
+    compileOnly("me.tbsten.analysis.code.gen:analysis-code-gen-processor-api:0.1.0")
 }

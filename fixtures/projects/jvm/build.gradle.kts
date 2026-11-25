@@ -1,7 +1,7 @@
 // 公開 DSL（ADR-016）で書いた F-JVM。同じソースを KSP2 で動かす版は build.ksp.gradle.kts
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    id("me.tbsten.analysiscodegen")
+    id("me.tbsten.analysis.code.gen")
 }
 
 analysisCodeGen {

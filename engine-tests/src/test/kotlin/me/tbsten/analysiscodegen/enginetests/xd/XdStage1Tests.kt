@@ -27,7 +27,7 @@ import me.tbsten.analysiscodegen.testing.runCodegenScenario
 import me.tbsten.analysiscodegen.testing.runCodegenTest
 
 // 5.29 三者差分（XD）のうち K と N を段階 1（公開 ABI と実行時テストの結果）で比べるもの（XD-05・XD-10）。
-// N の Processor を渡すのに processor-api の型が要るので :engine-tests に置く（ADR-037）。他の XD は e2e-tests の e2e.xd
+// N の Processor を渡すのに analysis-code-gen-processor-api の型が要るので :engine-tests に置く（ADR-037）。他の XD は e2e-tests の e2e.xd
 
 private val catalog: PatternCatalog by lazy { PatternCatalog.loadOrNull() ?: error("quality/catalog/index.json が読めない") }
 

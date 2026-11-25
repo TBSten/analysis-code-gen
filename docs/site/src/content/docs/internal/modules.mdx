@@ -4,7 +4,7 @@ description: analysisCodeGen のモジュールの役割・公開範囲と、守
 ---
 
 :::note[レビューで判断してほしいこと]
-- KSP Bridge がエンジンに直接依存せず、engine-spi だけを通す形でよいか
+- KSP Bridge がエンジンに直接依存せず、analysis-code-gen-engine-spi だけを通す形でよいか
 - DI フレームワークを使わず、組み立てを 1 か所に集める方針でよいか
 :::
 
@@ -12,23 +12,23 @@ description: analysisCodeGen のモジュールの役割・公開範囲と、守
 
 ## モジュールの一覧
 
-group とパッケージの根は `me.tbsten.analysiscodegen` です。
+group は `me.tbsten.analysis.code.gen`、パッケージの根は `me.tbsten.analysiscodegen` です（ADR-042）。
 
 | モジュール | 公開範囲 | 中身 |
 |---|---|---|
-| `processor-api` | 公開 | Native Processor の API |
-| `gradle-plugin` | 公開（DSL） | DSL・タスク・KGP / AGP との連携 |
-| `testing` / `testing-kct` | 公開 | Processor のテスト補助と、取り込んだ kotlin-compile-testing |
-| `ksp-bridge-api` | 公開（実験的） | Hybrid API |
-| `ksp-bridge-gradle-plugin` | 公開 | `kspBridge {}` の DSL |
-| `cli` | 公開（コマンド） | プロジェクトモデルの JSON を受けて生成する |
-| `project-model` | 内部 | Gradle にも AA にも依存しないプロジェクトモデル |
-| `engine-spi` | 内部 | エンジンに参加するための SPI |
-| `analysis-engine` | 内部 | AA Standalone の環境と Module Graph |
-| `aa-compat` | 内部 | AA の版ごとの差分 |
-| `incremental-engine` | 内部 | 依存グラフ・スナップショット・dirty の計算 |
-| `processing-engine` | 内部 | ラウンド制御・Processor の読み込み・出力 |
-| `ksp-bridge` | 内部 | KSP API の実装（KSP2 から移植） |
+| `analysis-code-gen-processor-api` | 公開 | Native Processor の API |
+| `analysis-code-gen-gradle-plugin` | 公開（DSL） | DSL・タスク・KGP / AGP との連携 |
+| `analysis-code-gen-testing` / `analysis-code-gen-testing-kct` | 公開 | Processor のテスト補助と、取り込んだ kotlin-compile-testing |
+| `analysis-code-gen-ksp-bridge-api` | 公開（実験的） | Hybrid API |
+| `analysis-code-gen-ksp-bridge-gradle-plugin` | 公開 | `kspBridge {}` の DSL |
+| `analysis-code-gen-cli` | 公開（コマンド） | プロジェクトモデルの JSON を受けて生成する |
+| `analysis-code-gen-project-model` | 内部 | Gradle にも AA にも依存しないプロジェクトモデル |
+| `analysis-code-gen-engine-spi` | 内部 | エンジンに参加するための SPI |
+| `analysis-code-gen-analysis-engine` | 内部 | AA Standalone の環境と Module Graph |
+| `analysis-code-gen-aa-compat` | 内部 | AA の版ごとの差分 |
+| `analysis-code-gen-incremental-engine` | 内部 | 依存グラフ・スナップショット・dirty の計算 |
+| `analysis-code-gen-processing-engine` | 内部 | ラウンド制御・Processor の読み込み・出力 |
+| `analysis-code-gen-ksp-bridge` | 内部 | KSP API の実装（KSP2 から移植） |
 
 ## 依存の向き
 
@@ -36,31 +36,31 @@ group とパッケージの根は `me.tbsten.analysiscodegen` です。
 
 ```mermaid
 flowchart TD
-    GP["gradle-plugin"] --> PM["project-model"]
-    GP -. "Worker" .-> PE["processing-engine"]
+    GP["analysis-code-gen-gradle-plugin"] --> PM["analysis-code-gen-project-model"]
+    GP -. "Worker" .-> PE["analysis-code-gen-processing-engine"]
     CLI["cli / testing"] --> PE
-    PE --> API["processor-api"]
-    PE --> SPI["engine-spi"]
-    PE --> AE["analysis-engine"]
-    PE --> IE["incremental-engine"]
+    PE --> API["analysis-code-gen-processor-api"]
+    PE --> SPI["analysis-code-gen-engine-spi"]
+    PE --> AE["analysis-code-gen-analysis-engine"]
+    PE --> IE["analysis-code-gen-incremental-engine"]
     SPI --> API
     SPI --> PM
     AE --> PM
     IE --> PM
-    BR["ksp-bridge"] --> SPI
-    BR --> BAPI["ksp-bridge-api"]
+    BR["analysis-code-gen-ksp-bridge"] --> SPI
+    BR --> BAPI["analysis-code-gen-ksp-bridge-api"]
     BR --> KSP["公式 symbol-processing-api"]
-    BGP["ksp-bridge-gradle-plugin"] --> GP
+    BGP["analysis-code-gen-ksp-bridge-gradle-plugin"] --> GP
 ```
 
 ## 守っていること
 
 境界はテストで検査します。破るとビルドが落ちます。
 
-- ksp-bridge は processing-engine と analysis-engine を import しない。エンジンは ServiceLoader で Bridge を見つけるだけ
-- gradle-plugin は `org.jetbrains.kotlin.analysis` を import しない。ビルドスクリプトの classpath に AA を載せない
-- incremental-engine は AA に依存しない。ファイルの識別子と依存グラフだけを扱う
-- AA の版で形が変わる呼び出しは aa-compat の中に閉じ込める（ADR-011）
+- analysis-code-gen-ksp-bridge は analysis-code-gen-processing-engine と analysis-code-gen-analysis-engine を import しない。エンジンは ServiceLoader で Bridge を見つけるだけ
+- analysis-code-gen-gradle-plugin は `org.jetbrains.kotlin.analysis` を import しない。ビルドスクリプトの classpath に AA を載せない
+- analysis-code-gen-incremental-engine は AA に依存しない。ファイルの識別子と依存グラフだけを扱う
+- AA の版で形が変わる呼び出しは analysis-code-gen-aa-compat の中に閉じ込める（ADR-011）
 
 ## 公開範囲の印
 
@@ -80,7 +80,9 @@ annotation class ExperimentalAnalysisCodegenApi
 
 ## 組み立て
 
-DI フレームワークは使いません。各エンジンはコンストラクタで部品を受け取り、組み立ては processing-engine の `EngineComponents` 1 か所に集めます。
+DI フレームワークは使いません。各エンジンはコンストラクタで部品を受け取ります。
+
+組み立ては analysis-code-gen-processing-engine の `EngineComponents` 1 か所に集めます。
 
 外から差し込めるのは、ServiceLoader で探す 2 種類だけです。
 

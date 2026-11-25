@@ -140,11 +140,11 @@ fun fixtureProject(
 
 /**
  * F-* を使わない小さなプロジェクトを作る。settings は F-* と同じ（`acg.fixture-settings`）なので、
- * `libs` / `acg` の version catalog と `me.tbsten.analysiscodegen` plugin がそのまま使える。
+ * `libs` / `acg` の version catalog と `me.tbsten.analysis.code.gen` plugin がそのまま使える。
  *
  * ```
  * val p = emptyProject {
- *     write("build.gradle.kts", """plugins { alias(libs.plugins.kotlin.jvm); id("me.tbsten.analysiscodegen") }""")
+ *     write("build.gradle.kts", """plugins { alias(libs.plugins.kotlin.jvm); id("me.tbsten.analysis.code.gen") }""")
  * }
  * ```
  */

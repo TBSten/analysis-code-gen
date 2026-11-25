@@ -1,114 +1,114 @@
 upstream_path,size_bytes,upstream_copyright,target_module,strategy,phase,status,target_paths,notes
-common-deps/src/main/kotlin/com/google/devtools/ksp/IncrementalContextLoggingOptions.kt,966,Google LLC;JetBrains,incremental-engine,as-is,P3,planned,,
-common-deps/src/main/kotlin/com/google/devtools/ksp/KSPConfig.kt,14823,Google LLC;JetBrains,project-model,adapt,P2,planned,,AnalysisConfig の土台。プラットフォーム別設定を SourceSet / Compilation モデルへ改変（project-model は kotlinx-serialization だけに依存、ADR-012）。ksp-bridge の SymbolProcessorEnvironment 組み立てにも使う
-common-deps/src/main/kotlin/com/google/devtools/ksp/KspGradleLogger.kt,2328,Google LLC;JetBrains,gradle-plugin,adapt,P2,planned,,KSPLogger の実装をやめ共通 Logger へ（ADR-012: gradle-plugin は KSP API・エンジンに依存しない）
-common-util/src/main/kotlin/com/google/devtools/ksp/common/ErrorTypeUtils.kt,1785,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/IncrementalUtil.kt,5000,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/JvmUtils.kt,1162,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/KSObjectCacheManager.kt,1668,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/KSPUtils.kt,1565,none,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/MemoizedSequence.kt,1452,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/CodeGeneratorImpl.kt,8123,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,code-generator-adapter/。出力トランザクション（ADR-014）へ engine-spi 経由で委譲するよう改変。Native の CodeGenerator 設計でも参照する
-common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/KSNameImpl.kt,762,none,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/KSTypeReferenceSyntheticImpl.kt,1608,none,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/PlatformInfoImpl.kt,1651,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/RefPosition.kt,3067,none,ksp-bridge,as-is,P2,planned,,symbols/
-common-util/src/main/kotlin/com/google/devtools/ksp/common/visitor/CollectAnnotatedSymbolsVisitor.kt,4940,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/AndroidPluginIntegration.kt,12329,Google LLC;JetBrains,gradle-plugin,adapt,P2,planned,,AgpIntegration（P-04 の結論で範囲を決める）
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/IsolatedClassLoaderCacheBuildService.kt,2978,Google LLC,gradle-plugin,as-is,P2,planned,,
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/KspAATask.kt,43321,Google LLC;JetBrains,gradle-plugin,adapt,P2,planned,,AnalysisCodegenTask・Worker。KspGradleConfig→project-model の変換を含む。エンジンは Worker の別 ClassLoader で読む（ADR-012）
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/KspConfigurations.kt,11365,none,gradle-plugin;ksp-bridge-gradle-plugin,adapt,P2,planned,,依存構成名を analysisCodeGen 用に改変。ksp() 互換は ksp-bridge-gradle-plugin 側
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/KspExtension.kt,4052,Google LLC;JetBrains,gradle-plugin,reference,P2,not-ported,,DSL は ACG-34 で新規設計
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/KspSubplugin.kt,22258,Google LLC;JetBrains,gradle-plugin,adapt,P2,planned,,KgpIntegration・GeneratedSourceRegistrar。Compilation 単位から SourceSet First へ改変。classpath 変更検出は incremental へ
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/model/Ksp.kt,1192,Google LLC;JetBrains,gradle-plugin,defer,P3,planned,,IDE 向け Tooling Model。IDE 対応を決めるまで保留
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/model/builder/KspModelBuilder.kt,1433,Google LLC;JetBrains,gradle-plugin,defer,P3,planned,,同上
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/model/impl/KspImpl.kt,1059,Google LLC;JetBrains,gradle-plugin,defer,P3,planned,,同上
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/utils/agpUtils.kt,1382,none,gradle-plugin,as-is,P2,planned,,
-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/utils/kgpUtils.kt,3143,none,gradle-plugin,as-is,P2,planned,,
-kotlin-analysis-api/compiler/cli/cli-common/resources/META-INF/extensions/compiler.xml,4909,none,analysis-engine,defer,P2,planned,,Kotlin 由来の拡張点登録 XML（JetBrains）。P-02 で要否を判断
-kotlin-analysis-api/src/main/java/com/intellij/mock/MockFileIndexFacade.java,2533,JetBrains,analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
-kotlin-analysis-api/src/main/java/com/intellij/openapi/fileTypes/BinaryFileTypeDecompilers.java,1231,JetBrains,analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
-kotlin-analysis-api/src/main/java/com/intellij/openapi/progress/impl/CoreProgressManager.java,44193,JetBrains,analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
-kotlin-analysis-api/src/main/java/com/intellij/openapi/vfs/impl/jar/CoreJarHandler.java,2495,JetBrains,analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
-kotlin-analysis-api/src/main/java/com/intellij/util/IntelliJCoroutinesFacade.kt,1089,JetBrains,analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/InternalKSPException.kt,2447,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,
+common-deps/src/main/kotlin/com/google/devtools/ksp/IncrementalContextLoggingOptions.kt,966,Google LLC;JetBrains,analysis-code-gen-incremental-engine,as-is,P3,planned,,
+common-deps/src/main/kotlin/com/google/devtools/ksp/KSPConfig.kt,14823,Google LLC;JetBrains,analysis-code-gen-project-model,adapt,P2,planned,,AnalysisConfig の土台。プラットフォーム別設定を SourceSet / Compilation モデルへ改変（analysis-code-gen-project-model は kotlinx-serialization だけに依存、ADR-012）。analysis-code-gen-ksp-bridge の SymbolProcessorEnvironment 組み立てにも使う
+common-deps/src/main/kotlin/com/google/devtools/ksp/KspGradleLogger.kt,2328,Google LLC;JetBrains,analysis-code-gen-gradle-plugin,adapt,P2,planned,,KSPLogger の実装をやめ共通 Logger へ（ADR-012: analysis-code-gen-gradle-plugin は KSP API・エンジンに依存しない）
+common-util/src/main/kotlin/com/google/devtools/ksp/common/ErrorTypeUtils.kt,1785,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/IncrementalUtil.kt,5000,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/JvmUtils.kt,1162,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/KSObjectCacheManager.kt,1668,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/KSPUtils.kt,1565,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/MemoizedSequence.kt,1452,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/CodeGeneratorImpl.kt,8123,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,code-generator-adapter/。出力トランザクション（ADR-014）へ analysis-code-gen-engine-spi 経由で委譲するよう改変。Native の CodeGenerator 設計でも参照する
+common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/KSNameImpl.kt,762,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/KSTypeReferenceSyntheticImpl.kt,1608,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/PlatformInfoImpl.kt,1651,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/impl/RefPosition.kt,3067,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+common-util/src/main/kotlin/com/google/devtools/ksp/common/visitor/CollectAnnotatedSymbolsVisitor.kt,4940,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/AndroidPluginIntegration.kt,12329,Google LLC;JetBrains,analysis-code-gen-gradle-plugin,adapt,P2,planned,,AgpIntegration（P-04 の結論で範囲を決める）
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/IsolatedClassLoaderCacheBuildService.kt,2978,Google LLC,analysis-code-gen-gradle-plugin,as-is,P2,planned,,
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/KspAATask.kt,43321,Google LLC;JetBrains,analysis-code-gen-gradle-plugin,adapt,P2,planned,,AnalysisCodegenTask・Worker。KspGradleConfig→analysis-code-gen-project-model の変換を含む。エンジンは Worker の別 ClassLoader で読む（ADR-012）
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/KspConfigurations.kt,11365,none,analysis-code-gen-gradle-plugin;analysis-code-gen-ksp-bridge-gradle-plugin,adapt,P2,planned,,依存構成名を analysisCodeGen 用に改変。ksp() 互換は analysis-code-gen-ksp-bridge-gradle-plugin 側
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/KspExtension.kt,4052,Google LLC;JetBrains,analysis-code-gen-gradle-plugin,reference,P2,not-ported,,DSL は ACG-34 で新規設計
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/KspSubplugin.kt,22258,Google LLC;JetBrains,analysis-code-gen-gradle-plugin,adapt,P2,planned,,KgpIntegration・GeneratedSourceRegistrar。Compilation 単位から SourceSet First へ改変。classpath 変更検出は incremental へ
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/model/Ksp.kt,1192,Google LLC;JetBrains,analysis-code-gen-gradle-plugin,defer,P3,planned,,IDE 向け Tooling Model。IDE 対応を決めるまで保留
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/model/builder/KspModelBuilder.kt,1433,Google LLC;JetBrains,analysis-code-gen-gradle-plugin,defer,P3,planned,,同上
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/model/impl/KspImpl.kt,1059,Google LLC;JetBrains,analysis-code-gen-gradle-plugin,defer,P3,planned,,同上
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/utils/agpUtils.kt,1382,none,analysis-code-gen-gradle-plugin,as-is,P2,planned,,
+analysis-code-gen-gradle-plugin/src/main/kotlin/com/google/devtools/ksp/gradle/utils/kgpUtils.kt,3143,none,analysis-code-gen-gradle-plugin,as-is,P2,planned,,
+kotlin-analysis-api/compiler/cli/cli-common/resources/META-INF/extensions/compiler.xml,4909,none,analysis-code-gen-analysis-engine,defer,P2,planned,,Kotlin 由来の拡張点登録 XML（JetBrains）。P-02 で要否を判断
+kotlin-analysis-api/src/main/java/com/intellij/mock/MockFileIndexFacade.java,2533,JetBrains,analysis-code-gen-analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
+kotlin-analysis-api/src/main/java/com/intellij/openapi/fileTypes/BinaryFileTypeDecompilers.java,1231,JetBrains,analysis-code-gen-analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
+kotlin-analysis-api/src/main/java/com/intellij/openapi/progress/impl/CoreProgressManager.java,44193,JetBrains,analysis-code-gen-analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
+kotlin-analysis-api/src/main/java/com/intellij/openapi/vfs/impl/jar/CoreJarHandler.java,2495,JetBrains,analysis-code-gen-analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
+kotlin-analysis-api/src/main/java/com/intellij/util/IntelliJCoroutinesFacade.kt,1089,JetBrains,analysis-code-gen-analysis-engine,defer,P2,planned,,IntelliJ Platform のクラスを同名で差し替えるパッチ（JetBrains 著作）。パッケージ名を変えられないため P-02 で要否を判断
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/InternalKSPException.kt,2447,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,
 kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/cmdline/KSPCommonMain.kt,2769,none,cli,exclude,-,not-ported,,CLI は新規設計（KSP2 の引数形式は互換対象外）
 kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/cmdline/KSPJsMain.kt,468,none,cli,exclude,-,not-ported,,同上
 kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/cmdline/KSPJvmMain.kt,473,none,cli,exclude,-,not-ported,,同上
 kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/cmdline/KSPNativeMain.kt,488,none,cli,exclude,-,not-ported,,同上
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/IncrementalContextBase.kt,28648,Google LLC;JetBrains,ksp-bridge;incremental-engine,adapt,P2,planned,,P2 は ksp-bridge/incremental/ にほぼそのまま。P3 で KS 非依存の DirtinessPropagator 等を incremental-engine へ切り出す。Bridge とは engine-spi の IncrementalParticipant（ADR-017）でつなぐ
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/IncrementalWrapperBase.kt,1604,Google LLC;JetBrains,incremental-engine,adapt,P2,planned,,dependency-tracking/。com.intellij の MultiMap を標準コレクションへ置き換える（ADR-012: incremental-engine は AA に依存しない）
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/IntelliJManager.kt,1291,Google LLC;JetBrains,analysis-engine,as-is,P2,planned,,environment/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/KotlinCoreProjectEnvironmentManager.kt,8462,Google LLC;JetBrains,analysis-engine,as-is,P2,planned,,environment/。P-02（ラウンド間の環境維持）の結論で手を入れる
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/MapUtils.kt,1932,Google LLC;JetBrains,incremental-engine,as-is,P2,planned,,
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/PersistentMap.kt,3026,none,incremental-engine,as-is,P2,planned,,persistent-cache/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/PsiUtils.kt,4113,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/impl/AAResolutionStrategy.kt,6416,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,resolver/。アノテーション解決
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/impl/AnnotationResolutionStrategy.kt,2156,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,resolver/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/impl/KSPCompilationError.kt,939,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/impl/PsiResolutionStrategy.kt,45095,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,resolver/。Java 側のアノテーション解決
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/visitor/CollectAnnotatedSymbolsPsiVisitor.kt,9854,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,resolver/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/visitor/CollectClassifierNameVisitor.kt,2665,Google LLC;JetBrains,analysis-engine,as-is,P2,planned,,source-index/。FileCache が使う
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/IncrementalContextBase.kt,28648,Google LLC;JetBrains,analysis-code-gen-ksp-bridge;analysis-code-gen-incremental-engine,adapt,P2,planned,,P2 は analysis-code-gen-ksp-bridge/incremental/ にほぼそのまま。P3 で KS 非依存の DirtinessPropagator 等を analysis-code-gen-incremental-engine へ切り出す。Bridge とは analysis-code-gen-engine-spi の IncrementalParticipant（ADR-017）でつなぐ
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/IncrementalWrapperBase.kt,1604,Google LLC;JetBrains,analysis-code-gen-incremental-engine,adapt,P2,planned,,dependency-tracking/。com.intellij の MultiMap を標準コレクションへ置き換える（ADR-012: analysis-code-gen-incremental-engine は AA に依存しない）
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/IntelliJManager.kt,1291,Google LLC;JetBrains,analysis-code-gen-analysis-engine,as-is,P2,planned,,environment/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/KotlinCoreProjectEnvironmentManager.kt,8462,Google LLC;JetBrains,analysis-code-gen-analysis-engine,as-is,P2,planned,,environment/。P-02（ラウンド間の環境維持）の結論で手を入れる
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/MapUtils.kt,1932,Google LLC;JetBrains,analysis-code-gen-incremental-engine,as-is,P2,planned,,
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/PersistentMap.kt,3026,none,analysis-code-gen-incremental-engine,as-is,P2,planned,,persistent-cache/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/PsiUtils.kt,4113,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/impl/AAResolutionStrategy.kt,6416,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,resolver/。アノテーション解決
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/impl/AnnotationResolutionStrategy.kt,2156,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,resolver/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/impl/KSPCompilationError.kt,939,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/impl/PsiResolutionStrategy.kt,45095,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,resolver/。Java 側のアノテーション解決
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/visitor/CollectAnnotatedSymbolsPsiVisitor.kt,9854,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,resolver/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/common/visitor/CollectClassifierNameVisitor.kt,2665,Google LLC;JetBrains,analysis-code-gen-analysis-engine,as-is,P2,planned,,source-index/。FileCache が使う
 kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/CommandLineKSPLogger.kt,1415,Google LLC;JetBrains,cli,reference,P3,not-ported,,共通 Logger は新規設計
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/DualLookupTracker.kt,2021,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,incremental/。IncrementalParticipant（ADR-017）の内部で使う
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/FileCache.kt,2669,Google LLC;JetBrains,analysis-engine,as-is,P2,planned,,source-index/。KtFile ごとのクラス名キャッシュ
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/IncrementalContextAA.kt,20747,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,incremental/。KS オブジェクトと密結合。engine-spi の IncrementalParticipant（ADR-017）として dirty 計算に参加する
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/KSPCoreEnvironment.kt,1307,Google LLC;JetBrains,analysis-engine,as-is,P2,planned,,environment/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/KSPLoader.kt,1539,Google LLC;JetBrains,processing-engine,reference,P2,not-ported,,processor-loader/ は新規設計。読んで参考にするだけ
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/KotlinSymbolProcessing.kt,39461,Google LLC;JetBrains,analysis-engine;processing-engine,adapt,P2,planned,,AA 環境構築・インデックス更新・無効化は analysis-engine、ラウンドループは processing-engine へ分割。版で形が変わる AA 呼び出しは aa-compat 経由（ADR-011）。P2 はほぼそのまま分割し P3 で SourceSet 単位へ作り直す
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/KspDiagnostics.kt,5026,Google LLC;JetBrains,processing-engine,adapt,P3,planned,,未解決参照の診断。Native と Bridge の両方で使えるか P3 で判断
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/ResolverAAImpl.kt,48262,Google LLC;JetBrains,ksp-bridge,adapt,P2,planned,,resolver/。ラウンド・生成物の参照は engine-spi の AnalysisAccess 経由に改変（ADR-017。ksp-bridge はエンジンに直接依存しない）
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/java/KSAnnotationJavaImpl.kt,8938,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/java/KSValueArgumentLiteImpl.kt,517,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/AbstractKSDeclarationImpl.kt,7309,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSAnnotationImpl.kt,5126,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSAnnotationOps.kt,7805,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSBackingFieldImpl.kt,5677,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSBackingFieldJavaImpl.kt,5268,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSCallableReferenceImpl.kt,1947,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSClassDeclarationEnumEntryImpl.kt,5008,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSClassDeclarationImpl.kt,14462,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSClassifierReferenceImpl.kt,2373,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSContextParameterImpl.kt,7548,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSDefNonNullReferenceImpl.kt,1262,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSDynamicReferenceImpl.kt,842,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSErrorType.kt,2767,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSErrorTypeClassDeclaration.kt,3352,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSExpectActualImpl.kt,1721,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFileImpl.kt,4146,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFileJavaImpl.kt,2790,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFunctionDeclarationImpl.kt,24132,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFunctionErrorImpl.kt,1269,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFunctionImpl.kt,4163,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSPropertyAccessorImpl.kt,6747,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSPropertyDeclarationImpl.kt,13480,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSPropertyDeclarationJavaImpl.kt,8627,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSPropertyDeclarationLocalVariableImpl.kt,2473,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeAliasImpl.kt,2541,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeArgumentImpl.kt,2630,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeArgumentLiteImpl.kt,1403,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeImpl.kt,6938,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeParameterImpl.kt,3989,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeReferenceImpl.kt,4873,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSValueArgumentImpl.kt,2771,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSValueParameterImpl.kt,5196,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSValueParameterLiteImpl.kt,1615,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSAnnotationResolvedImpl.kt,7194,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSClassifierReferenceResolvedImpl.kt,2936,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSTypeArgumentResolvedImpl.kt,3258,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSTypeReferenceResolvedImpl.kt,6712,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/synthetic/KSSyntheticAnnotations.kt,782,none,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/synthetic/KSSyntheticJavaBackingFieldImpl.kt,4367,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/util.kt,59380,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/util/BinaryUtils.kt,11726,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/util/PsiUtils.kt,4409,Google LLC;JetBrains,ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/IncrementalJavaFileManager.kt,8310,none,analysis-engine,as-is,P2,planned,,source-index/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/IncrementalKotlinDeclarationProviderFactory.kt,2360,none,analysis-engine,as-is,P2,planned,,source-index/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/IncrementalKotlinPackageProviderFactory.kt,2615,none,analysis-engine,as-is,P2,planned,,source-index/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/JvmDependenciesPackageIndex.kt,1450,none,analysis-engine,as-is,P2,planned,,library-index/
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/KspLibraryModuleBuilder.kt,6238,Google LLC;JetBrains,analysis-engine,adapt,P2,planned,,module-graph/。KLIB・metadata 依存を P-01 の結論に合わせて改変
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/KspSourceModuleBuilder.kt,4541,Google LLC;JetBrains,analysis-engine,adapt,P2,planned,,module-graph/。SourceSet と dependsOn を扱えるように改変（P-01）
-kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/KspStandaloneDirectInheritorsProvider.kt,5793,none,analysis-engine,as-is,P2,planned,,source-index/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/DualLookupTracker.kt,2021,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,incremental/。IncrementalParticipant（ADR-017）の内部で使う
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/FileCache.kt,2669,Google LLC;JetBrains,analysis-code-gen-analysis-engine,as-is,P2,planned,,source-index/。KtFile ごとのクラス名キャッシュ
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/IncrementalContextAA.kt,20747,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,incremental/。KS オブジェクトと密結合。analysis-code-gen-engine-spi の IncrementalParticipant（ADR-017）として dirty 計算に参加する
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/KSPCoreEnvironment.kt,1307,Google LLC;JetBrains,analysis-code-gen-analysis-engine,as-is,P2,planned,,environment/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/KSPLoader.kt,1539,Google LLC;JetBrains,analysis-code-gen-processing-engine,reference,P2,not-ported,,processor-loader/ は新規設計。読んで参考にするだけ
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/KotlinSymbolProcessing.kt,39461,Google LLC;JetBrains,analysis-code-gen-analysis-engine;analysis-code-gen-processing-engine,adapt,P2,planned,,AA 環境構築・インデックス更新・無効化は analysis-code-gen-analysis-engine、ラウンドループは analysis-code-gen-processing-engine へ分割。版で形が変わる AA 呼び出しは analysis-code-gen-aa-compat 経由（ADR-011）。P2 はほぼそのまま分割し P3 で SourceSet 単位へ作り直す
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/KspDiagnostics.kt,5026,Google LLC;JetBrains,analysis-code-gen-processing-engine,adapt,P3,planned,,未解決参照の診断。Native と Bridge の両方で使えるか P3 で判断
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/ResolverAAImpl.kt,48262,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,adapt,P2,planned,,resolver/。ラウンド・生成物の参照は analysis-code-gen-engine-spi の AnalysisAccess 経由に改変（ADR-017。analysis-code-gen-ksp-bridge はエンジンに直接依存しない）
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/java/KSAnnotationJavaImpl.kt,8938,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/java/KSValueArgumentLiteImpl.kt,517,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/AbstractKSDeclarationImpl.kt,7309,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSAnnotationImpl.kt,5126,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSAnnotationOps.kt,7805,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSBackingFieldImpl.kt,5677,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSBackingFieldJavaImpl.kt,5268,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSCallableReferenceImpl.kt,1947,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSClassDeclarationEnumEntryImpl.kt,5008,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSClassDeclarationImpl.kt,14462,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSClassifierReferenceImpl.kt,2373,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSContextParameterImpl.kt,7548,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSDefNonNullReferenceImpl.kt,1262,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSDynamicReferenceImpl.kt,842,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSErrorType.kt,2767,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSErrorTypeClassDeclaration.kt,3352,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSExpectActualImpl.kt,1721,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFileImpl.kt,4146,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFileJavaImpl.kt,2790,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFunctionDeclarationImpl.kt,24132,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFunctionErrorImpl.kt,1269,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSFunctionImpl.kt,4163,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSPropertyAccessorImpl.kt,6747,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSPropertyDeclarationImpl.kt,13480,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSPropertyDeclarationJavaImpl.kt,8627,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSPropertyDeclarationLocalVariableImpl.kt,2473,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeAliasImpl.kt,2541,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeArgumentImpl.kt,2630,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeArgumentLiteImpl.kt,1403,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeImpl.kt,6938,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeParameterImpl.kt,3989,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeReferenceImpl.kt,4873,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSValueArgumentImpl.kt,2771,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSValueParameterImpl.kt,5196,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSValueParameterLiteImpl.kt,1615,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSAnnotationResolvedImpl.kt,7194,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSClassifierReferenceResolvedImpl.kt,2936,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSTypeArgumentResolvedImpl.kt,3258,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSTypeReferenceResolvedImpl.kt,6712,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/synthetic/KSSyntheticAnnotations.kt,782,none,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/synthetic/KSSyntheticJavaBackingFieldImpl.kt,4367,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/util.kt,59380,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/util/BinaryUtils.kt,11726,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/util/PsiUtils.kt,4409,Google LLC;JetBrains,analysis-code-gen-ksp-bridge,as-is,P2,planned,,symbols/。KS* 実装
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/IncrementalJavaFileManager.kt,8310,none,analysis-code-gen-analysis-engine,as-is,P2,planned,,source-index/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/IncrementalKotlinDeclarationProviderFactory.kt,2360,none,analysis-code-gen-analysis-engine,as-is,P2,planned,,source-index/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/IncrementalKotlinPackageProviderFactory.kt,2615,none,analysis-code-gen-analysis-engine,as-is,P2,planned,,source-index/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/JvmDependenciesPackageIndex.kt,1450,none,analysis-code-gen-analysis-engine,as-is,P2,planned,,library-index/
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/KspLibraryModuleBuilder.kt,6238,Google LLC;JetBrains,analysis-code-gen-analysis-engine,adapt,P2,planned,,module-graph/。KLIB・metadata 依存を P-01 の結論に合わせて改変
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/KspSourceModuleBuilder.kt,4541,Google LLC;JetBrains,analysis-code-gen-analysis-engine,adapt,P2,planned,,module-graph/。SourceSet と dependsOn を扱えるように改変（P-01）
+kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/KspStandaloneDirectInheritorsProvider.kt,5793,none,analysis-code-gen-analysis-engine,as-is,P2,planned,,source-index/
 kotlin-analysis-api/src/test/kotlin/com/google/devtools/ksp/processor/AnnotationArrayValueTypeProcessor.kt,2449,Google LLC;JetBrains,ksp-compatibility-tests,as-is,P1,ported,ksp-compatibility-tests/src/kspt/kotlin/com/google/devtools/ksp/processor/AnnotationArrayValueTypeProcessor.kt,KSPT のテスト用 Processor（ADR-024）。期待値に FQN が出るためパッケージは上流のまま
 kotlin-analysis-api/src/test/kotlin/com/google/devtools/ksp/processor/AnnotationsInDependenciesProcessor.kt,5546,Google LLC;JetBrains,ksp-compatibility-tests,as-is,P1,ported,ksp-compatibility-tests/src/kspt/kotlin/com/google/devtools/ksp/processor/AnnotationsInDependenciesProcessor.kt,KSPT のテスト用 Processor（ADR-024）。期待値に FQN が出るためパッケージは上流のまま
 kotlin-analysis-api/src/test/kotlin/com/google/devtools/ksp/processor/BackingFieldsPackageNameNPEProcessor.kt,2126,Google LLC;JetBrains,ksp-compatibility-tests,as-is,P1,ported,ksp-compatibility-tests/src/kspt/kotlin/com/google/devtools/ksp/processor/BackingFieldsPackageNameNPEProcessor.kt,KSPT のテスト用 Processor（ADR-024）。期待値に FQN が出るためパッケージは上流のまま

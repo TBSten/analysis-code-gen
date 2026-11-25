@@ -1,7 +1,7 @@
 // 公開 DSL（ADR-016）で書いた F-KMP-CUSTOM。階層: commonMain ← sharedJvmJsMain ← {jvmMain, jsMain}、commonMain ← nativeMain ← linuxX64Main
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    id("me.tbsten.analysiscodegen")
+    id("me.tbsten.analysis.code.gen")
 }
 
 kotlin {

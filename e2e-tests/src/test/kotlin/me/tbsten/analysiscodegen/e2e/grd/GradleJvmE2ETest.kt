@@ -165,7 +165,7 @@ class GradleJvmE2ETest : E2ESpec({
                     """
                     plugins {
                         alias(libs.plugins.kotlin.jvm)
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     kotlin { jvmToolchain($jdk) }
                     analysisCodeGen {
@@ -314,7 +314,7 @@ class GradleJvmE2ETest : E2ESpec({
                     """
                     plugins {
                         alias(libs.plugins.kotlin.jvm)
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     analysisCodeGen {
                         arg("tp.processors", "Probe")
@@ -370,7 +370,7 @@ class GradleJvmE2ETest : E2ESpec({
                     buildscript { dependencies { classpath("com.google.guava:guava:33.4.0-jre") } }
                     plugins {
                         alias(libs.plugins.kotlin.jvm)
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     analysisCodeGen { sourceSets { main { processor(project(":processor")) } } }
                     tasks.register("printGuava") {
@@ -510,7 +510,7 @@ class GradleJvmE2ETest : E2ESpec({
                     """
                     plugins {
                         alias(libs.plugins.kotlin.jvm)
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     analysisCodeGen { sourceSets { main { processor("example:my-processor:1.0") } } }
                     """,
@@ -573,7 +573,7 @@ class GradleJvmE2ETest : E2ESpec({
                     """
                     plugins {
                         alias(libs.plugins.kotlin.jvm)
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     analysisCodeGen {
                         sourceSets { main { processor(project(":processor")) } }

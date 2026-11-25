@@ -9,7 +9,7 @@ plugins {
 val libs = versionCatalogs.named("libs")
 
 dependencies {
-    api(project(":testing"))
+    api(project(":analysis-code-gen-testing"))
     testImplementation(project(":test-processors:ksp"))
     // XD-16 の性質テストは PBT 基盤の acgCheckAll で回す（ADR-022）
     testImplementation(project(":pbt"))

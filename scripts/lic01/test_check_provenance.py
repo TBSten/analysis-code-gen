@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import check_provenance as cp  # noqa: E402
 
 UP_PATH = "kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/FileCache.kt"
-TARGET = "analysis-engine/src/main/kotlin/example/FileCache.kt"
+TARGET = "analysis-code-gen-analysis-engine/src/main/kotlin/example/FileCache.kt"
 
 UPSTREAM_HEADER = textwrap.dedent("""\
     /*
@@ -64,7 +64,7 @@ class Fixture:
     def set_map(self, status: str, targets: str, strategy: str = "as-is") -> None:
         header = ",".join(cp.PORT_MAP_COLUMNS)
         self.write("porting/ksp/port-map.csv",
-                   f"{header}\n{UP_PATH},100,Google LLC;JetBrains,analysis-engine,{strategy},P2,{status},{targets},\n")
+                   f"{header}\n{UP_PATH},100,Google LLC;JetBrains,analysis-code-gen-analysis-engine,{strategy},P2,{status},{targets},\n")
 
     def ported_file(self, *, sha: str | None = None, header: str = UPSTREAM_HEADER,
                     modified_by: bool = True, modifications: str | None = "パッケージ名を変更") -> None:
@@ -201,7 +201,7 @@ class CheckProvenanceTest(unittest.TestCase):
         self.assertRule(self.run_check(), "R4", "Copied.java")
 
     def test_import_of_ksp_api_is_not_a_copy(self) -> None:
-        self.fx.write("ksp-bridge/src/Adapter.kt",
+        self.fx.write("analysis-code-gen-ksp-bridge/src/Adapter.kt",
                       "package example\nimport com.google.devtools.ksp.processing.SymbolProcessor\n")
         self.assertEqual(self.run_check(), [])
 
@@ -222,7 +222,7 @@ class CheckProvenanceTest(unittest.TestCase):
         (self.root / TARGET).write_text(text)
         self.fx.write("porting/ksp/port-map.csv",
                       ",".join(cp.PORT_MAP_COLUMNS) + "\n"
-                      + f"{UP_PATH.replace('FileCache', 'Nope')},1,Google LLC,analysis-engine,as-is,P2,ported,{TARGET},\n")
+                      + f"{UP_PATH.replace('FileCache', 'Nope')},1,Google LLC,analysis-code-gen-analysis-engine,as-is,P2,ported,{TARGET},\n")
         self.assertRule(self.run_check(with_upstream=True), "R5", "無い")
 
     # --- MPL-2.0 の上流（kotlin-compile-testing、ADR-021） ---
@@ -237,10 +237,10 @@ class CheckProvenanceTest(unittest.TestCase):
             notice_marker=kotlin-compile-testing
             """))
         self.fx.write("NOTICE", f"Kotlin Symbol Processing (KSP) 2.3.14 kotlin-compile-testing 0.14.0 {self.sha} Apache License\n")
-        target = "testing-kct/src/main/kotlin/example/SourceFile.kt"
+        target = "analysis-code-gen-testing-kct/src/main/kotlin/example/SourceFile.kt"
         up_path = "core/src/main/kotlin/com/tschuchort/compiletesting/SourceFile.kt"
         header = ",".join(cp.PORT_MAP_COLUMNS)
-        self.fx.write("porting/kct/port-map.csv", f"{header}\n{up_path},1,,testing-kct,as-is,P1,ported,{target},\n")
+        self.fx.write("porting/kct/port-map.csv", f"{header}\n{up_path},1,,analysis-code-gen-testing-kct,as-is,P1,ported,{target},\n")
         return target
 
     def _mpl_file(self, target: str, license_lines: str) -> None:
@@ -264,7 +264,7 @@ class CheckProvenanceTest(unittest.TestCase):
         self.assertRule(self.run_check(), "R2", "MPL-2.0")
 
     def test_unrecorded_kct_copy(self) -> None:
-        self.fx.write("testing/src/main/kotlin/Copied.kt", "package com.tschuchort.compiletesting\n\nclass X\n")
+        self.fx.write("analysis-code-gen-testing/src/main/kotlin/Copied.kt", "package com.tschuchort.compiletesting\n\nclass X\n")
         self.assertRule(self.run_check(), "R4", "Ported-From 行が無い")
 
     # --- 実リポジトリ ---

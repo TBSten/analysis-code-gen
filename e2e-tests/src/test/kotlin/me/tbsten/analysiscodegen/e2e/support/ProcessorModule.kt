@@ -13,7 +13,8 @@ package me.tbsten.analysiscodegen.e2e.support
  * }
  * ```
  *
- * - processor-api は compileOnly（実行時はエンジンが渡す。ADR-013）。`build/fixture-repo` に processor-api が publish されている必要がある
+ * - analysis-code-gen-processor-api は compileOnly（実行時はエンジンが渡す。ADR-013）。
+ *   `build/fixture-repo` に analysis-code-gen-processor-api が publish されている必要がある
  * - [dependencies] は `dependencies { }` の中にそのまま書く行
  */
 fun FixtureProject.processorModule(
@@ -31,7 +32,7 @@ fun FixtureProject.processorModule(
         group = "$group"
         version = "$version"
         dependencies {
-            compileOnly("me.tbsten.analysiscodegen:processor-api:${'$'}{acg.versions.acg.get()}")
+            compileOnly("me.tbsten.analysis.code.gen:analysis-code-gen-processor-api:${'$'}{acg.versions.acg.get()}")
         ${dependencies.joinToString("\n") { "    $it" }}
         }
         """,

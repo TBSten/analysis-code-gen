@@ -374,7 +374,7 @@ class KmpE2ETest : E2ESpec({
                     """
                     plugins {
                         alias(libs.plugins.kotlin.multiplatform)
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     kotlin {
                         jvm()
@@ -444,7 +444,7 @@ class KmpE2ETest : E2ESpec({
                     """
                     plugins {
                         alias(libs.plugins.kotlin.multiplatform)
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     kotlin {
                         jvm()

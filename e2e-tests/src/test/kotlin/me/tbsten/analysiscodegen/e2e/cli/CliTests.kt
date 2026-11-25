@@ -37,11 +37,11 @@ private const val CLI_MAIN = "me.tbsten.analysiscodegen.cli.MainKt"
 
 private val json = Json { prettyPrint = true }
 
-/** CLI を動かす classpath。e2e-tests のビルドが `:cli` の実行時 classpath を渡す（ADR-040）。 */
+/** CLI を動かす classpath。e2e-tests のビルドが `:analysis-code-gen-cli` の実行時 classpath を渡す（ADR-040）。 */
 private val cliClasspath: String
     get() =
         System.getProperty("acg.cli.classpath")?.takeIf { it.isNotBlank() }
-            ?: error("system property acg.cli.classpath が無い（e2e-tests のビルドが :cli の実行時 classpath を渡す。ADR-040）")
+            ?: error("system property acg.cli.classpath が無い（e2e-tests のビルドが :analysis-code-gen-cli の実行時 classpath を渡す。ADR-040）")
 
 private data class CliRun(val exitCode: Int, val stdout: String, val stderr: String) {
     val stderrLines: List<String> get() = stderr.lines().filter { it.isNotBlank() }

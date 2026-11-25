@@ -12,16 +12,16 @@ KSP の API をすべて外し、Analysis API（AA）と PSI だけで書きま�
 
 ## 依存を替える
 
-`symbol-processing-api` と `ksp-bridge-api` を外し、`processor-api` に替えます。
+`symbol-processing-api` と `analysis-code-gen-ksp-bridge-api` を外し、`analysis-code-gen-processor-api` に替えます。
 
 ```kotlin title="hello-native-processor/build.gradle.kts"
 dependencies {
-    // symbol-processing-api と ksp-bridge-api は要らなくなる
-    compileOnly("me.tbsten.analysiscodegen:processor-api:0.1.0")
+    // symbol-processing-api と analysis-code-gen-ksp-bridge-api は要らなくなる
+    compileOnly("me.tbsten.analysis.code.gen:analysis-code-gen-processor-api:0.1.0")
 }
 ```
 
-使う側は plugin を `me.tbsten.analysiscodegen` に戻せます。ほかの KSP Processor を使っていなければ Bridge は要りません。
+使う側は plugin を `me.tbsten.analysis.code.gen` に戻せます。ほかの KSP Processor を使っていなければ Bridge は要りません。
 
 ## Provider を替える
 
@@ -91,7 +91,7 @@ context.defer(classSymbol.createPointer())
 
 | やること | 移行前 → 移行後 |
 |---|---|
-| 依存 | `symbol-processing-api` → `processor-api` |
+| 依存 | `symbol-processing-api` → `analysis-code-gen-processor-api` |
 | Provider | `SymbolProcessorProvider` → `AnalysisCodegenProcessorProvider` |
 | 探し方 | `getSymbolsWithAnnotation` → `newFiles` + `analyze` |
 | 生成 | `createNewFile` → `generateKotlin` |

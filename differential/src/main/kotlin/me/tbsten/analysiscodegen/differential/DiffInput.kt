@@ -57,7 +57,7 @@ public data class DiffSource(
  * 比べる Processor 1 つ。
  *
  * - [ksp]: KSP 版の Provider を作る関数。K と B はこれを使う。無ければ K / B は動かない
- * - [nativeProviderClass]: Native 移植版の Provider のクラス名。processor-api（ACG-34）が入るまでは型を持たずに名前で持つ。
+ * - [nativeProviderClass]: Native 移植版の Provider のクラス名。analysis-code-gen-processor-api（ACG-34）が入るまでは型を持たずに名前で持つ。
  *   無い Processor（Room など）は N を動かさない
  * - [version]: 元の Processor の版（例: Moshi なら `1.15.2`）。K 結果キャッシュの鍵に入る。
  *   さらに [ksp] が作るクラスの置き場所（jar かディレクトリ）の中身のハッシュも鍵に入るので、版を上げ忘れてもキャッシュは古くならない

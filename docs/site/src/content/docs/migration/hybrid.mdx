@@ -15,13 +15,13 @@ KSP の API では、プロパティの初期化式や関数の本体を読め�
 
 ## 依存を足す
 
-Processor のモジュールに `ksp-bridge-api` を足します。素の KSP でも読み込めるよう、Processor に同梱します。
+Processor のモジュールに `analysis-code-gen-ksp-bridge-api` を足します。素の KSP でも読み込めるよう、Processor に同梱します。
 
 ```kotlin title="hello-hybrid-processor/build.gradle.kts"
 dependencies {
     compileOnly("com.google.devtools.ksp:symbol-processing-api:2.3.14")
     // withAnalysis など。素の KSP でも読み込めるよう Processor に同梱する
-    implementation("me.tbsten.analysiscodegen:ksp-bridge-api:0.1.0")
+    implementation("me.tbsten.analysis.code.gen:analysis-code-gen-ksp-bridge-api:0.1.0")
 }
 ```
 
@@ -74,7 +74,7 @@ val isNullable = type.withAnalysis { kaType -> kaType.isMarkedNullable }
 
 | 要素 | 役割 |
 |---|---|
-| `ksp-bridge-api` | Hybrid API の入ったライブラリ |
+| `analysis-code-gen-ksp-bridge-api` | Hybrid API の入ったライブラリ |
 | `withAnalysis { }` | KS のオブジェクトから AA に入る |
 | `isAnalysisCodegenBridge` | Bridge の上かどうか |
 | `UnsupportedHybridConversionException` | AA に対応するものが無い |
