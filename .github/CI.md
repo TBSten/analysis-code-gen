@@ -6,12 +6,12 @@
 
 | ワークフロー | いつ | 中身 | 知らせ方 |
 |---|---|---|---|
-| `ci.yml` | PR・main への push | 軽い検査（script）、`./gradlew build`（test・ktlint を含む）を Kotlin 2 版で | PR のチェック。必須は `ci-ok` だけ |
+| `ci.yml` | PR・main への push | 軽い検査（script。doc-lint を含む）、`./gradlew build`（test・ktlint を含む）を Kotlin 2 版で | PR のチェック。必須は `ci-ok` だけ |
 | `nightly.yml` | 毎日 04:00 JST | 全 Kotlin 版の build、macOS、保留中ケースの実行 | issue `nightly-failure` / `unexpected-pass` |
 | `kotlin-upstream.yml` | 毎日 08:00 JST | Maven Central の Kotlin と `gradle/kotlin-versions.txt` の差 | issue `kotlin-upstream` |
 | `docs.yml` | docs などの PR・main への push | サイトのビルド、Dokka、内部リンク検査、Pages へのデプロイ | PR のチェック |
 | `pbt-hourly.yml` | 毎時 | PBT × E2E（ACG-40 が追加。詳細は ADR-022） | ACG-40 の取り決め |
-| `lic-01.yml` ほか | PR・push | 出所記録・版一覧・Processor 一覧の検査 | PR のチェック |
+| `lic-01.yml` ほか | PR・push | 出所記録・版一覧・Processor 一覧・PoC の検査（ci-ok の外。必要なら必須に足す） | PR のチェック |
 
 issue は同じラベルで 1 つだけ開き、続けて落ちたらコメントを足す。回復したら自動で閉じる。毎朝 09:00 の振り返りはこの issue を見る。
 
