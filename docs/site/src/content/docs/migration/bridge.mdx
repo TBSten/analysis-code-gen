@@ -1,0 +1,107 @@
+---
+title: 1. KSP Bridge に載せ替える
+description: KSP の Processor をコードを変えずに analysisCodeGen の KSP Bridge で動かします。
+fixture: fixtures/docs/migration
+---
+
+:::note[レビューで判断してほしいこと]
+- KMP での既定を、KSP2 と同じ見え方の `Compatible` モードにしてよいか
+- 同じ jar に Native と KSP の両方の Provider があるとき、Native だけを使う方針でよいか
+:::
+
+Processor のコードは変えず、使う側のビルドスクリプトだけを書き換えます。
+
+## plugin を替える
+
+KSP の plugin を外し、KSP Bridge の plugin を適用します。移行前はこうです。
+
+```kotlin title="ksp-app/build.gradle.kts"
+plugins {
+    kotlin("jvm") version "2.4.21"
+    id("com.google.devtools.ksp") version "2.3.14"
+}
+
+dependencies {
+    ksp(project(":hello-ksp-processor"))
+}
+```
+
+移行後は `ksp(...)` を `analysisCodeGen(...)` にします。
+
+```kotlin title="app/build.gradle.kts"
+plugins {
+    kotlin("jvm") version "2.4.21"
+    id("me.tbsten.analysiscodegen.ksp-bridge") version "0.1.0"
+    application
+}
+
+dependencies {
+    analysisCodeGen(project(":hello-ksp-processor"))
+}
+```
+
+本体の plugin `me.tbsten.analysiscodegen` も自動で適用されます。
+
+## オプションを移す
+
+`ksp { arg(...) }` は `analysisCodeGen { arg(...) }` に移します。Processor から見える値は同じです。
+
+```kotlin title="app/build.gradle.kts"
+analysisCodeGen {
+    arg("hello.verbose", "true")
+}
+```
+
+KMP の `kspJvm(...)` のような設定は、下の対応表で置き換えます。
+
+| KSP | analysisCodeGen |
+|---|---|
+| `ksp(...)`（KMP 以外） | `analysisCodeGen(...)` |
+| `kspCommonMainMetadata(...)` | `analysisCodeGenCommonMain(...)` |
+| `kspJvm(...)` | `analysisCodeGenJvmMainCompilation(...)` |
+| `ksp { arg(k, v) }` | `analysisCodeGen { arg(k, v) }` |
+
+## 同じ結果かテストで確かめる
+
+同じテストを公式の KSP2 と Bridge で流し、生成物を比べます。
+
+```kotlin title="hello-ksp-processor/src/test/kotlin/com/example/hello/BridgeCompatibilityTest.kt"
+val (ksp2, bridge) = listOf(TestEngine.Ksp2, TestEngine.AnalysisCodegen).map { engine ->
+    runCodegenTest(engine) {
+        kotlin("com/example/Greeter.kt", "package com.example\n\nannotation class Hello\n\n@Hello class Greeter")
+        ksp(HelloSymbolProcessorProvider())
+    }
+}
+assertTrue(bridge.isSuccess, bridge.messages)
+assertEquals(ksp2.generatedFiles, bridge.generatedFiles)
+```
+
+違いが出たら、KSP2 との互換の不具合として報告してください。
+
+## KMP での実行モードを選ぶ
+
+KMP では、既定の `Compatible` モードが KSP2 と同じファイルの見え方で動きます。
+
+```kotlin
+analysisCodeGen {
+    kspBridge {
+        processingMode = KspProcessingMode.SourceSet
+    }
+}
+```
+
+`SourceSet` モードでは、`getAllFiles()` がその SourceSet のファイルだけになります。共通コードの生成が 1 回で済みますが、Processor が対応している必要があります。
+
+## まとめ
+
+| やること | 書き換える場所 |
+|---|---|
+| plugin を替える | `com.google.devtools.ksp` → `me.tbsten.analysiscodegen.ksp-bridge` |
+| 依存を替える | `ksp(...)` → `analysisCodeGen(...)` |
+| オプションを移す | `ksp { arg }` → `analysisCodeGen { arg }` |
+| 結果を比べる | `TestEngine.Ksp2` と `TestEngine.AnalysisCodegen` |
+| KMP のモード | `kspBridge { processingMode }` |
+
+## 次のステップ
+
+- [2. Hybrid で AA を使う](/analysis-code-gen/migration/hybrid/): KSP では読めない情報を読む
