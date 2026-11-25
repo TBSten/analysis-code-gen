@@ -18,6 +18,7 @@ dependencies {
     acgCases(project(":e2e-tests"))
     acgCases(project(":engine-tests"))
     acgCases(project(":pbt"))
+    acgCases(project(":differential"))
 }
 
 val baseRef = providers.gradleProperty("acg.caseCheck.baseRef").orElse("origin/main")
