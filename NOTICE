@@ -1,0 +1,26 @@
+analysis-code-gen
+Copyright 2026 analysis-code-gen contributors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+------------------------------------------------------------------------
+Third-party code
+------------------------------------------------------------------------
+
+This product includes software derived from Kotlin Symbol Processing (KSP),
+https://github.com/google/ksp
+  Copyright Google LLC
+  Copyright JetBrains s.r.o. and Kotlin Programming Language contributors
+  Licensed under the Apache License, Version 2.0.
+  Ported from tag 2.3.14 (commit a3aaaabae570bae3ab4b84e72385483a14ab4498).
+  The upstream repository has no NOTICE file at that commit.
+
+Some files ported from KSP were themselves derived from the IntelliJ Platform
+and the Kotlin compiler,
+  Copyright JetBrains s.r.o. and contributors
+  Licensed under the Apache License, Version 2.0.
+
+Every ported file keeps its original copyright and license header and carries
+"Ported-From", "Modified-By" and "Modifications" lines that name the upstream
+path, the upstream commit and what was changed. The full list of ported files
+is in porting/ksp/port-map.csv.
