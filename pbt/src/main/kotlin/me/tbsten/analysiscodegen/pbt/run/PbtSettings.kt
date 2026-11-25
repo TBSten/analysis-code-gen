@@ -72,8 +72,7 @@ public data class PbtSettings(
             )
         }
 
-        private fun lookup(key: String): String? =
-            System.getProperty(key) ?: System.getenv(key.uppercase().replace('.', '_'))
+        private fun lookup(key: String): String? = System.getProperty(key) ?: System.getenv(key.uppercase().replace('.', '_'))
     }
 }
 

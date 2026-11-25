@@ -162,7 +162,14 @@ private class Renderer(private val index: SpecIndex) {
                     } else {
                         defaultExpr(p.type)
                     }
-                val kw = if (d.isConst) "const val" else if (p.mutable) "var" else "val"
+                val kw =
+                    if (d.isConst) {
+                        "const val"
+                    } else if (p.mutable) {
+                        "var"
+                    } else {
+                        "val"
+                    }
                 out.appendLine("${annos(p.annotations)}${p.visibility.keyword} $kw ${p.name}: ${type(p.type)} = $init")
             }
         }
@@ -177,7 +184,8 @@ private class Renderer(private val index: SpecIndex) {
             f.params.joinToString(", ") { p ->
                 annos(p.annotations) + "${p.name}: ${type(p.type)}" + if (p.hasDefault) " = ${defaultExpr(p.type)}" else ""
             }
-        return "${annos(f.annotations)}${f.visibility.keyword} fun $tps$receiver${f.name}($params): ${type(f.returnType)} = TODO()"
+        return "${annos(f.annotations)}${f.visibility.keyword} fun $tps$receiver${f.name}($params): ${type(f.returnType)} = " +
+            if (f.bodyVersion == 0) "TODO()" else "TODO(\"b${f.bodyVersion}\")"
     }
 
     private fun property(

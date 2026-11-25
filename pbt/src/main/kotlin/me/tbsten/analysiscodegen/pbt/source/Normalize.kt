@@ -184,17 +184,26 @@ private class Structural {
         // 名前
         val tpNames = HashSet<String>()
         d = d.copy(typeParams = d.typeParams.filter { tpNames.add(it.name) })
-        val variantOk = { tp: TypeParamSpec -> if (tp.variance != Variance.INVARIANT && tp.bound !in setOf(Bound.None, Bound.AnyBound)) tp.copy(bound = Bound.None) else tp }
+        val variantOk = { tp: TypeParamSpec ->
+            if (tp.variance != Variance.INVARIANT &&
+                tp.bound !in setOf(Bound.None, Bound.AnyBound)
+            ) {
+                tp.copy(bound = Bound.None)
+            } else {
+                tp
+            }
+        }
         d = d.copy(typeParams = d.typeParams.map(variantOk))
         val memberVis =
             if (k == ClassKind.INTERFACE) listOf(Visibility.PUBLIC) else Visibility.entries
         d =
             d.copy(
                 ctorParams =
-                    d.ctorParams.map {
-                        val name = if (it.kind == PropKind.PLAIN) it.name else uniqueMember(it.name)
-                        it.copy(name = name, visibility = if (it.kind == PropKind.PLAIN) Visibility.PUBLIC else it.visibility)
-                    }.distinctBy { it.name },
+                    d.ctorParams
+                        .map {
+                            val name = if (it.kind == PropKind.PLAIN) it.name else uniqueMember(it.name)
+                            it.copy(name = name, visibility = if (it.kind == PropKind.PLAIN) Visibility.PUBLIC else it.visibility)
+                        }.distinctBy { it.name },
                 members = d.members.map { member(it, memberVis) },
                 companion = d.companion.map { member(it, if (k == ClassKind.INTERFACE) listOf(Visibility.PUBLIC) else Visibility.entries) },
                 superInterfaces = d.superInterfaces.distinct().filter { it != d.id },
@@ -395,15 +404,16 @@ private class References(private val spec: ProjectSpec) {
             val info = index.decls[u.annotationId] ?: return@mapNotNull null
             if (info.kind != ClassKind.ANNOTATION || !accessible(info, c) || !seen.add(u.annotationId)) return@mapNotNull null
             val args =
-                info.annotationParams.mapNotNull { p ->
-                    val a = u.args[p.name]
-                    val fixed = a?.let { arg(it, p.type, c) }
-                    when {
-                        fixed != null -> p.name to fixed
-                        p.hasDefault -> null
-                        else -> p.name to defaultArg(p.type)
-                    }
-                }.toMap()
+                info.annotationParams
+                    .mapNotNull { p ->
+                        val a = u.args[p.name]
+                        val fixed = a?.let { arg(it, p.type, c) }
+                        when {
+                            fixed != null -> p.name to fixed
+                            p.hasDefault -> null
+                            else -> p.name to defaultArg(p.type)
+                        }
+                    }.toMap()
             u.copy(args = args, site = if (u.site in sites) u.site else UseSite.NONE)
         }
     }
@@ -461,10 +471,8 @@ private class References(private val spec: ProjectSpec) {
                 val p = d.prop
                 val t = type(p.type, base.vis(p.visibility), if (p.mutable) Pos.INV else Pos.OUT)
                 val constOk = !p.mutable && t is TypeRef.Builtin && !t.nullable && t.type in setOf(BuiltinType.INT, BuiltinType.STRING)
-                d.copy(
-                    prop = p.copy(type = t, annotations = annotations(p.annotations, base, setOf(UseSite.NONE, UseSite.FIELD, UseSite.GET, UseSite.PROPERTY))),
-                    isConst = d.isConst && constOk,
-                )
+                val annos = annotations(p.annotations, base, setOf(UseSite.NONE, UseSite.FIELD, UseSite.GET, UseSite.PROPERTY))
+                d.copy(prop = p.copy(type = t, annotations = annos), isConst = d.isConst && constOk)
             }
         }
     }
@@ -494,7 +502,16 @@ private class References(private val spec: ProjectSpec) {
         val clsCtx = Ctx(outerCtx.module, emptyMap(), eff)
         // 自分の中の宣言を継承・上限に使うと「supertypes の循環」になる
         val own = descendants(d)
-        val tps = typeParams(d.typeParams, clsCtx).map { if (it.bound is Bound.Interface && (it.bound as Bound.Interface).id in own) it.copy(bound = Bound.None) else it }
+        val tps =
+            typeParams(d.typeParams, clsCtx).map {
+                if (it.bound is Bound.Interface &&
+                    (it.bound as Bound.Interface).id in own
+                ) {
+                    it.copy(bound = Bound.None)
+                } else {
+                    it
+                }
+            }
         val inner = clsCtx.with(tps)
 
         val supers =
@@ -577,7 +594,10 @@ private class References(private val spec: ProjectSpec) {
         val c = base.with(tps)
         return f.copy(
             typeParams = tps,
-            params = f.params.map { p -> p.copy(type = type(p.type, c, Pos.IN), annotations = annotations(p.annotations, c, setOf(UseSite.NONE))) },
+            params =
+                f.params.map { p ->
+                    p.copy(type = type(p.type, c, Pos.IN), annotations = annotations(p.annotations, c, setOf(UseSite.NONE)))
+                },
             returnType = type(f.returnType, c, Pos.OUT),
             annotations = annotations(f.annotations, c, setOf(UseSite.NONE)),
         )
@@ -606,7 +626,13 @@ private class References(private val spec: ProjectSpec) {
                                 if (ok) t0.copy(nullable = false, starArgs = 0) else TypeRef.INT
                             }
                             is TypeRef.Java ->
-                                if (index.javas[t0.id]?.module in index.visibleModules[module].orEmpty()) t0.copy(nullable = true) else TypeRef.INT
+                                if (index.javas[t0.id]?.module in
+                                    index.visibleModules[module].orEmpty()
+                                ) {
+                                    t0.copy(nullable = true)
+                                } else {
+                                    TypeRef.INT
+                                }
                             is TypeRef.Param -> TypeRef.INT
                         }
                     f.copy(type = t)

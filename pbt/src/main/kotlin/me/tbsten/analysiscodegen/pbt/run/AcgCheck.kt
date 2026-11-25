@@ -46,6 +46,7 @@ public class PbtFailure(
  * @param generatorVersion 生成器の版。保存した seed がどの版の生成器で見つかったかを残す
  * @param weight 定期実行の時間の配分の重み
  * @param labels 生成した値のラベル（網羅の記録用）
+ * @param regressions 再生する回帰ケース（既定はテストのリソース `pbt/regressions/<name>.tsv`）
  */
 public suspend fun <A> acgCheckAll(
     name: String,
@@ -55,6 +56,7 @@ public suspend fun <A> acgCheckAll(
     weight: Double = 1.0,
     labels: ((A) -> Iterable<String>)? = null,
     settings: PbtSettings = PbtSettings.current,
+    regressions: List<Regression> = RegressionStore.load(name),
     property: suspend PropertyContext.(A) -> Unit,
 ): PbtRunSummary {
     if (settings.only != null && settings.only != name) return PbtRunSummary(name, true, emptyList(), emptyMap())
@@ -74,7 +76,8 @@ public suspend fun <A> acgCheckAll(
             }
         } catch (e: Throwable) {
             if (e is PbtFailure) throw e
-            val r = Regression(seed, iterations, generatorVersion, "$origin: ${e.message?.lineSequence()?.firstOrNull().orEmpty().take(80)}")
+            val r =
+                Regression(seed, iterations, generatorVersion, "$origin: ${e.message?.lineSequence()?.firstOrNull().orEmpty().take(80)}")
             val report = FailureReports.write(settings, name, r, e.message.orEmpty())
             throw PbtFailure(
                 name,
@@ -96,7 +99,7 @@ public suspend fun <A> acgCheckAll(
     if (explicit != null) {
         batch(explicit, settings.iterations ?: prIterations, "explicit")
     } else {
-        for (r in RegressionStore.load(name)) batch(r.seed, r.iterations, "regression")
+        for (r in regressions) batch(r.seed, r.iterations, "regression")
         when (settings.mode) {
             PbtMode.PR -> batch(prSeed(name), settings.iterations ?: prIterations, "pr")
             PbtMode.SCHEDULED -> scheduled(name, weight, settings) { seed, n -> batch(seed, n, "scheduled") }
@@ -167,7 +170,9 @@ public suspend fun <A> acgCheckExhaustive(
     }
     val elapsed = System.nanoTime() - start
     if (settings.mode == PbtMode.SCHEDULED && targets.isNotEmpty()) {
-        TimingStore(settings.stateDir).update(name, elapsed.toDouble() / targets.size, targets.size.toLong(), 0.0, runNanos = elapsed, fixed = true)
+        TimingStore(
+            settings.stateDir,
+        ).update(name, elapsed.toDouble() / targets.size, targets.size.toLong(), 0.0, runNanos = elapsed, fixed = true)
     }
     counter.write(settings, name)
     return PbtRunSummary(name, false, listOf(PbtBatch(settings.shard.toLong(), targets.size, "exhaustive", elapsed)), counter.snapshot())

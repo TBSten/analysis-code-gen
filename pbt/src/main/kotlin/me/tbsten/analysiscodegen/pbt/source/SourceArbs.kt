@@ -52,7 +52,13 @@ private fun projectEdgecases(): List<ProjectSpec> {
                         ModuleSpec(
                             "m0",
                             emptyList(),
-                            listOf(KotlinFileSpec("F0", "gen.m0.p0", listOf(KClassDecl("C0", kind = k, ctorParams = listOf(ParamSpec("p0", TypeRef.INT, PropKind.VAL)))))),
+                            listOf(
+                                KotlinFileSpec(
+                                    "F0",
+                                    "gen.m0.p0",
+                                    listOf(KClassDecl("C0", kind = k, ctorParams = listOf(ParamSpec("p0", TypeRef.INT, PropKind.VAL)))),
+                                ),
+                            ),
                         ),
                     ),
                 ),
@@ -114,7 +120,11 @@ private class Gen(
     }
 
     private fun javaFieldType(): TypeRef {
-        val candidates = refs.filter { it.typeParams == 0 && it.kind in setOf(ClassKind.CLASS, ClassKind.DATA, ClassKind.INTERFACE, ClassKind.ENUM) }
+        val candidates =
+            refs.filter {
+                it.typeParams == 0 &&
+                    it.kind in setOf(ClassKind.CLASS, ClassKind.DATA, ClassKind.INTERFACE, ClassKind.ENUM)
+            }
         return when {
             candidates.isNotEmpty() && chance(0.5) -> TypeRef.Decl(pick(candidates).id)
             javaRefs.isNotEmpty() && chance(0.3) -> TypeRef.Java(pick(javaRefs).first)
@@ -179,13 +189,32 @@ private class Gen(
     ): TypeRef {
         val nullable = chance(0.25)
         return when (r.nextInt(if (depth > 1) 6 else 9)) {
-            0, 1 -> if (tps.isNotEmpty()) TypeRef.Param(pick(tps).name, nullable) else TypeRef.Builtin(BuiltinType.STRING, nullable = nullable)
+            0, 1 ->
+                if (tps.isNotEmpty()) {
+                    TypeRef.Param(
+                        pick(tps).name,
+                        nullable,
+                    )
+                } else {
+                    TypeRef.Builtin(BuiltinType.STRING, nullable = nullable)
+                }
             2, 3 -> {
                 val cands = refs.filter { it.kind != ClassKind.ANNOTATION }
-                if (cands.isNotEmpty()) TypeRef.Decl(pick(cands).id, nullable = nullable) else TypeRef.Builtin(BuiltinType.INT, nullable = nullable)
+                if (cands.isNotEmpty()) {
+                    TypeRef.Decl(
+                        pick(cands).id,
+                        nullable = nullable,
+                    )
+                } else {
+                    TypeRef.Builtin(BuiltinType.INT, nullable = nullable)
+                }
             }
             4 -> if (javaRefs.isNotEmpty()) TypeRef.Java(pick(javaRefs).first) else TypeRef.Builtin(BuiltinType.LONG, nullable = nullable)
-            5 -> TypeRef.Builtin(pick(listOf(BuiltinType.INT, BuiltinType.STRING, BuiltinType.BOOLEAN, BuiltinType.DOUBLE, BuiltinType.LONG)), nullable = nullable)
+            5 ->
+                TypeRef.Builtin(
+                    pick(listOf(BuiltinType.INT, BuiltinType.STRING, BuiltinType.BOOLEAN, BuiltinType.DOUBLE, BuiltinType.LONG)),
+                    nullable = nullable,
+                )
             else -> {
                 val t = pick(listOf(BuiltinType.LIST, BuiltinType.SET, BuiltinType.MAP))
                 TypeRef.Builtin(t, List(t.arity) { type(tps, depth + 1) }, nullable)
@@ -240,7 +269,13 @@ private class Gen(
             List(r.nextInt(3)) {
                 ParamSpec(
                     next("c"),
-                    if (kind == ClassKind.VALUE) TypeRef.Builtin(pick(listOf(BuiltinType.INT, BuiltinType.STRING, BuiltinType.LONG))) else type(tps, 0),
+                    if (kind ==
+                        ClassKind.VALUE
+                    ) {
+                        TypeRef.Builtin(pick(listOf(BuiltinType.INT, BuiltinType.STRING, BuiltinType.LONG)))
+                    } else {
+                        type(tps, 0)
+                    },
                     kind = pick(PropKind.entries),
                     visibility = visibility(),
                     hasDefault = chance(0.3),

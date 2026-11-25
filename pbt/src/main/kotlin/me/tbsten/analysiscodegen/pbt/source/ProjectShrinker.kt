@@ -32,7 +32,8 @@ public object ProjectShrinker : Shrinker<ProjectSpec> {
                         }
                     is JavaFileSpec ->
                         f.cls.fields.indices.forEach { k ->
-                            out += value.replaceFile(i, fi, f.copy(cls = f.cls.copy(fields = f.cls.fields.filterIndexed { j, _ -> j != k })))
+                            out +=
+                                value.replaceFile(i, fi, f.copy(cls = f.cls.copy(fields = f.cls.fields.filterIndexed { j, _ -> j != k })))
                         }
                 }
             }
@@ -44,14 +45,19 @@ public object ProjectShrinker : Shrinker<ProjectSpec> {
             }
         }
         // トップレベルの関数・プロパティ・typealias を単純に
-        out += value.mapTopLevel { d ->
-            when (d) {
-                is KTopFunction -> d.copy(fn = d.fn.simplified(), receiver = null)
-                is KTopProperty -> d.copy(prop = d.prop.copy(type = TypeRef.INT, annotations = emptyList(), mutable = false), isConst = false)
-                is KTypeAlias -> d.copy(target = TypeRef.INT)
-                else -> d
+        out +=
+            value.mapTopLevel { d ->
+                when (d) {
+                    is KTopFunction -> d.copy(fn = d.fn.simplified(), receiver = null)
+                    is KTopProperty ->
+                        d.copy(
+                            prop = d.prop.copy(type = TypeRef.INT, annotations = emptyList(), mutable = false),
+                            isConst = false,
+                        )
+                    is KTypeAlias -> d.copy(target = TypeRef.INT)
+                    else -> d
+                }
             }
-        }
         return out.map { normalize(it) }.filter { it != value }.distinct()
     }
 }
@@ -73,7 +79,14 @@ private val CLASS_EDITS: List<(KClassDecl) -> KClassDecl?> =
                     d.members.map {
                         when (it) {
                             is PropertyMember -> it.copy(annotations = emptyList())
-                            is FunctionMember -> it.copy(annotations = emptyList(), params = it.params.map { p -> p.copy(annotations = emptyList()) })
+                            is FunctionMember ->
+                                it.copy(
+                                    annotations = emptyList(),
+                                    params =
+                                        it.params.map { p ->
+                                            p.copy(annotations = emptyList())
+                                        },
+                                )
                         }
                     },
             )
@@ -122,7 +135,9 @@ public fun ProjectSpec.classIds(): List<String> {
         out += d.id
         d.nested.forEach(::walk)
     }
-    modules.forEach { m -> m.files.filterIsInstance<KotlinFileSpec>().forEach { f -> f.decls.filterIsInstance<KClassDecl>().forEach(::walk) } }
+    modules.forEach { m ->
+        m.files.filterIsInstance<KotlinFileSpec>().forEach { f -> f.decls.filterIsInstance<KClassDecl>().forEach(::walk) }
+    }
     return out
 }
 

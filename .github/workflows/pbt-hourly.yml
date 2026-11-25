@@ -1,0 +1,96 @@
+# 毎時の PBT（ACG-40、ADR-022）。PR ごとには回さない（PR では回帰 seed と固定 seed だけが ./gradlew build の中で回る）。
+# - 新しい seed で、予算 30 分（上限 40 分）に収まる試行数を自動で決める。1 試行の時間は .pbt-state/ に記録し、actions/cache で持ち回る
+# - 決定的な網羅層は UTC の時（0〜23）の区画を回す。Kotlin の版も時ごとに入れ替える（acg.kotlin、ADR-026）
+# - 反例が出たら build/pbt/failures を artifact にし、issue（ラベル pbt-counterexample）を作る。open は 1 つだけ、続けて出たらコメント
+name: PBT hourly
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      budget:
+        description: "予算（分）"
+        default: "30"
+
+concurrency:
+  group: pbt-hourly
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  # PBT を持つモジュールのテストタスク。acgCheckAll を使うテストを足したモジュールはここに足す
+  PBT_TASKS: ":pbt:test"
+
+jobs:
+  pbt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Restore timing
+        uses: actions/cache/restore@v4
+        with:
+          path: .pbt-state
+          key: pbt-state-${{ github.run_id }}
+          restore-keys: pbt-state-
+      - name: Pick Kotlin version and shard
+        id: plan
+        run: |
+          hour=$(date -u +%H | sed 's/^0//')
+          mapfile -t versions < <(python3 scripts/kotlin-versions.py matrix full | python3 -c 'import json,sys; print("\n".join(json.load(sys.stdin)))')
+          echo "kotlin=${versions[$((hour % ${#versions[@]}))]}" >> "$GITHUB_OUTPUT"
+          echo "start=$(date +%s%3N)" >> "$GITHUB_OUTPUT"
+      - name: Run PBT
+        run: |
+          ./gradlew $PBT_TASKS --continue --console=plain \
+            -Pacg.pbt.mode=scheduled \
+            -Pacg.pbt.budgetMinutes=${{ inputs.budget || '30' }} \
+            -Pacg.pbt.runStartEpochMs=${{ steps.plan.outputs.start }} \
+            -Pacg.kotlin=${{ steps.plan.outputs.kotlin }}
+      - name: Save timing
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .pbt-state
+          key: pbt-state-${{ github.run_id }}
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pbt-${{ github.run_id }}
+          path: |
+            **/build/pbt/**
+            **/build/test-results/**/*.xml
+          if-no-files-found: ignore
+      - name: Report counterexample
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          body=$(mktemp)
+          {
+            echo "毎時の PBT で反例が見つかった（Kotlin ${{ steps.plan.outputs.kotlin }}）。実行: $RUN_URL"
+            echo
+            echo "回帰ケースにする行（各モジュールの src/test/resources/pbt/regressions/<性質>.tsv に足す）:"
+            echo '```'
+            found=$(find . -path '*/build/pbt/failures/new-regressions.tsv' -exec cat {} +)
+            echo "${found:-（記録なし。テスト以外の失敗の可能性）}"
+            echo '```'
+          } > "$body"
+          gh label create pbt-counterexample --color B60205 --description "毎時 PBT の反例（ADR-022）" 2>/dev/null || true
+          num=$(gh issue list --label pbt-counterexample --state open --json number --jq '.[0].number')
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body-file "$body"
+          else
+            gh issue create --title "毎時 PBT の反例" --label pbt-counterexample --body-file "$body"
+          fi

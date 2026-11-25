@@ -29,7 +29,9 @@ public class TimingStore(
     public fun read(name: String): Timing? = parse(file(name))
 
     public fun all(nowEpochMs: Long = System.currentTimeMillis()): List<Timing> =
-        File(dir, "timing").listFiles { f -> f.extension == "tsv" }.orEmpty()
+        File(dir, "timing")
+            .listFiles { f -> f.extension == "tsv" }
+            .orEmpty()
             .mapNotNull { parse(it) }
             .filter { nowEpochMs - it.updatedEpochMs < STALE_MS }
 
@@ -48,7 +50,9 @@ public class TimingStore(
         val t = Timing(name, avg, (old?.samples ?: 0) + trials, weight, nowEpochMs, runNanos, fixed)
         val f = file(name)
         f.parentFile.mkdirs()
-        f.writeText(listOf(t.name, t.nanosPerTrial, t.samples, t.weight, t.updatedEpochMs, t.lastRunNanos, t.fixed).joinToString("\t") + "\n")
+        f.writeText(
+            listOf(t.name, t.nanosPerTrial, t.samples, t.weight, t.updatedEpochMs, t.lastRunNanos, t.fixed).joinToString("\t") + "\n",
+        )
         return t
     }
 
@@ -95,7 +99,8 @@ public object RegressionStore {
     }
 
     public fun parse(text: String): List<Regression> =
-        text.lineSequence()
+        text
+            .lineSequence()
             .map { it.trim() }
             .filter { it.isNotEmpty() && !it.startsWith("#") }
             .mapNotNull { line ->

@@ -22,7 +22,12 @@ public data class CompileResult(
  * Kotlin の版は `pbt` モジュールが依存する kotlin-compiler-embeddable（= catalog の `kotlin`）。
  */
 public object JvmCompileCheck {
-    private val stdlib: String by lazy { File(Unit::class.java.protectionDomain.codeSource.location.toURI()).absolutePath }
+    private val stdlib: String by lazy {
+        File(
+            Unit::class.java.protectionDomain.codeSource.location
+                .toURI(),
+        ).absolutePath
+    }
 
     public fun compile(
         project: RenderedProject,
@@ -35,7 +40,13 @@ public object JvmCompileCheck {
                 val src = File(workDir, "${m.name}/src").apply { mkdirs() }
                 val out = File(workDir, "${m.name}/classes").apply { mkdirs() }
                 outputs[m.name] = out
-                val files = m.files.map { (path, content) -> File(src, path).apply { parentFile.mkdirs(); writeText(content) } }
+                val files =
+                    m.files.map { (path, content) ->
+                        File(src, path).apply {
+                            parentFile.mkdirs()
+                            writeText(content)
+                        }
+                    }
                 if (files.isEmpty()) continue
                 val deps = transitiveDeps(project, m.name).mapNotNull { outputs[it] }
                 val classpath = (listOf(stdlib) + deps.map { it.absolutePath }).joinToString(File.pathSeparator)
@@ -68,7 +79,8 @@ public object JvmCompileCheck {
                     val javac = ToolProvider.getSystemJavaCompiler() ?: error("javac が見つからない（JDK で実行する）")
                     val jbuf = ByteArrayOutputStream()
                     val jcp = (listOf(stdlib, out.absolutePath) + deps.map { it.absolutePath }).joinToString(File.pathSeparator)
-                    val jargs = listOf("-d", out.absolutePath, "-classpath", jcp, "-nowarn", "--release", "17") + javaFiles.map { it.absolutePath }
+                    val jargs =
+                        listOf("-d", out.absolutePath, "-classpath", jcp, "-nowarn", "--release", "17") + javaFiles.map { it.absolutePath }
                     val code = javac.run(null, jbuf, jbuf, *jargs.toTypedArray())
                     if (code != 0) {
                         log.appendLine("[javac ${m.name}] exit=$code").append(jbuf.toString())

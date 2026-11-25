@@ -210,6 +210,8 @@ public data class FunctionMember(
     val returnType: TypeRef = TypeRef.INT,
     override val visibility: Visibility = Visibility.PUBLIC,
     override val annotations: List<AnnotationUse> = emptyList(),
+    /** 本体だけの変更（ABI は変わらない）を表す版。0 なら `TODO()`、それ以外は `TODO("b<版>")` */
+    val bodyVersion: Int = 0,
 ) : Member
 
 public sealed interface KTopLevel {
