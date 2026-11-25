@@ -1,0 +1,19 @@
+// クラウド環境（Claude Code on the web）専用。Maven Central が 429 を返すため、
+// Google のミラーを最優先で参照させる（ADR-025 / ADR-029）。
+// session-start.sh が ~/.gradle/init.d/ に置く。ローカル PC には置かない。
+def mirror = 'https://maven-central.storage-download.googleapis.com/maven2/'
+gradle.beforeSettings { settings ->
+    settings.pluginManagement.repositories {
+        maven { url = mirror; name = 'MavenCentralGoogleMirror' }
+    }
+    settings.dependencyResolutionManagement.repositories {
+        maven { url = mirror; name = 'MavenCentralGoogleMirror' }
+    }
+}
+gradle.settingsEvaluated { settings ->
+    // pluginManagement を書いていないビルド（build-logic など）は既定の Plugin Portal を失うので戻す
+    def repos = settings.pluginManagement.repositories
+    if (repos.size() == 1) {
+        repos.gradlePluginPortal()
+    }
+}

@@ -34,5 +34,9 @@ include(
     ":ksp-bridge-gradle-plugin",
     ":ksp-compatibility-tests",
     ":e2e-tests",
+    // テスト基盤（ACG-37、ADR-030）。:quality はケース ID 整合チェックを持つ（quality/ 直下）
+    ":test-foundation",
+    ":quality",
+    // PBT 基盤（ACG-40、ADR-022）
     ":pbt",
 )

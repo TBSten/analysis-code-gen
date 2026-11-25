@@ -1,0 +1,36 @@
+{
+  // 依存の更新（ADR-029）。PR は CI が緑なら Agent がマージする（自動マージは使わない）。
+  // Kotlin と KSP は方針で版を決めるので Renovate では上げない
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: ['config:recommended'],
+  timezone: 'Asia/Tokyo',
+  // Agent のクールタイム（03:00〜09:00 JST）を避けて PR を作る
+  schedule: ['after 9am and before 11pm'],
+  labels: ['dependencies'],
+  prConcurrentLimit: 5,
+  ignorePaths: ['fixtures/**', 'porting/**'],
+  packageRules: [
+    {
+      // Kotlin は gradle/kotlin-versions.txt と毎朝の上流リリース確認で管理する（ADR-008 / ADR-011）
+      description: 'Kotlin は Renovate で上げない',
+      matchPackageNames: ['org.jetbrains.kotlin{/,}**'],
+      enabled: false,
+    },
+    {
+      // KSP は移植元として 2.3.14 に固定（ADR-018）。上げるときは ADR を書く
+      description: 'KSP は移植元に固定',
+      matchPackageNames: ['com.google.devtools.ksp{/,}**'],
+      enabled: false,
+    },
+    {
+      description: 'GitHub Actions はまとめる',
+      matchManagers: ['github-actions'],
+      groupName: 'GitHub Actions',
+    },
+    {
+      description: 'テスト・整形まわりはまとめる',
+      matchPackageNames: ['io.kotest{/,}**', 'org.jlleitschuh.gradle{/,}**', 'com.pinterest.ktlint{/,}**'],
+      groupName: 'test and lint tools',
+    },
+  ],
+}
