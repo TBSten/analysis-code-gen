@@ -6,7 +6,7 @@ E2E・PBT・三者差分で繰り返し使う、振る舞いが分かってい�
 |---|---|
 | `core` | 解析結果のモデルと生成するコード（AA にも KSP にも依存しない） |
 | `ksp` | KSP 版。三者差分の K 側と、フィクスチャを KSP2 で確かめるのに使う |
-| `native` | Native API 版（本命）。`-Pacg.nativeTestProcessors=true` のときだけビルドに入る |
+| `native` | Native API 版（本命）。AA に依存するのでクラウドの Agent 環境ではビルドできず、CI で確かめる |
 
 両方の版は解析だけが違い、生成は `core` を共有する。同じ入力なら生成物は 1 文字も違わない（TP-Body を除く）。
 
