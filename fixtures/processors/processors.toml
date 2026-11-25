@@ -1,0 +1,177 @@
+# 移植・検証する既存 Processor と、入力カタログの源 ②（実プロジェクト）の唯一の一覧（ADR-019）
+# 検査: python3 scripts/processors.py check
+# 版を上げるときは、このファイルと ADR-019 の表を同時に直す。
+#   bridge / native: "required"（合格ラインに入る）/ "optional"（任意）/ "none"
+#   kmp: Processor が KMP の commonMain などで使えるか
+#   source: 上流の出所。GitHub は "github:<owner>/<repo>@<40 桁の SHA>"、
+#           monorepo などコミットを指せないものは "maven-sources:<座標>:<版>"
+
+[[processor]]
+id = "CRM"
+name = "cream.kt"
+artifacts = ["me.tbsten.cream:cream-ksp"]
+version = "0.10.0"
+source = "github:TBSten/cream@2162ec8d5261e3cb047de6825545f589102caab5"
+tag = "v0.10.0"
+license = "Apache-2.0"
+bridge = "required"
+native = "required"
+kmp = true
+notes = "外部の利用プロジェクトが無いため、源 ② は cream.kt の test モジュールで代える"
+
+[[processor]]
+id = "MSH"
+name = "Moshi codegen"
+artifacts = ["com.squareup.moshi:moshi-kotlin-codegen"]
+version = "1.15.2"
+source = "github:square/moshi@7f957b18ea123b7bb2ffc9d3c079e680eecf15e1"
+tag = "1.15.2"
+license = "Apache-2.0"
+bridge = "required"
+native = "required"
+kmp = false
+notes = "1.15.2 は main の KSP2 修正（#1870・#1874）を含まない。2.0.0-alpha.1 は Maven Central 未公開"
+
+[[processor]]
+id = "KOI"
+name = "Koin Annotations (KSP)"
+artifacts = ["io.insert-koin:koin-ksp-compiler"]
+version = "2.3.1"
+source = "github:InsertKoinIO/koin-annotations@1d4c1af21faaccdfef0c433e49ee40d9b013e7f9"
+tag = "2.3.1"
+license = "Apache-2.0"
+bridge = "required"
+native = "required"
+kmp = true
+notes = "KSP 版は上流で非推奨（Koin Compiler Plugin へ移行）。Koin + cream.kt の組み合わせ検証のため残す"
+
+[[processor]]
+id = "KIN"
+name = "kotlin-inject"
+artifacts = ["me.tatarka.inject:kotlin-inject-compiler-ksp"]
+version = "0.9.0"
+source = "github:evant/kotlin-inject@5314482de3c7a12369daf8384a3a5a3894a72313"
+tag = "v0.9.0"
+license = "Apache-2.0"
+bridge = "required"
+native = "optional"
+kmp = true
+notes = "KSP2 のみ対応。未解決の KSP2 issue #493・#497"
+
+[[processor]]
+id = "DAG"
+name = "Dagger / Hilt"
+artifacts = ["com.google.dagger:dagger-compiler", "com.google.dagger:hilt-compiler", "com.google.dagger:hilt-android-compiler"]
+version = "2.60.1"
+source = "github:google/dagger@f7a89b6cea7d47167f2d5f9912f61f3fee333d88"
+tag = "dagger-2.60.1"
+license = "Apache-2.0"
+bridge = "required"
+native = "optional"
+kmp = false
+notes = "XProcessing 経由で KSP を使う。Hilt は Android フィクスチャと Google Maven が要る"
+
+[[processor]]
+id = "ROM"
+name = "Room"
+artifacts = ["androidx.room:room-compiler"]
+version = "2.8.5"
+source = "maven-sources:androidx.room:room-compiler:2.8.5"
+tag = ""
+license = "Apache-2.0"
+bridge = "required"
+native = "none"
+kmp = true
+notes = "Google Maven が要る。Room 3（androidx.room3）は候補置き場 CB-1"
+
+# ---- 入力カタログの源 ②: 実プロジェクト（Apache-2.0 / MIT、2026-11-26 の HEAD） ----
+
+[[project]]
+repo = "simpledotorg/simple-android"
+commit = "482bb8c9bcddffea8e13cd7a99b51efdb10bc817"
+license = "MIT"
+uses = ["MSH", "DAG", "ROM"]
+
+[[project]]
+repo = "GetStream/gemini-android"
+commit = "7021b359468d34d5048c79a1a343124e2b2ead1e"
+license = "Apache-2.0"
+uses = ["MSH", "DAG", "ROM"]
+
+[[project]]
+repo = "christiandeange/ozone"
+commit = "cd044f638de47f8083b5f9fc4905f6e51d750c66"
+license = "MIT"
+uses = ["MSH", "KIN"]
+
+[[project]]
+repo = "cashapp/cash-app-pay-android-sdk"
+commit = "a4979b3d3094aea54675118fec4d067a8584fd49"
+license = "Apache-2.0"
+uses = ["MSH"]
+
+[[project]]
+repo = "ZacSweers/CatchUp"
+commit = "b0873380ad4ac21ece1fe58fc6032ec7894e2364"
+license = "Apache-2.0"
+uses = ["MSH", "DAG"]
+
+[[project]]
+repo = "tddworks/openai-kotlin"
+commit = "d02d678103d2ba9e254e4a09e9703c412ab22a12"
+license = "Apache-2.0"
+uses = ["KOI"]
+
+[[project]]
+repo = "kotzilla-io/nowinandroid_koin_annotations"
+commit = "6f0e1d2d8880c745239d37b6a4e8e29828aedcb3"
+license = "Apache-2.0"
+uses = ["KOI", "ROM"]
+
+[[project]]
+repo = "codymikol/git-down"
+commit = "dfbb1e11eab986bb5616282de1c29e13457806f5"
+license = "MIT"
+uses = ["KOI"]
+
+[[project]]
+repo = "msimonides/homerplayer2"
+commit = "ec5f4317b5fb265e5358894999e6561c99c0cf70"
+license = "MIT"
+uses = ["KOI", "ROM"]
+
+[[project]]
+repo = "slackhq/circuit"
+commit = "c9aa9c7730d8d465103042cccff6e1db017f84b9"
+license = "Apache-2.0"
+uses = ["KIN", "DAG"]
+
+[[project]]
+repo = "joreilly/BikeShare"
+commit = "4d3dc57b573944a38efb2200a6033f0b7283b64a"
+license = "Apache-2.0"
+uses = ["KIN"]
+
+[[project]]
+repo = "r0adkll/kimchi"
+commit = "fab4abf81197674db4aac22b637c58c3dc78df7c"
+license = "Apache-2.0"
+uses = ["KIN"]
+
+[[project]]
+repo = "vRallev/app-platform"
+commit = "3d79af4047c7568a5994a1dc522db5e29ac71f7e"
+license = "Apache-2.0"
+uses = ["KIN"]
+
+[[project]]
+repo = "skydoves/chatgpt-android"
+commit = "0155011570e6d77dba127a21164d4562fbb5eee5"
+license = "Apache-2.0"
+uses = ["MSH", "DAG", "ROM"]
+
+[[project]]
+repo = "0xZhangKe/Fread"
+commit = "373bf1b331ab06dcf51cdc51a98b048c20b9d793"
+license = "Apache-2.0"
+uses = ["ROM"]

@@ -1,0 +1,19 @@
+name: processors
+on:
+  pull_request:
+    paths: ["fixtures/processors/**", "scripts/processors.py", ".github/workflows/processors.yml"]
+  push:
+    branches: [main]
+    paths: ["fixtures/processors/**", "scripts/processors.py", ".github/workflows/processors.yml"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 移植・検証する Processor の一覧を検査（ADR-019）
+        run: |
+          python3 scripts/processors.py check
+          python3 scripts/processors.py list
