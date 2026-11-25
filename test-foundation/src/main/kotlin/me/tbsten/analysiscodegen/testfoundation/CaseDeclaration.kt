@@ -12,8 +12,11 @@ data class CaseDeclaration(
     val testName: String get() = testNameOf(id, title)
 
     companion object {
-        /** ケース ID の書式。一覧の `観点-連番`（観点は `RW-ALL` のように複数語も可）、細分化した `a`, `b` 付きも許す。 */
-        val ID_PATTERN: Regex = Regex("^[A-Z]+(-[A-Z]+)*-[A-Z0-9]+[a-z]?$")
+        /**
+         * ケース ID の書式。一覧の `観点-連番`（観点は `RW-ALL` のように複数語も可）、細分化した `a`, `b` 付きも許す。
+         * KSP 公式テストは `KSPT-<上流のメソッド名から test を除いたもの>`（例: `KSPT-AllFunctions_kotlin`、ADR-024）。
+         */
+        val ID_PATTERN: Regex = Regex("^(?:[A-Z]+(-[A-Z]+)*-[A-Z0-9]+[a-z]?|KSPT-[A-Za-z0-9_]+)$")
 
         fun testNameOf(
             id: String,
