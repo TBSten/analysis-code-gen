@@ -78,6 +78,8 @@ val internalOnlyModules = setOf(
     "quality",
     "pbt",
     "test-processors",
+    // katachi のアーキテクチャ検査（ACG-50、ADR-041）
+    "architecture-test",
 )
 rootProject.children.forEach { module ->
     check(module.name.startsWith("analysis-code-gen-") || module.name in internalOnlyModules) {
@@ -85,3 +87,5 @@ rootProject.children.forEach { module ->
     }
     check(module.projectDir.name == module.name) { "モジュール ${module.path} のディレクトリ名をモジュール名と同じにする（ADR-042）" }
 }
+
+include(":architecture-test")
