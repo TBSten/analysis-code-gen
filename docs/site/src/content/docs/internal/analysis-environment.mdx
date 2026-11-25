@@ -85,7 +85,9 @@ flowchart LR
     R2 --> E["環境を捨てる"]
 ```
 
-無効化には `publishGlobalSourceModuleStateModificationEvent` と `dropPsiCaches` を使います。無効化を抜くと、既存の宣言の解決結果（上位型など）が古いまま残ります。
+無効化には `publishGlobalSourceModuleStateModificationEvent` と `dropPsiCaches` を使います。
+
+無効化を抜くと、既存の宣言の解決結果（上位型など）が古いまま残ります。
 
 `KaSession` や `KaSymbol` の有効期間は延ばしません。ラウンドをまたいで持ち越せるのは Pointer などだけです。
 
