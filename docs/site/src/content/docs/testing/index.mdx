@@ -1,0 +1,96 @@
+---
+title: Processor をテストする
+description: ソース文字列を渡して Processor を動かし、生成物と診断を確かめるテストを書きます。
+fixture: fixtures/docs/testing
+---
+
+:::note[レビューで判断してほしいこと]
+- テスト補助を JUnit などのテストフレームワークに依存しない関数（`runCodegenTest`）にしてよいか
+- Native Processor の指定を `native(...)`、KSP を `ksp(...)` と分けてよいか
+:::
+
+Processor のテストは、Gradle を動かさずに同じプロセスの中で回せます。ここではクイックスタートの `HelloProcessor` をテストします。
+
+## 依存を足す
+
+Processor のモジュールに `testing` をテスト用の依存として足します。
+
+```kotlin title="hello-processor/build.gradle.kts"
+dependencies {
+    compileOnly("me.tbsten.analysiscodegen:processor-api:0.1.0")
+    // テストでは processor-api と実行時の Analysis API も testing が持ってくる
+    testImplementation("me.tbsten.analysiscodegen:testing:0.1.0")
+    testImplementation(kotlin("test"))
+```
+
+テストフレームワークは何でも使えます。この例は `kotlin.test` と JUnit 5 です。
+
+## Processor を動かす
+
+`runCodegenTest` にソースと Processor を渡します。生成と、生成物を含むコンパイルまでが 1 回で動きます。
+
+```kotlin title="hello-processor/src/test/kotlin/com/example/hello/HelloProcessorTest.kt"
+private fun runHello() = runCodegenTest(TestEngine.AnalysisCodegen) {
+    kotlin("com/example/Greeter.kt", """
+        package com.example
+        annotation class Hello
+        @Hello class Greeter
+    """)
+    native(HelloProcessorProvider())
+}
+```
+
+`kotlin(パス, 中身)` の中身は、行頭の共通の字下げを取り除いてから使います。
+
+## 生成物を確かめる
+
+`generatedFile` はパスの末尾で生成物を探し、中身を返します。
+
+```kotlin title="hello-processor/src/test/kotlin/com/example/hello/HelloProcessorTest.kt"
+val result = runHello()
+assertTrue(result.isSuccess, result.messages)
+assertEquals(
+    "package com.example\n\nfun Greeter.hello(): String = \"Hello, Greeter!\"\n",
+    result.generatedFile("com/example/GreeterHello.kt"),
+)
+```
+
+`isSuccess` は生成とコンパイルの両方が通ったかです。失敗したら `messages` に理由が出ます。
+
+## 生成物を動かす
+
+生成物を含むコンパイル結果は `loadClass` で読み込めます。生成したコードの振る舞いまで確かめられます。
+
+```kotlin title="hello-processor/src/test/kotlin/com/example/hello/HelloProcessorTest.kt"
+val result = runHello()
+val greeter = result.loadClass("com.example.Greeter").getDeclaredConstructor().newInstance()
+val hello = result.loadClass("com.example.GreeterHelloKt").getMethod("hello", greeter.javaClass)
+assertEquals("Hello, Greeter!", hello.invoke(null, greeter))
+```
+
+## 何も生成しないことを確かめる
+
+`generatedFiles` は生成物の一覧、`errors` と `warnings` は診断です。
+
+```kotlin title="hello-processor/src/test/kotlin/com/example/hello/HelloProcessorTest.kt"
+assertTrue(result.isSuccess, result.messages)
+assertTrue(result.generatedFiles.isEmpty())
+assertTrue(result.warnings.isEmpty())
+```
+
+`generatedFiles` のキーは出力先からの相対パスで、辞書順に並びます。そのまま比べても順番で揺れません。
+
+## まとめ
+
+| 要素 | 役割 |
+|---|---|
+| `runCodegenTest(engine) { }` | ソースと Processor を渡して、生成とコンパイルを回す |
+| `kotlin(...)` / `native(...)` | 入れるソースと、動かす Processor |
+| `generatedFile` / `generatedFiles` | 生成物の中身と一覧 |
+| `loadClass` | 生成物を含むクラスを読み込んで動かす |
+| `errors` / `warnings` | 診断 |
+
+## 次のステップ
+
+- [いろいろな状況をテストする](/analysis-code-gen/testing/advanced/): KMP、変更の再実行、Gradle
+- [KSP Bridge に載せ替える](/analysis-code-gen/migration/bridge/): KSP の Processor を KSP2 と比べてテストする

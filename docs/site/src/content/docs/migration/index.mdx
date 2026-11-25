@@ -1,0 +1,41 @@
+---
+title: 既存の KSP Processor を移行する
+description: KSP の Processor を、Bridge・Hybrid・Native の 3 段階で少しずつ analysisCodeGen に移します。
+docLint: page
+---
+
+:::note[レビューで判断してほしいこと]
+- 移行を 3 段階に分け、どの段階で止めてもよいとする方針でよいか
+- Hybrid API を実験的（`@ExperimentalAnalysisCodegenApi`）として出してよいか
+:::
+
+既存の KSP Processor は、書き換えずにそのまま動かすところから始められます。必要になった分だけ、Analysis API（AA）を直接使う形に進めます。
+
+```mermaid
+flowchart LR
+    K["KSP Processor<br/>（公式 KSP で実行）"] -->|"1. plugin を替える"| B["Bridge<br/>コードはそのまま"]
+    B -->|"2. 一部で AA を使う"| H["Hybrid<br/>withAnalysis"]
+    H -->|"3. 書き換える"| N["Native<br/>AnalysisCodegenProcessor"]
+```
+
+## 3 つの段階
+
+| 段階 | Processor のコード | できるようになること |
+|---|---|---|
+| 1. Bridge | 変えない | KMP の SourceSet ごとの実行。Native の Processor と同じビルドで動く |
+| 2. Hybrid | 一部だけ足す | 式・関数本体・定数など、KSP では読めない情報を AA で読む |
+| 3. Native | 書き換える | KSP API を外す。AA と PSI を直接使い、生成物の依存も細かく書ける |
+
+どの段階で止めても使い続けられます。Processor の利用者は 1 だけ、作者は 2 と 3 を必要に応じて選びます。
+
+## 移行の進め方
+
+各段階の前後で、同じ入力から同じ生成物が出ることをテストで確かめます。テストは [Processor をテストする](/analysis-code-gen/testing/)の `runCodegenTest` で書けます。
+
+例として、`@Hello` の付いたクラスに `hello()` を生成する KSP の Processor を移します。コードはリポジトリの `fixtures/docs/migration` にあります。
+
+## 次のステップ
+
+- [1. KSP Bridge に載せ替える](/analysis-code-gen/migration/bridge/)
+- [2. Hybrid で AA を使う](/analysis-code-gen/migration/hybrid/)
+- [3. Native Processor に書き換える](/analysis-code-gen/migration/native/)

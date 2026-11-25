@@ -1,0 +1,91 @@
+# 進捗レポートの材料（ACG-30、ADR-032）。main の CI・定期実行が終わるたびに、
+# テスト結果（JUnit XML）をケースごとの結果 JSON にして progress-data branch の runs/<種類>/ に積む。
+# 2 時間ごとの進捗レポート更新は `git fetch origin progress-data` してから scripts/progress/progress_report.py report を呼ぶ
+name: Progress data
+
+on:
+  workflow_run:
+    workflows: [CI, Nightly, PBT hourly]
+    types: [completed]
+    branches: [main]
+
+# 積む順がぶつからないよう 1 本ずつ
+concurrency:
+  group: progress-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  record:
+    if: github.event.workflow_run.conclusion != 'cancelled' && github.event.workflow_run.conclusion != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: src
+      - name: 実行の種類を決める
+        id: kind
+        env:
+          WF_PATH: ${{ github.event.workflow_run.path }}
+        run: |
+          case "$(basename "$WF_PATH")" in
+            ci.yml) echo "kind=ci" >> "$GITHUB_OUTPUT" ;;
+            pbt-hourly.yml) echo "kind=pbt" >> "$GITHUB_OUTPUT" ;;
+            nightly.yml) echo "kind=nightly" >> "$GITHUB_OUTPUT" ;;
+            *) echo "kind=other" >> "$GITHUB_OUTPUT" ;;
+          esac
+      - name: テスト結果を取ってくる
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: results
+        continue-on-error: true # 結果を上げずに落ちた実行も「全部失敗」として記録する
+      - name: ケースごとの結果にまとめる
+        env:
+          RUN: ${{ github.event.workflow_run.id }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          EVENT: ${{ github.event.workflow_run.event }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          FINISHED: ${{ github.event.workflow_run.updated_at }}
+          KIND: ${{ steps.kind.outputs.kind }}
+        run: |
+          mkdir -p results
+          python3 src/scripts/progress/progress_report.py collect --results results \
+            --workflow "$KIND" --run-id "$RUN" --sha "$SHA" --event "$EVENT" \
+            --conclusion "$CONCLUSION" --finished-at "$FINISHED" \
+            --out "record/runs/$KIND/$(date -u -d "$FINISHED" +%Y%m%dT%H%M%SZ)-$RUN.json"
+      - name: progress-data branch に積む
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          url="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          if git ls-remote --exit-code "$url" refs/heads/progress-data > /dev/null; then
+            git clone --depth 1 --branch progress-data "$url" data
+          else
+            git init -b progress-data data && git -C data remote add origin "$url"
+            printf '# progress-data\n\n進捗レポートの材料（ADR-032）。CI が自動で積む。手で直さない。\n' > data/README.md
+          fi
+          cp -r record/runs data/
+          # 30 日より古い記録は消す（レポートが使うのは直近 3 回と 24 時間だけ）
+          # （clone すると mtime がそろうので、ファイル名の日時で判断する）
+          python3 - <<'EOF'
+          import datetime as dt, pathlib
+          limit = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)).strftime("%Y%m%dT%H%M%SZ")
+          for f in pathlib.Path("data/runs").rglob("*.json"):
+              if f.name[:16] < limit:
+                  f.unlink()
+          EOF
+          cd data
+          git add -A
+          git commit -q -m "記録: ${{ steps.kind.outputs.kind }} ${{ github.event.workflow_run.id }}"
+          for i in 1 2 3 4; do
+            git push origin progress-data && exit 0
+            sleep $((i * 5))
+            git pull --rebase -q origin progress-data || true
+          done
+          exit 1

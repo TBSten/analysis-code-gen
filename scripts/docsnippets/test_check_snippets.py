@@ -42,6 +42,14 @@ class CheckSnippetsTest(unittest.TestCase):
     def test_一部が一致すれば通る(self):
         self.assertEqual(self.run_check(PAGE, "package x\n\nfun a() = 1   \n\nfun b() = 2\n"), [])
 
+    def test_字下げを浅くした切り出しも通る(self):
+        nested = "class C {\n    fun a() = 1\n}\n"
+        self.assertEqual(self.run_check(PAGE, nested), [])
+
+    def test_字下げの相対関係が違えば失敗する(self):
+        page = PAGE.replace("fun a() = 1", "fun a() =\n1")
+        self.assertEqual(len(self.run_check(page, "fun a() =\n    1\n")), 1)
+
     def test_中身が違えば失敗する(self):
         errors = self.run_check(PAGE, "fun a() = 2\n")
         self.assertEqual(len(errors), 1)

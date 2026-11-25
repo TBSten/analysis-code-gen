@@ -1,0 +1,105 @@
+---
+title: いろいろな状況をテストする
+description: KMP の SourceSet、変更を当てた再実行、Gradle でのビルドをテストで再現します。
+fixture: fixtures/docs/testing
+---
+
+:::note[レビューで判断してほしいこと]
+- 再実行のシナリオを、KSP2 では毎回クリーンに流す（増分の正解として比べる）方針でよいか
+- kotlin-compile-testing からの移行を、対応表だけで済ませてよいか
+:::
+
+[Processor をテストする](/analysis-code-gen/testing/)の続きです。1 回の生成では確かめにくい状況を扱います。
+
+## KMP の SourceSet を指定する
+
+`sourceSet(名前) { }` で SourceSet を作り、`dependsOn` で上流をつなぎます。
+
+```kotlin title="hello-processor/src/test/kotlin/com/example/hello/HelloKmpTest.kt"
+val result = runCodegenTest(TestEngine.AnalysisCodegen) {
+    sourceSet("commonMain") {
+        kotlin("com/example/Greeter.kt", "package com.example\n\n@Hello class Greeter")
+        kotlin("com/example/Hello.kt", "package com.example\n\nannotation class Hello")
+    }
+    sourceSet("jvmMain") { dependsOn += "commonMain" }
+    native(HelloProcessorProvider())
+}
+assertEquals(listOf("commonMain/kotlin/com/example/GreeterHello.kt"), result.generatedFiles.keys.toList())
+```
+
+SourceSet が 2 つ以上あると、生成物のキーの先頭に SourceSet 名が付きます。`commonMain` の生成物が `jvmMain` に重複して出ないことを確かめられます。
+
+## 変更を当てて再実行する
+
+`runCodegenScenario` は、最初の入力に変更を順に当てて再実行します。結果はステップごとに返ります。
+
+```kotlin title="hello-processor/src/test/kotlin/com/example/hello/HelloScenarioTest.kt"
+val results = runCodegenScenario(TestEngine.AnalysisCodegen) {
+    initial {
+        kotlin("com/example/Hello.kt", "package com.example\n\nannotation class Hello")
+        kotlin("com/example/A.kt", "package com.example\n\n@Hello class A")
+        kotlin("com/example/B.kt", "package com.example\n\n@Hello class B")
+        native(HelloProcessorProvider())
+    }
+    step("B を消す") { delete("com/example/B.kt") }
+}
+```
+
+2 回目からは増分で動きます。`TestEngine.Ksp2` では毎回クリーンに動くので、増分の結果と比べる基準になります。
+
+## Gradle でビルドする
+
+DSL やタスクの連携まで確かめるときは、`gradleFixture` で Gradle のプロジェクトを作ってビルドします。
+
+```kotlin title="hello-processor/src/test/kotlin/com/example/hello/HelloGradleTest.kt"
+val fixture = gradleFixture {
+    buildScript = """
+        plugins {
+            kotlin("jvm") version "{{kotlinVersion}}"
+            id("me.tbsten.analysiscodegen") version "0.1.0"
+        }
+        dependencies { analysisCodeGen(files("$processorJar")) }
+    """
+    kotlin("src/main/kotlin/com/example/Greeter.kt", "package com.example\n\n@Hello class Greeter")
+    kotlin("src/main/kotlin/com/example/Hello.kt", "package com.example\n\nannotation class Hello")
+}
+val result = fixture.build("compileKotlin")
+```
+
+中身は Gradle TestKit です。テストの依存に `gradleTestKit()` を足します。数秒かかるので、数を絞って使います。
+
+## kotlin-compile-testing から移る
+
+kotlin-compile-testing（kct）の KSP のテストは、Processor の指定と結果の読み方を置き換えます。
+
+```kotlin
+// 移行前（kct）
+val result = KotlinCompilation().apply {
+    sources = listOf(SourceFile.kotlin("Greeter.kt", source))
+    symbolProcessorProviders = mutableListOf(HelloSymbolProcessorProvider())
+}.compile()
+```
+
+| kct | analysisCodeGen の testing |
+|---|---|
+| `KotlinCompilation().apply { }.compile()` | `runCodegenTest(TestEngine.Ksp2) { }` |
+| `SourceFile.kotlin(名前, 中身)` | `kotlin(パス, 中身)` |
+| `symbolProcessorProviders` | `ksp(...)` |
+| `result.exitCode == OK` | `result.isSuccess` |
+| `result.classLoader` | `result.classLoader` / `loadClass` |
+
+`TestEngine.Ksp2` を `AnalysisCodegen` に替えると、同じテストが KSP Bridge で動きます。
+
+## まとめ
+
+| やりたいこと | 使うもの |
+|---|---|
+| KMP の SourceSet を作る | `sourceSet(名前) { dependsOn += ... }` |
+| 変更を当てて再実行する | `runCodegenScenario { initial { }; step { } }` |
+| Gradle でビルドする | `gradleFixture { }.build(...)` |
+| kct から移る | 上の対応表と `TestEngine` |
+
+## 次のステップ
+
+- [KSP Bridge に載せ替える](/analysis-code-gen/migration/bridge/): KSP2 と Bridge の結果を比べる
+- [アーキテクチャ](/analysis-code-gen/internal/): テストが動かしているエンジンの仕組み

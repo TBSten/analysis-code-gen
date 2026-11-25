@@ -16,6 +16,7 @@ dependencies {
     runtimeOnly(project(":test-foundation"))
     // ケース ID 付きテストを持つモジュール（acg.tests を適用したもの）をすべて並べる
     acgCases(project(":e2e-tests"))
+    acgCases(project(":pbt"))
 }
 
 val baseRef = providers.gradleProperty("acg.caseCheck.baseRef").orElse("origin/main")
