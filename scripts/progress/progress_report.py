@@ -35,7 +35,7 @@ JST = dt.timezone(dt.timedelta(hours=9))
 REPO = Path(__file__).resolve().parents[2]
 
 # テスト名は "[ID] タイトル"（ADR-030）。ID の書式は CaseDeclaration.ID_PATTERN と同じ
-CASE_NAME = re.compile(r"\[([A-Z]+(?:-[A-Z]+)*-[A-Z0-9]+[a-z]?)\]")
+CASE_NAME = re.compile(r"\[([A-Z]+(?:-[A-Z]+)*-[A-Z0-9]+[a-z]?|KSPT-[A-Za-z0-9_]+)\]")
 
 # 「直近 3 回の CI がすべて成功したものだけを通過とする」（pm/progress-report-format.md）
 PASS_WINDOW = 3
@@ -50,7 +50,7 @@ DELIVERABLES: list[tuple[str, list[str]]] = [
     ("Processor 向け API", [r"API", r"DEF", r"LIF", r"HYB"]),
     ("解析・コード生成エンジン", [r"ANA", r"INC", r"RND", r"CCH", r"MOD", r"OUT", r"FAIL", r"TRM", r"DET", r"MEM", r"PERF"]),
     ("Gradle plugin", [r"GRD", r"KMP", r"GCC", r"CLI", r"VER"]),
-    ("KSP Bridge", [r"BRG", r"BINC", r"BKMP", r"BIN", r"MIX", r"LIC"]),
+    ("KSP Bridge", [r"BRG", r"BINC", r"BKMP", r"BIN", r"MIX", r"LIC", r"KSPT-[A-Za-z0-9_]+"]),
     ("既存 Processor 移植 (Bridge)", [r"RW-[A-Z]+-B\d+", r"RW-CMB-0[13]", r"RW-ALL-[A-Z]\d+"]),
     ("既存 Processor 移植 (Rewrite)", [r"RW-[A-Z]+-N\d+", r"RW-CMB-02"]),
     ("E2E テストフレームワーク", [r"TST", r"PBT", r"XD"]),
