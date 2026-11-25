@@ -42,14 +42,12 @@ jobs:
           python-version: "3.12"
       - name: CI script の自己テスト
         run: python3 scripts/ci/test_test_guard.py
-      - name: テストを弱める変更の検出（保留に戻す・無効化・ケース削除）
+      # 有効 → 保留の逆戻り・ケースの消失は :quality:checkCaseIds（ACG-37、build に含む）が見る
+      - name: PendingCase 以外の無効化の検出
         if: github.event_name == 'pull_request'
         env:
-          PR_BODY: ${{ github.event.pull_request.body }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
-          python3 scripts/ci/test_guard.py --base "$BASE_SHA" --pr-body-file "$RUNNER_TEMP/pr-body.md"
+        run: python3 scripts/ci/test_guard.py --base "$BASE_SHA"
       - name: doc-lint の自己テスト（ADR-028）
         run: python3 scripts/doclint/test_doc_lint.py
       - name: ドキュメントの構成・分量チェック（ADR-028、基準は docs/doc-lint.toml）

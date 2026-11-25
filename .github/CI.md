@@ -26,11 +26,10 @@ issue は同じラベルで 1 つだけ開き、続けて落ちたらコメン�
 
 ## テストを弱める変更の検出
 
-`scripts/ci/test_guard.py` が PR の差分を見て、次で CI を落とす。
+2 つで分担する。
 
-- 保留でなかったケースを保留に戻した（例外なし）
-- 保留（PendingCase）以外の方法でテストを無効にした（`@Ignore`、`enabled = false`、`xtest`、`"!名前"` など）
-- テストからケース ID が消えた。ADR を書いたうえで、PR 本文に `Case-Removal-ADR: ADR-<番号>` を書けば警告だけになる
+- `scripts/ci/test_guard.py`（`checks` job）: PR で追加したテストの行に、PendingCase 以外の無効化（`@Ignore` / `@Ignored`、`enabled = false`、`xtest` / `xcase`、`"!名前"`、assume 系）があれば落とす
+- `:quality:checkCaseIds`（ACG-37、`build` に含む）: `quality/case-status.csv` を origin/main と比べ、有効だったケースの保留への逆戻りと消失を落とす。例外は ADR 付きで `quality/case-exceptions.csv`
 
 ## 検査を足すとき
 
