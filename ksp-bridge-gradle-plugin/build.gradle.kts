@@ -9,9 +9,10 @@ dependencies {
 
 gradlePlugin {
     plugins {
+        // ADR-016・017
         create("analysisCodegenKspBridge") {
             id = "me.tbsten.analysiscodegen.ksp-bridge"
-            implementationClass = "me.tbsten.analysiscodegen.kspbridgegradleplugin.KspBridgeGradlePlugin"
+            implementationClass = "me.tbsten.analysiscodegen.ksp.gradle.KspBridgePlugin"
         }
     }
 }
