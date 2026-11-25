@@ -259,6 +259,8 @@ def build_report(
     counted = [c for c in cases if c.milestone != "任意"]  # 任意のケースは合格ラインの外
     passed = {c.id for c in counted if state[c.id] == "passing"}
 
+    # マイルストーンの予定（start / guide / p50 / p80）・phases・goOffset・projectStart は人が決める枠。
+    # てべすてん の指示なしに変えない（2026-11-26）。コマンドは前回の値をそのまま引き継ぎ、通過数だけを書く
     milestones = []
     for m in prev.get("milestones", []):
         mine = [c for c in counted if c.milestone == m["id"]]

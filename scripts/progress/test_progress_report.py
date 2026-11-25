@@ -171,6 +171,17 @@ class ReportTest(unittest.TestCase):
         self.assertEqual(out["history"]["series"][3]["values"], [None, 1.5])
         self.assertNotIn("sample", {k for k, v in out.items() if v is True})
 
+    def test_schedule_is_never_changed(self) -> None:
+        # マイルストーンの予定（薄い帯）は人の指示なしに変えない（てべすてん、2026-11-26）
+        prev = {**self.PREV, "goOffset": 7,
+                "milestones": [{"id": "M1", "name": "最小限動く", "guide": 3, "p50": 4.5, "p80": 5.5, "start": 0, "passed": 0, "total": 1}],
+                "phases": [{"id": "P1", "name": "検証", "start": 4, "end": 6, "state": "次"}]}
+        out = pr.build_report(prev, [case("API-01")], [], NOW, None, [])
+        keys = ("id", "name", "guide", "p50", "p80", "start")
+        self.assertEqual([{k: m[k] for k in keys} for m in out["milestones"]], [{k: m[k] for k in keys} for m in prev["milestones"]])
+        self.assertEqual(out["phases"], prev["phases"])
+        self.assertEqual((out["goOffset"], out["projectStart"]), (7, "2026-11-24"))
+
     def test_report_command_from_runs_dir(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             d = Path(tmp)

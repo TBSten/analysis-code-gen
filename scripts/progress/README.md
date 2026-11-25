@@ -33,6 +33,7 @@ python3 scripts/progress/progress_report.py report \
 - 任意（M 列が `任意`）のケースは合格ラインの外なので数えない。ベンチマーク（種別 B）は正しさに数えない
 - 成果物とケースの対応は `progress_report.py` の `DELIVERABLES`。一覧に区分が増えたらそこに足す（自己テストが漏れを落とす）
 - 数字がおかしいときは `auto.json` を手で直さず、このコマンドを直す
+- **マイルストーンの予定（グラフの薄い帯）は人の指示なしに変えない**（てべすてん、2026-11-26）。`milestones` の `start` / `guide` / `p50` / `p80`、`phases` の `start` / `end`、`goOffset`、`projectStart` が対象。コマンドは前回の値を引き継ぐだけで、Agent も `--prev` に渡す前に書き換えない
 
 ## 自己テスト
 
