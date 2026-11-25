@@ -4,7 +4,7 @@
 // Copyright kotlin-compile-testing contributors (tschuchortdev/kotlin-compile-testing, ZacSweers/kotlin-compile-testing)
 // Ported-From: ZacSweers/kotlin-compile-testing@244ec46c6e280e0a7e8ab7a65022a657bd6824e8:core/src/main/kotlin/com/tschuchort/compiletesting/MainComponentRegistrar.kt
 // Modified-By: analysis-code-gen contributors
-// Modifications: パッケージを me.tbsten.analysiscodegen.testing.kct へ移動、@AutoService を手書きの META-INF/services に置換、コンパイラプラグイン ID を変更（それ以外の処理は変えていない）
+// Modifications: パッケージを me.tbsten.analysiscodegen.testing.kct へ移動、@AutoService を手書きの META-INF/services に置換、コンパイラプラグイン ID を変更、kapt（Java の注釈処理）への対応を削除（porting/kct/patches/0001-remove-kapt.patch）
 /*
  * Copyright 2010-2016 JetBrains s.r.o.
  *
@@ -24,12 +24,9 @@
 
 package me.tbsten.analysiscodegen.testing.kct
 
-import me.tbsten.analysiscodegen.testing.kct.kapt.KctKaptCompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.kapt.base.KaptOptions
-import org.jetbrains.kotlin.kapt.base.incremental.IncrementalProcessor
 
 @ExperimentalCompilerApi
 internal class MainComponentRegistrar : CompilerPluginRegistrar() {
@@ -58,10 +55,6 @@ internal class MainComponentRegistrar : CompilerPluginRegistrar() {
     parameters.compilerPluginRegistrar.forEach { pluginRegistrar ->
       with(pluginRegistrar) { registerExtensions(configuration) }
     }
-
-    with(KctKaptCompilerPluginRegistrar(parameters.processors, parameters.kaptOptions)) {
-      registerExtensions(configuration)
-    }
   }
 
   companion object {
@@ -74,9 +67,5 @@ internal class MainComponentRegistrar : CompilerPluginRegistrar() {
     val threadLocalParameters: ThreadLocal<ThreadLocalParameters> = ThreadLocal()
   }
 
-  data class ThreadLocalParameters(
-    val processors: List<IncrementalProcessor>,
-    val kaptOptions: KaptOptions.Builder,
-    val compilerPluginRegistrar: List<CompilerPluginRegistrar>,
-  )
+  data class ThreadLocalParameters(val compilerPluginRegistrar: List<CompilerPluginRegistrar>)
 }

@@ -13,7 +13,6 @@ val kotlinCompilerVersion: String =
 
 dependencies {
     api("org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinCompilerVersion")
-    api("org.jetbrains.kotlin:kotlin-annotation-processing-embeddable:$kotlinCompilerVersion")
     api(libs.findLibrary("ksp-api").get())
     implementation(libs.findLibrary("ksp-impl").get())
     implementation(libs.findLibrary("ksp-common-deps").get())

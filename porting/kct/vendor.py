@@ -13,6 +13,8 @@ UPSTREAM.properties の tag / commit を書き換えてからこのスクリプ�
   - @AutoService を外す（サービス登録は testing-kct/src/main/resources/META-INF/services に手書き）
   - コンパイラプラグイン ID を本家と衝突しないものに変える
   - 先頭に MPL-2.0 の表示と Ported-From / Modified-By / Modifications を書く（LIC-01）
+  - EXCLUDED の上流ファイルは取り込まない（port-map に not-ported で残す）
+  - porting/kct/patches/*.patch を名前順に git apply する（取り込み後の手直しはパッチにして残す）
   - porting/kct/port-map.csv を書き直す
 """
 
@@ -35,6 +37,14 @@ PACKAGE_REWRITES = [
     ("com.tschuchort.compiletesting", NEW_PKG),
     ("com.facebook.buck.jvm.java.javax", NEW_PKG),
 ]
+
+# 取り込まない上流ファイルと理由
+EXCLUDED = {
+    "core/src/main/kotlin/com/tschuchort/compiletesting/kapt/KctKaptCompilerPluginRegistrar.kt":
+        "kapt は対象外（ADR-021）。Kotlin 2.4.0 でコンパイルできない",
+    "core/src/main/kotlin/com/tschuchort/compiletesting/kapt/util.kt": "kapt は対象外（ADR-021）",
+}
+PATCHES_DIR = ROOT / "porting/kct/patches"
 
 MODIFICATIONS = (
     f"パッケージを {NEW_PKG} へ移動、@AutoService を手書きの META-INF/services に置換、"
@@ -115,6 +125,14 @@ def main() -> None:
     rows = []
     for up in files:
         original = git_show(args.upstream_dir, sha, up)
+        if up in EXCLUDED:
+            rows.append({
+                "upstream_path": up, "size_bytes": str(len(original.encode("utf-8"))),
+                "upstream_copyright": upstream_copyright(original), "target_module": "testing-kct",
+                "strategy": "exclude", "phase": "P1", "status": "not-ported", "target_paths": "",
+                "notes": EXCLUDED[up],
+            })
+            continue
         dest = target_path(up)
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(header(owner_repo, sha, up) + transform(original), encoding="utf-8")
@@ -129,6 +147,9 @@ def main() -> None:
             "target_paths": dest.relative_to(ROOT).as_posix(),
             "notes": "",
         })
+    for patch in sorted(PATCHES_DIR.glob("*.patch")):
+        subprocess.run(["git", "-C", str(ROOT), "apply", str(patch)], check=True)
+        print(f"applied {patch.name}")
     with (ROOT / "porting/kct/port-map.csv").open("w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()), lineterminator="\n")
         w.writeheader()

@@ -24,3 +24,22 @@ Every ported file keeps its original copyright and license header and carries
 "Ported-From", "Modified-By" and "Modifications" lines that name the upstream
 path, the upstream commit and what was changed. The full list of ported files
 is in porting/ksp/port-map.csv.
+
+------------------------------------------------------------------------
+
+The testing-kct module includes source code derived from
+kotlin-compile-testing (the ZacSweers fork, "kctfork"),
+https://github.com/ZacSweers/kotlin-compile-testing
+which itself is a fork of https://github.com/tschuchortdev/kotlin-compile-testing
+  Copyright kotlin-compile-testing contributors
+  Licensed under the Mozilla Public License, v. 2.0 (MPL-2.0).
+  Ported from tag 0.14.0 (commit 244ec46c6e280e0a7e8ab7a65022a657bd6824e8).
+  Some of those files also carry their own Apache License, Version 2.0
+  headers (Square, Inc., The Android Open Source Project, JetBrains s.r.o.,
+  Facebook, Inc.), which are kept as is.
+
+Those files remain under MPL-2.0 (file-level copyleft). Their source is
+available in this repository under testing-kct/, the full MPL-2.0 text is in
+porting/kct/LICENSE-MPL-2.0.txt (also bundled in the testing-kct jar under
+META-INF/), and the list of files and changes is in porting/kct/port-map.csv
+and porting/kct/patches/.

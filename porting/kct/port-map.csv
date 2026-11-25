@@ -16,8 +16,8 @@ core/src/main/kotlin/com/tschuchort/compiletesting/PrecursorTool.kt,423,,testing
 core/src/main/kotlin/com/tschuchort/compiletesting/SourceFile.kt,1801,,testing-kct,as-is,P1,ported,testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct/SourceFile.kt,
 core/src/main/kotlin/com/tschuchort/compiletesting/StreamUtils.kt,1595,,testing-kct,as-is,P1,ported,testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct/StreamUtils.kt,
 core/src/main/kotlin/com/tschuchort/compiletesting/Utils.kt,2697,,testing-kct,as-is,P1,ported,testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct/Utils.kt,
-core/src/main/kotlin/com/tschuchort/compiletesting/kapt/KctKaptCompilerPluginRegistrar.kt,5858,,testing-kct,as-is,P1,ported,testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct/kapt/KctKaptCompilerPluginRegistrar.kt,
-core/src/main/kotlin/com/tschuchort/compiletesting/kapt/util.kt,3560,,testing-kct,as-is,P1,ported,testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct/kapt/util.kt,
+core/src/main/kotlin/com/tschuchort/compiletesting/kapt/KctKaptCompilerPluginRegistrar.kt,5858,,testing-kct,exclude,P1,not-ported,,kapt は対象外（ADR-021）。Kotlin 2.4.0 でコンパイルできない
+core/src/main/kotlin/com/tschuchort/compiletesting/kapt/util.kt,3560,,testing-kct,exclude,P1,not-ported,,kapt は対象外（ADR-021）
 ksp/src/main/kotlin/com/tschuchort/compiletesting/Ksp.kt,4640,,testing-kct,as-is,P1,ported,testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct/Ksp.kt,
 ksp/src/main/kotlin/com/tschuchort/compiletesting/Ksp2.kt,4913,,testing-kct,as-is,P1,ported,testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct/Ksp2.kt,
 ksp/src/main/kotlin/com/tschuchort/compiletesting/KspTool.kt,835,,testing-kct,as-is,P1,ported,testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct/KspTool.kt,
