@@ -21,6 +21,9 @@ dependencies {
     testImplementation(libs.ksp.api)
     // KMP-23: Gradle plugin のタスク名・出力先の命名（ADR-016）
     testImplementation(project(":gradle-plugin"))
+    testImplementation(project(":analysis-engine")) // ACG-46: MEM-01（解析環境、ADR-037）
+    testImplementation(project(":project-model")) // ACG-46: MEM-01 のモデル
+    testImplementation(project(":pbt")) // ACG-46: XD-05・XD-10 のカタログと変更の列（ADR-022）
 }
 
 kotlin {
