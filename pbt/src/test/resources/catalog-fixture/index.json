@@ -1,0 +1,8 @@
+{"schema":1,"shards":24,"patterns":[
+{"id":"CMN-O-0001","title":"背景","owner":"common","source":"own","processors":["*"],"expect":"ok","expectMessage":"","options":[],"tags":["kt.decl=class"],"status":"verified","origin":"own","shard":18,"path":"patterns/common/CMN-O-0001.kt","files":["bg/main/com/example/bg/Bg.kt"]},
+{"id":"KOI-O-0001","title":"single","owner":"koin","source":"own","processors":["koin"],"expect":"ok","expectMessage":"","options":[{"KOIN_CONFIG_CHECK":"true"}],"tags":[],"status":"verified","origin":"own","shard":-1,"path":"patterns/koin/KOI-O-0001.kt","files":["com/example/a/A.kt","com/example/a/B.kt"]},
+{"id":"KOI-O-0002","title":"error","owner":"koin","source":"own","processors":["koin"],"expect":"error","expectMessage":"missing","options":[],"tags":[],"status":"verified","origin":"own","shard":-1,"path":"patterns/koin/KOI-O-0002.kt","files":["com/example/b/B.kt"]},
+{"id":"KOI-O-0003","title":"error2","owner":"koin","source":"own","processors":["koin"],"expect":"compile-error","expectMessage":"","options":[],"tags":[],"status":"verified","origin":"own","shard":-1,"path":"patterns/koin/KOI-O-0003.kt","files":["com/example/c/C.kt"]},
+{"id":"CRM-O-0001","title":"cream","owner":"cream","source":"own","processors":["cream","koin"],"expect":"ok","expectMessage":"","options":[],"tags":[],"status":"candidate","origin":"own","shard":-1,"path":"patterns/cream/CRM-O-0001.kt","files":["com/example/d/D.kt"]},
+{"id":"MSH-O-0001","title":"rejected","owner":"moshi","source":"own","processors":["moshi"],"expect":"ok","expectMessage":"","options":[],"tags":[],"status":"rejected","origin":"own","shard":-1,"path":"patterns/koin/KOI-O-0001.kt","files":["com/example/e/E.kt"]}
+]}

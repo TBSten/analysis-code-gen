@@ -38,6 +38,8 @@ include(
     // テスト基盤（ACG-37、ADR-030）。:quality はケース ID 整合チェックを持つ（quality/ 直下）
     ":test-foundation",
     ":quality",
+    // PBT 基盤（ACG-40、ADR-022）
+    ":pbt",
     // テスト用 Processor（ADR-027）
     ":test-processors:core",
     ":test-processors:ksp",

@@ -52,3 +52,20 @@ tasks.withType<Test>().configureEach {
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
 }
+
+// PBT の設定（ACG-40、ADR-022）を Gradle の -Pacg.pbt.* からテスト JVM に渡す。
+// 置き場の既定: タイミング = <root>/.pbt-state（毎時のワークフローが actions/cache で持ち回る）、記録 = <module>/build/pbt
+val pbtKeys = listOf("mode", "seed", "iterations", "only", "budgetMinutes", "hardLimitMinutes", "runStartEpochMs", "shard")
+val pbtProps = pbtKeys.associateWith { providers.gradleProperty("acg.pbt.$it") }
+val pbtStateDir = providers.gradleProperty("acg.pbt.stateDir").orElse(rootDir.resolve(".pbt-state").absolutePath)
+val pbtReportDir = layout.buildDirectory.dir("pbt").map { it.asFile.absolutePath }
+val repoRoot = rootDir.absolutePath
+
+tasks.withType<Test>().configureEach {
+    pbtProps.forEach { (k, v) -> v.orNull?.let { systemProperty("acg.pbt.$k", it) } }
+    systemProperty("acg.pbt.stateDir", pbtStateDir.get())
+    systemProperty("acg.pbt.reportDir", pbtReportDir.get())
+    systemProperty("acg.repoRoot", repoRoot)
+    // 定期実行（scheduled）は毎回違う seed で回すので、Gradle のテスト結果キャッシュを使わない
+    if (pbtProps.getValue("mode").orNull == "scheduled") outputs.upToDateWhen { false }
+}
