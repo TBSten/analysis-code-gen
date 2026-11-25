@@ -15,3 +15,10 @@ dependencies {
     testImplementation(project(":project-model")) // ACG-46: MEM-01 のモデル
     testImplementation(project(":pbt")) // ACG-46: XD-05・XD-10 のカタログと変更の列（ADR-022）
 }
+
+kotlin {
+    compilerOptions {
+        // AA の実験的 API（expect / actual の対応など）をテストから使う
+        optIn.add("org.jetbrains.kotlin.analysis.api.KaExperimentalApi")
+    }
+}
