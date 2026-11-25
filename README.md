@@ -29,5 +29,5 @@ JDK 21 で `./gradlew build`。生成物は JVM 17 向け。共通設定は `bui
 ## 開発の進め方
 
 - 変更は branch → PR → CI が緑ならマージ（AI Agent が自分でマージしてよい）
-- テストを弱める変更は禁止。ルールは `CLAUDE.md` と `.claude/rules/`（ACG-27 で追加）
+- テストを弱める変更は禁止。Agent 向けのルールは `CLAUDE.md` と `.claude/rules/`、繰り返す手順は `.claude/skills/`
 - ライセンス: Apache License 2.0

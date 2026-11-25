@@ -1,0 +1,40 @@
+name: 不具合
+description: 生成物の誤り・ビルドの失敗・KSP2 との差など
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: 何が起きたか
+      description: 期待した動きと実際の動き
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: 再現手順
+      description: 最小の入力コード・Processor・Gradle の設定。テストケース ID があれば書く
+      render: kotlin
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: バージョン
+      placeholder: "analysis-code-gen 0.1.0 / Kotlin 2.4.21 / Gradle 9.9.2 / AGP -"
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: 実行モード
+      options:
+        - Native Processor
+        - KSP Bridge
+        - Hybrid
+        - 不明
+  - type: textarea
+    id: logs
+    attributes:
+      label: ログ・スタックトレース
+      render: text
