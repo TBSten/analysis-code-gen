@@ -1,0 +1,122 @@
+---
+title: インストール
+description: 既存の Gradle プロジェクトに analysisCodeGen を組み込み、Processor を足す手順です。
+fixture: fixtures/docs/install
+---
+
+:::note[レビューで判断してほしいこと]
+- AA が Maven Central に無いため、使う側にも JetBrains のリポジトリを 3 つ足してもらう案でよいか（plugin 側で吸収する案もある）
+- 版の `0.1.0` は仮の値（まだ公開していない）
+- Android は Variant ごとの実行だけにして、Android の SourceSet ごとの実行は出さない
+:::
+
+必要なものは、Kotlin 2.4.0 以降の Kotlin Gradle Plugin と、Gradle を動かす JDK 17 以上です。
+
+Gradle の版は、使う Kotlin Gradle Plugin の対応範囲に従います。
+
+## リポジトリを足す
+
+Analysis API と、それが使う IntelliJ Platform は Maven Central にありません。`settings.gradle.kts` に置き場を足します。
+
+```kotlin title="settings.gradle.kts"
+pluginManagement {
+    repositories { gradlePluginPortal(); mavenCentral() }
+}
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        // Analysis API と IntelliJ Platform の置き場（Maven Central に無いため）
+        maven("https://redirector.kotlinlang.org/maven/kotlin-ide-plugin-dependencies")
+        maven("https://www.jetbrains.com/intellij-repository/releases")
+        maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    }
+}
+```
+
+AA は利用者の Kotlin と同じ版を、実行時にここから取ります。
+
+## plugin を適用する
+
+Kotlin の plugin と一緒に `me.tbsten.analysiscodegen` を適用し、`analysisCodeGen` の依存に Processor を足します。
+
+```kotlin title="jvm-app/build.gradle.kts"
+plugins {
+    kotlin("jvm") version "2.4.21"
+    id("me.tbsten.analysiscodegen") version "0.1.0"
+}
+
+dependencies {
+    analysisCodeGen(project(":hello-processor"))
+}
+```
+
+Kotlin/JVM では `main` の SourceSet で動きます。生成物は `build/generated/analysisCodeGen/main/` に出て、そのままコンパイルされます。
+
+## KMP で SourceSet を選ぶ
+
+KMP では、Processor を動かす SourceSet を `analysisCodeGen { sourceSets { } }` で選びます。
+
+```kotlin title="kmp-lib/build.gradle.kts"
+kotlin {
+    jvm()
+    iosArm64()
+}
+
+analysisCodeGen {
+    sourceSets {
+        commonMain { processor(project(":hello-processor")) }
+    }
+}
+```
+
+`commonMain` で 1 回だけ生成し、その生成物は `jvmMain` と `iosArm64Main` からも見えます。ターゲットごとに動かすときは `compilations { }` を使います。
+
+## KSP の Processor を使う
+
+既存の KSP Processor は、KSP Bridge の plugin を適用すると動きます。本体の plugin も自動で適用されます。
+
+```kotlin title="bridge-app/build.gradle.kts"
+plugins {
+    kotlin("jvm") version "2.4.21"
+    id("me.tbsten.analysiscodegen.ksp-bridge") version "0.1.0"
+}
+
+dependencies {
+    implementation("com.squareup.moshi:moshi:1.15.2")
+    analysisCodeGen("com.squareup.moshi:moshi-kotlin-codegen:1.15.2")
+}
+```
+
+`ksp { arg(...) }` に書いていたオプションは、`analysisCodeGen { arg(...) }` に移します。
+
+## Processor を作る
+
+Processor を作るモジュールは、`processor-api` に `compileOnly` で依存します。AA も一緒にコンパイル時だけ見えます。
+
+```kotlin title="hello-processor/build.gradle.kts"
+plugins {
+    kotlin("jvm") version "2.4.21"
+}
+
+dependencies {
+    // Analysis API も processor-api 経由でコンパイル時に見える。実行時は analysisCodeGen が用意する
+    compileOnly("me.tbsten.analysiscodegen:processor-api:0.1.0")
+}
+```
+
+実行時の AA は analysisCodeGen が用意するので、Processor に AA を同梱しません。
+
+## まとめ
+
+| やりたいこと | 書くもの |
+|---|---|
+| AA の置き場を足す | `settings.gradle.kts` の `repositories` |
+| Processor を動かす | `me.tbsten.analysiscodegen` と `analysisCodeGen(...)` |
+| KMP で SourceSet を選ぶ | `analysisCodeGen { sourceSets { } }` |
+| KSP Processor を動かす | `me.tbsten.analysiscodegen.ksp-bridge` |
+| Processor を作る | `compileOnly` の `processor-api` |
+
+## 次のステップ
+
+- [クイックスタート](/analysis-code-gen/start/quick-start/): Processor を書いて動かす
+- [概要](/analysis-code-gen/): KSP2 との違い
