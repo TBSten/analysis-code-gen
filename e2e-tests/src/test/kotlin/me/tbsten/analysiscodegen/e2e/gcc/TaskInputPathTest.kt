@@ -47,7 +47,7 @@ private fun configuredProject(dir: File): Project {
             .withName("app")
             .build()
     project.pluginManager.apply("org.jetbrains.kotlin.jvm")
-    project.pluginManager.apply("me.tbsten.analysiscodegen")
+    project.pluginManager.apply("me.tbsten.analysis.code.gen")
     project.extensions.getByType(AnalysisCodegenExtension::class.java).arg("key", "value")
     return project
 }

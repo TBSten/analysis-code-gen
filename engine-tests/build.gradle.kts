@@ -10,20 +10,18 @@ plugins {
 }
 
 dependencies {
-    testImplementation(project(":testing"))
+    testImplementation(project(":analysis-code-gen-testing"))
     testImplementation(project(":pbt"))
-    testImplementation(project(":project-model"))
-    testImplementation(project(":processor-api"))
-    testImplementation(project(":analysis-engine"))
-    testImplementation(project(":processing-engine"))
-    testImplementation(project(":incremental-engine"))
-    testImplementation(project(":ksp-bridge-api"))
-    testImplementation(project(":ksp-bridge"))
+    testImplementation(project(":analysis-code-gen-project-model"))
+    testImplementation(project(":analysis-code-gen-processor-api"))
+    testImplementation(project(":analysis-code-gen-analysis-engine"))
+    testImplementation(project(":analysis-code-gen-processing-engine"))
+    testImplementation(project(":analysis-code-gen-incremental-engine"))
+    testImplementation(project(":analysis-code-gen-ksp-bridge-api"))
+    testImplementation(project(":analysis-code-gen-ksp-bridge"))
     testImplementation(libs.ksp.api)
     // KMP-23: Gradle plugin のタスク名・出力先の命名（ADR-016）
     testImplementation(project(":analysis-code-gen-gradle-plugin"))
-    testImplementation(project(":analysis-code-gen-analysis-engine")) // ACG-46: MEM-01（解析環境、ADR-037）
-    testImplementation(project(":analysis-code-gen-project-model")) // ACG-46: MEM-01 のモデル
 }
 
 kotlin {

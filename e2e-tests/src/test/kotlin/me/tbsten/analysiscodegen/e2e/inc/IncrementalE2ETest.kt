@@ -253,7 +253,7 @@ class IncrementalE2ETest : E2ESpec({
                     """
                     plugins {
                         kotlin("multiplatform") version "{{kotlinVersion}}"
-                        id("me.tbsten.analysiscodegen") version "${Acg45Repo.acgVersion}"
+                        id("me.tbsten.analysis.code.gen") version "${Acg45Repo.acgVersion}"
                     }
 
                     kotlin { jvm() }
@@ -313,7 +313,7 @@ class IncrementalE2ETest : E2ESpec({
                     """
                     plugins {
                         kotlin("jvm") version "{{kotlinVersion}}" apply false
-                        id("me.tbsten.analysiscodegen") version "$v" apply false
+                        id("me.tbsten.analysis.code.gen") version "$v" apply false
                     }
                     """.trimIndent()
                 file("lib/build.gradle.kts", "plugins { kotlin(\"jvm\") }")
@@ -322,7 +322,7 @@ class IncrementalE2ETest : E2ESpec({
                     """
                     plugins {
                         kotlin("jvm")
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     dependencies { implementation(project(":lib")) }
                     analysisCodeGen {

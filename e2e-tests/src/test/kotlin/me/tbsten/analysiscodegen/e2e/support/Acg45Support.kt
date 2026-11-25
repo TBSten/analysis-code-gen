@@ -8,14 +8,14 @@ import java.util.Properties
 
 // ACG-45 の E2E（INC・OUT・FAIL・GCC・BRG・BINC・MIX・BKMP・BIN・HYB）が使う補助（ADR-034）。
 // ACG-44 の support（fixtureProject など）が入ったら、重なる部分はそちらに寄せる。
-// Bridge の道（me.tbsten.analysiscodegen.ksp-bridge）を使うケースの保留を外すときは、ksp-bridge-gradle-plugin を publishFixtureDeps に足す。
+// Bridge の道（me.tbsten.analysis.code.gen.ksp-bridge）を使うケースの保留を外すときは、analysis-code-gen-ksp-bridge-gradle-plugin を publishFixtureDeps に足す。
 
 /** どの道でフィクスチャを動かすか。 */
 enum class Acg45Engine {
     /** 公開 DSL + TP の Native 版。 */
     Native,
 
-    /** 公開 DSL + ksp-bridge + TP の KSP 版。 */
+    /** 公開 DSL + analysis-code-gen-ksp-bridge + TP の KSP 版。 */
     Bridge,
 
     /** 公式 KSP2 + TP の KSP 版。差分の基準（K）。 */
@@ -40,7 +40,7 @@ object Acg45Repo {
 
     val fixtureRepo: File get() = File(root, "build/fixture-repo")
 
-    fun coordinate(artifact: String): String = "me.tbsten.analysiscodegen:$artifact:$acgVersion"
+    fun coordinate(artifact: String): String = "me.tbsten.analysis.code.gen:$artifact:$acgVersion"
 }
 
 /**
@@ -73,7 +73,7 @@ fun acg45Project(
                     """
                     plugins {
                         kotlin("jvm") version "{{kotlinVersion}}"
-                        id("me.tbsten.analysiscodegen") version "$v"
+                        id("me.tbsten.analysis.code.gen") version "$v"
                     }
 
                     analysisCodeGen {
@@ -86,7 +86,7 @@ fun acg45Project(
                     """
                     plugins {
                         kotlin("jvm") version "{{kotlinVersion}}"
-                        id("me.tbsten.analysiscodegen.ksp-bridge") version "$v"
+                        id("me.tbsten.analysis.code.gen.ksp-bridge") version "$v"
                     }
 
                     analysisCodeGen {

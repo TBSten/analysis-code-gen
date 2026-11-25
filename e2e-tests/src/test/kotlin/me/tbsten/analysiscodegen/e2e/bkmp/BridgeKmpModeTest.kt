@@ -54,7 +54,7 @@ private fun kmpProject(
     }
 
 private val ksp2Plugin = "id(\"com.google.devtools.ksp\") version \"${Acg45Repo.kspVersion}\""
-private val bridgePlugin = "id(\"me.tbsten.analysiscodegen.ksp-bridge\") version \"${Acg45Repo.acgVersion}\""
+private val bridgePlugin = "id(\"me.tbsten.analysis.code.gen.ksp-bridge\") version \"${Acg45Repo.acgVersion}\""
 
 /** [root] 以下の生成 Kotlin を「Compilation（または SourceSet）名 / ファイル名 → 中身」で集める。 */
 private fun collect(
