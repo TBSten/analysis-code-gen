@@ -10,11 +10,11 @@ import me.tbsten.analysiscodegen.testfoundation.UnitSpec
 /** 利用者に公開するモジュール（ADR-012）と、ABI の dump に必ず現れるはずの宣言。 */
 private val PUBLIC_MODULES =
     mapOf(
-        "processor-api" to "me/tbsten/analysiscodegen/processor/AnalysisCodegenProcessorProvider",
-        "gradle-plugin" to "me/tbsten/analysiscodegen/gradle/AnalysisCodegenExtension",
-        "testing" to "me/tbsten/analysiscodegen/testing/CodegenTestResult",
-        "ksp-bridge-api" to "me/tbsten/analysiscodegen/ksp/hybrid",
-        "ksp-bridge-gradle-plugin" to "me/tbsten/analysiscodegen/ksp/gradle/KspBridgePlugin",
+        "analysis-code-gen-processor-api" to "me/tbsten/analysiscodegen/processor/AnalysisCodegenProcessorProvider",
+        "analysis-code-gen-gradle-plugin" to "me/tbsten/analysiscodegen/gradle/AnalysisCodegenExtension",
+        "analysis-code-gen-testing" to "me/tbsten/analysiscodegen/testing/CodegenTestResult",
+        "analysis-code-gen-ksp-bridge-api" to "me/tbsten/analysiscodegen/ksp/hybrid",
+        "analysis-code-gen-ksp-bridge-gradle-plugin" to "me/tbsten/analysiscodegen/ksp/gradle/KspBridgePlugin",
     )
 
 // 5.3 のうち API-15。ADR-038: KGP 組み込みの ABI 検査（旧 binary-compatibility-validator）を acg.library に入れ、dump は <module>/api/<module>.api

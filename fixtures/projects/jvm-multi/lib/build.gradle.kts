@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    id("me.tbsten.analysiscodegen")
+    id("me.tbsten.analysis.code.gen")
 }
 
 analysisCodeGen {

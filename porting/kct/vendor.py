@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""kotlin-compile-testing (kctfork) の main ソースを testing-kct へ取り込む（ADR-021）。
+"""kotlin-compile-testing (kctfork) の main ソースを analysis-code-gen-testing-kct へ取り込む（ADR-021）。
 
 固定コミットは porting/kct/UPSTREAM.properties の commit。fork 元を更新するときは
 UPSTREAM.properties の tag / commit を書き換えてからこのスクリプトを流し直し、差分を確認して PR にする。
@@ -8,9 +8,9 @@ UPSTREAM.properties の tag / commit を書き換えてからこのスクリプ�
   python3 porting/kct/vendor.py --upstream-dir /path/to/kotlin-compile-testing
 
 やること
-  - core/src/main と ksp/src/main の .kt を testing-kct/src/main/kotlin/... へコピーする
+  - core/src/main と ksp/src/main の .kt を analysis-code-gen-testing-kct/src/main/kotlin/... へコピーする
   - パッケージを me.tbsten.analysiscodegen.testing.kct（kapt は .kapt）へ移す
-  - @AutoService を外す（サービス登録は testing-kct/src/main/resources/META-INF/services に手書き）
+  - @AutoService を外す（サービス登録は analysis-code-gen-testing-kct/src/main/resources/META-INF/services に手書き）
   - コンパイラプラグイン ID を本家と衝突しないものに変える
   - 先頭に MPL-2.0 の表示と Ported-From / Modified-By / Modifications を書く（LIC-01）
   - EXCLUDED の上流ファイルは取り込まない（port-map に not-ported で残す）
@@ -27,7 +27,7 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-TARGET_ROOT = ROOT / "testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct"
+TARGET_ROOT = ROOT / "analysis-code-gen-testing-kct/src/main/kotlin/me/tbsten/analysiscodegen/testing/kct"
 NEW_PKG = "me.tbsten.analysiscodegen.testing.kct"
 
 # 長いものから置き換える
@@ -128,7 +128,7 @@ def main() -> None:
         if up in EXCLUDED:
             rows.append({
                 "upstream_path": up, "size_bytes": str(len(original.encode("utf-8"))),
-                "upstream_copyright": upstream_copyright(original), "target_module": "testing-kct",
+                "upstream_copyright": upstream_copyright(original), "target_module": "analysis-code-gen-testing-kct",
                 "strategy": "exclude", "phase": "P1", "status": "not-ported", "target_paths": "",
                 "notes": EXCLUDED[up],
             })
@@ -140,7 +140,7 @@ def main() -> None:
             "upstream_path": up,
             "size_bytes": str(len(original.encode("utf-8"))),
             "upstream_copyright": upstream_copyright(original),
-            "target_module": "testing-kct",
+            "target_module": "analysis-code-gen-testing-kct",
             "strategy": "as-is",
             "phase": "P1",
             "status": "ported",

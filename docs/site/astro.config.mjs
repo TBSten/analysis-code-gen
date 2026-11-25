@@ -5,6 +5,8 @@ import starlight from '@astrojs/starlight';
 import mermaid from 'astro-mermaid';
 import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightLinksValidator from 'starlight-links-validator';
+// `astro dev` のときだけ Dev Toolbar に Feedback を出す（ADR-043）。build には何も足さない
+import feedbackMode from './src/integrations/feedback/feedback-integration.ts';
 
 const repo = 'analysis-code-gen';
 
@@ -12,6 +14,10 @@ export default defineConfig({
 	site: 'https://tbsten.github.io',
 	base: `/${repo}`,
 	integrations: [
+		feedbackMode({
+			appName: 'analysisCodeGen docs',
+			pointer: '案内: analysisCodeGen の docs サイトへのフィードバック。ページは docs/site/src/content/docs/、コード例は fixtures/docs/、決まりは docs/site/README.md と ADR-028 / ADR-031',
+		}),
 		// starlight より前に置く（```mermaid を Starlight の処理より先に置き換えるため）
 		mermaid({ theme: 'neutral', autoTheme: true }),
 		starlight({
@@ -37,6 +43,22 @@ export default defineConfig({
 					items: [
 						{ label: 'クイックスタート', slug: 'start/quick-start' },
 						{ label: 'インストール', slug: 'start/install' },
+					],
+				},
+				{
+					// 1 要素 1 ページ（ADR-033）。読む順に並べる
+					label: 'ガイド',
+					items: [
+						{ label: 'Processor と Provider', slug: 'guides/processor' },
+						{ label: 'ラウンドとファイル集合', slug: 'guides/rounds' },
+						{ label: '生成と出力の管理', slug: 'guides/code-generator' },
+						{ label: '増分処理と依存の宣言', slug: 'guides/incremental' },
+						{ label: 'Deferred', slug: 'guides/deferred' },
+						{ label: 'SourceSet First と KMP', slug: 'guides/kmp' },
+						{ label: 'Gradle DSL', slug: 'guides/gradle-dsl' },
+						{ label: 'KSP Bridge', slug: 'guides/ksp-bridge' },
+						{ label: 'Hybrid Processor', slug: 'guides/hybrid' },
+						{ label: '対応バージョン', slug: 'guides/versions' },
 					],
 				},
 				{

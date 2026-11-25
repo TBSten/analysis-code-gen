@@ -4,7 +4,7 @@ kotlin = "2.4.21"
 ksp = "2.3.14"
 kotest = "6.2.7"
 ktlint-gradle = "14.2.0"
-# Analysis API（ADR-011）。いまは全モジュールを最新 stable でコンパイルする。processor-api を最小版（2.4.0）でコンパイルする切り替えは ACG-28 の版マトリクスで足す
+# Analysis API（ADR-011）。いまは全モジュールを最新 stable でコンパイルする。analysis-code-gen-processor-api を最小版（2.4.0）でコンパイルする切り替えは ACG-28 の版マトリクスで足す
 analysis-api = "2.4.21"
 # AA が前提とする IntelliJ Platform の版（KSP2 の aa-intellij に当たる）
 aa-intellij = "251.27812.49"
@@ -27,7 +27,7 @@ kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest"
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
-# kct fork（testing-kct、ADR-021）が使うもの。Kotlin コンパイラの版は -Pacg.kotlin で差し替える（testing-kct/build.gradle.kts）
+# kct fork（analysis-code-gen-testing-kct、ADR-021）が使うもの。Kotlin コンパイラの版は -Pacg.kotlin で差し替える（analysis-code-gen-testing-kct/build.gradle.kts）
 ksp-impl = { module = "com.google.devtools.ksp:symbol-processing", version.ref = "ksp" }
 ksp-aa-embeddable = { module = "com.google.devtools.ksp:symbol-processing-aa-embeddable", version.ref = "ksp" }
 ksp-common-deps = { module = "com.google.devtools.ksp:symbol-processing-common-deps", version.ref = "ksp" }

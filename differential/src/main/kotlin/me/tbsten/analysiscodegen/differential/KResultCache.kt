@@ -88,7 +88,7 @@ public data class EngineVersions(val kotlin: String, val ksp: String) {
 
         private fun kspVersionFromJar(): String {
             val location =
-                // ksp-impl は testing-kct の implementation なので、名前で読み込む
+                // ksp-impl は analysis-code-gen-testing-kct の implementation なので、名前で読み込む
                 runCatching { Class.forName("com.google.devtools.ksp.impl.KotlinSymbolProcessing") }
                     .getOrNull()
                     ?.protectionDomain

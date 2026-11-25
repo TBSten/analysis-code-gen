@@ -1,0 +1,86 @@
+---
+title: Processor と Provider
+description: Processor の作られ方と、process・finish・onError が呼ばれる順番を説明します。
+fixture: fixtures/docs/guides
+---
+
+:::note[レビューで判断してほしいこと]
+- Provider の `create` を実行単位ごとに 1 回にし、全ラウンドで同じインスタンスを使う契約でよいか
+- `finish()` と `onError()` の中では生成できない（KSP Bridge だけは KSP に合わせて許す）
+:::
+
+Processor は解析と生成をする本体で、Provider がそれを作ります。どちらも `analysis-code-gen-processor-api` のインターフェースです。
+
+## Provider で Processor を作る
+
+Provider は ServiceLoader で見つかります。`create` には実行単位ごとの環境が渡されます。
+
+```kotlin title="greeting-processor/src/main/kotlin/com/example/greeting/GreetingProcessorProvider.kt"
+class GreetingProcessorProvider : AnalysisCodegenProcessorProvider {
+    override fun create(environment: AnalysisCodegenProcessorEnvironment): AnalysisCodegenProcessor {
+        val prefix = environment.options["greeting.prefix"] ?: "Hello"
+        environment.logger.info("greeting: ${environment.executionUnit.name} で動きます")
+        return GreetingProcessor(prefix)
+    }
+}
+```
+
+`create` は 1 回のタスク実行で 1 回だけ呼ばれます。KMP では SourceSet や Compilation ごとに別のインスタンスになります。
+
+## 呼ばれる順番
+
+`process` はラウンドごとに 1 回呼ばれます。全ラウンドが成功すると `finish`、失敗すると代わりに `onError` が 1 回呼ばれます。
+
+```kotlin title="greeting-processor/src/main/kotlin/com/example/greeting/GreetingProcessor.kt"
+    override fun finish() {
+        // 全ラウンドが成功したときだけ呼ばれる。ここでは生成できない
+        println("greeting: $generated 個のファイルを生成しました")
+    }
+
+    override fun onError() {
+        // logger.error か例外があったときに、finish() の代わりに呼ばれる
+        generated = 0
+    }
+```
+
+同じインスタンスが全ラウンドで使われるので、ラウンドをまたぐ集計はフィールドに持てます。
+
+## オプションを渡す
+
+オプションは Gradle の `analysisCodeGen { arg() }` で渡し、`environment.options` で受け取ります。
+
+```kotlin title="app/build.gradle.kts"
+analysisCodeGen {
+    // すべての実行単位に渡すオプション
+    arg("greeting.prefix", "Hi")
+```
+
+キーは Processor が決めます。`analysisCodeGen.` で始まるキーは予約済みで、Processor には渡りません。
+
+## エラーを報告する
+
+`logger.error` に要素を渡すと、ファイル名と行番号付きで出ます。1 回でも呼ぶとビルドは失敗します。
+
+```kotlin title="greeting-processor/src/main/kotlin/com/example/greeting/GreetingProcessor.kt"
+                    if (klass.isInterface()) {
+                        context.logger.error("@Greeting は interface に付けられません", klass)
+                        continue
+                    }
+```
+
+Processor が例外を投げたときも同じ扱いです。どちらの場合も生成物は前回のビルドのまま残ります。
+
+## まとめ
+
+| 要素 | 役割 |
+|---|---|
+| `AnalysisCodegenProcessorProvider` | 実行単位ごとに 1 回、Processor を作る |
+| `AnalysisCodegenProcessorEnvironment` | オプション・ロガー・実行単位・版 |
+| `process` | ラウンドごとに 1 回呼ばれる |
+| `finish` / `onError` | 最後に、成功か失敗のどちらか 1 回 |
+| `logger.error` | ビルドを失敗させる |
+
+## 次のステップ
+
+- [ラウンドとファイル集合](/analysis-code-gen/guides/rounds/): `process` に渡るファイル
+- [生成と出力の管理](/analysis-code-gen/guides/code-generator/): ファイルの書き方

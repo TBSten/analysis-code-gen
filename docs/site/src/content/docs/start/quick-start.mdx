@@ -77,7 +77,7 @@ class HelloProcessorProvider : AnalysisCodegenProcessorProvider {
 com.example.hello.HelloProcessorProvider
 ```
 
-Processor のモジュールは `processor-api` に `compileOnly` で依存します。
+Processor のモジュールは `analysis-code-gen-processor-api` に `compileOnly` で依存します。
 
 ## アプリに適用する
 
@@ -86,7 +86,7 @@ Processor のモジュールは `processor-api` に `compileOnly` で依存し�
 ```kotlin title="app/build.gradle.kts"
 plugins {
     kotlin("jvm") version "2.4.21"
-    id("me.tbsten.analysiscodegen") version "0.1.0"
+    id("me.tbsten.analysis.code.gen") version "0.1.0"
     application
 }
 
@@ -127,3 +127,4 @@ fun main() {
 ## 次のステップ
 
 - [インストール](/analysis-code-gen/start/install/): KMP や既存の KSP Processor で使う
+- [Processor と Provider](/analysis-code-gen/guides/processor/): Processor の契約を詳しく知る

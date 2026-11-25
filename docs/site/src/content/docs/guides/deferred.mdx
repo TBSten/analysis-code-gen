@@ -1,0 +1,78 @@
+---
+title: Deferred
+description: まだ解決できない宣言を次のラウンドへ持ち越し、他の Processor の生成物を待つ方法を説明します。
+fixture: fixtures/docs/guides
+---
+
+:::note[レビューで判断してほしいこと]
+- 最後まで解決できない Deferred を既定でエラーにした（`Warning` に変えられる）
+- 復元できなくなった Pointer（元の宣言が消えたなど）は、警告を出して落とす
+:::
+
+他の Processor が生成する型を使う宣言は、最初のラウンドではまだ解決できません。そうした宣言は次のラウンドへ持ち越せます。これを Deferred と呼びます。
+
+## 次のラウンドへ持ち越す
+
+`context.defer` に、シンボルから作った Pointer を渡します。`payload` には好きな文字列を添えられます。
+
+```kotlin title="deferred-processor/src/main/kotlin/com/example/deferred/FactoryProcessor.kt"
+        if (constructor.valueParameters.any { it.returnType is KaErrorType }) {
+            // 引数の型がまだ無い（他の Processor が生成する）。KaSymbol ではなく Pointer で持ち越す
+            context.defer(symbol.createPointer(), payload = "factory")
+            return
+        }
+```
+
+持ち越すだけではラウンドは進みません。誰かが新しいファイルを生成したときに、次のラウンドで渡されます。
+
+## 持ち越したものを受け取る
+
+次のラウンドの `context.deferred` に入ります。`analyze` の中で `restoreSymbol()` すると、そのラウンドのシンボルに戻ります。
+
+```kotlin title="deferred-processor/src/main/kotlin/com/example/deferred/FactoryProcessor.kt"
+        analyze(context.sourceSet.module) {
+            for (deferred in context.deferred) {
+                val symbol = deferred.pointer.restoreSymbol() as? KaNamedClassSymbol ?: continue
+                handle(context, symbol)
+            }
+        }
+```
+
+入っているのは、この Processor が持ち越したものだけです。元の宣言が消えて復元できないものは、警告付きで落とされます。
+
+## シンボルを持ち越さない
+
+`KaSymbol`・`KaType`・`KaSession` は、ラウンドをまたいで使えません。フィールドに入れて次のラウンドで触ると例外になります。
+
+```kotlin
+class BadProcessor : AnalysisCodegenProcessor {
+    private val pending = mutableListOf<KaClassSymbol>() // 次のラウンドで触ると例外
+}
+```
+
+持ち越せるのは Pointer・文字列・ファイルのパスだけです。
+
+## 最後まで解決できないとき
+
+新しいファイルが無くなっても Deferred が残っていると、既定ではエラーになります。Processor 名と残ったシンボルが出ます。
+
+```kotlin title="app/build.gradle.kts"
+    // 最後まで解決できなかった Deferred を警告にする（既定はエラー）
+    unresolvedDeferred = DeferredSeverity.Warning
+```
+
+警告にすると、残ったものを生成しないままビルドを続けます。
+
+## まとめ
+
+| 要素 | 役割 |
+|---|---|
+| `context.defer(pointer, payload)` | 次のラウンドへ持ち越す |
+| `context.deferred` | 前のラウンドで持ち越し、復元できたもの |
+| `restoreSymbol()` | Pointer をそのラウンドのシンボルに戻す |
+| `unresolvedDeferred` | 最後に残ったときの扱い（既定はエラー） |
+
+## 次のステップ
+
+- [ラウンドとファイル集合](/analysis-code-gen/guides/rounds/): ラウンドが進む条件
+- [増分処理と依存の宣言](/analysis-code-gen/guides/incremental/): 生成物の依存

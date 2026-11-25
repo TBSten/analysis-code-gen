@@ -34,6 +34,7 @@ python3 scripts/lic01/check_provenance.py  # 移植コードの出所検査（AD
 
 - JDK 21 でビルドし、生成物は JVM 17 向け。Gradle 9.9.2（wrapper）
 - バージョンは `gradle/libs.versions.toml`、共通設定は `build-logic/` の `acg.jvm` / `acg.library` / `acg.gradle-plugin`
+- docs サイトのフィードバック（dev だけ）は `.local/feedback/` に溜まる。「feedback を対応して」と言われたら読んで直し、`archived/` へ移す（`docs/site/README.md`、ADR-043）
 - クラウド環境では SessionStart hook（`.claude/hooks/session-start.sh`）が Maven Central のミラー設定と依存の取得を済ませる
 
 ## どこに何があるか
@@ -54,3 +55,4 @@ python3 scripts/lic01/check_provenance.py  # 移植コードの出所検査（AD
 - ドキュメント・コメント・コミット・PR は**日本語**。識別子は英語
 - ドキュメントは短く（1 ページ 1,400 字以下など。[docs-style](.claude/rules/docs-style.md)）
 - Kotlin のコードの決まりは [kotlin-code](.claude/rules/kotlin-code.md)
+- モジュール名は `analysis-code-gen-xxx`（ディレクトリ名も同じ）、group は `me.tbsten.analysis.code.gen`。検査・テスト用の内部モジュールは例外（[module-naming](docs/design/module-naming.md)、ADR-042）

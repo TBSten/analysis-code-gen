@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     compileOnly("com.google.devtools.ksp:symbol-processing-api:2.3.14")
-    testImplementation("me.tbsten.analysiscodegen:testing:0.1.0")
+    testImplementation("me.tbsten.analysis.code.gen:analysis-code-gen-testing:0.1.0")
     testImplementation(kotlin("test"))
 }
 

@@ -6,10 +6,10 @@
 
 ```mermaid
 flowchart LR
-    U["利用者の KGP 2.4.10"] --> G["gradle-plugin"]
+    U["利用者の KGP 2.4.10"] --> G["analysis-code-gen-gradle-plugin"]
     G -->|"AA 一式を 2.4.10 で解決"| W["Worker（隔離 ClassLoader）"]
     W --> L["CompatLoader: 2.4.10 以下で最も近い実装"]
-    L --> C["aa-compat-k240"]
+    L --> C["analysis-code-gen-aa-compat-k240"]
 ```
 
 - 成果物は 1 つ。版は Kotlin から独立した `0.x.y`。対応範囲は docs の互換表に書く
@@ -19,8 +19,8 @@ flowchart LR
 
 | 置き場所 | 何を書くか |
 |---|---|
-| `aa-compat` | SPI `AaCompat` と `Factory(minVersion)`、`CompatLoader`、版の比較、小さなリフレクション shim |
-| `aa-compat-k<版>` | その版の AA に `compileOnly` で固定した実装。直前の版へ `by` で委譲し差分だけ上書き。`META-INF/services` に Factory を登録 |
+| `analysis-code-gen-aa-compat` | SPI `AaCompat` と `Factory(minVersion)`、`CompatLoader`、版の比較、小さなリフレクション shim |
+| `analysis-code-gen-aa-compat-k<版>` | その版の AA に `compileOnly` で固定した実装。直前の版へ `by` で委譲し差分だけ上書き。`META-INF/services` に Factory を登録 |
 | engine 本体 | 最新 stable の AA でコンパイル。版で形が変わる呼び出しを直接書かず `AaCompat` を通す |
 | `ksp-bridge-compat` | Bridge 固有の差分（必要になってから作る） |
 

@@ -10,7 +10,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test:feedback": "node --test \"src/integrations/feedback/core/*.test.mjs\"",
+    "check:dist": "sh src/integrations/feedback/check-no-dev-tools-in-dist.sh dist"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.43.1",

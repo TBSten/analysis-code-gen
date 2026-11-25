@@ -64,7 +64,7 @@ private fun kmpFixture(h: KmpHierarchy): GradleFixture {
             """
             |plugins {
             |    kotlin("multiplatform") version "{{kotlinVersion}}"
-            |    id("me.tbsten.analysiscodegen") version "$version"
+            |    id("me.tbsten.analysis.code.gen") version "$version"
             |}
             |
             |kotlin {
@@ -79,7 +79,7 @@ private fun kmpFixture(h: KmpHierarchy): GradleFixture {
             |
             |analysisCodeGen {
             |    arg("tp.processors", "Mapper")
-            |    sourceSets.configureEach { processor("me.tbsten.analysiscodegen:test-processors-native:$version") }
+            |    sourceSets.configureEach { processor("me.tbsten.analysis.code.gen:test-processors-native:$version") }
             |}
             """.trimMargin()
         kotlin("src/commonMain/kotlin/me/tbsten/analysiscodegen/tp/${TpAnnotationsSource.FILE_NAME}", TpAnnotationsSource.content)

@@ -23,6 +23,6 @@
 
 ## 守ること
 
-- 先に `./gradlew publishFixtureDeps` が要る。`processorModule` を使うケースを有効にするときは processor-api も publish 対象に足す
+- 先に `./gradlew publishFixtureDeps` が要る。`processorModule` を使うケースを有効にするときは analysis-code-gen-processor-api も publish 対象に足す
 - 診断は `e: ` / `w: ` で始まる 1 行、要素があれば `<相対パス>:<行>` を含む（ADR-038）
 - Android・Apple・Windows のケースは CI の該当ランナーで動かす。クラウドの Agent 環境では動かない

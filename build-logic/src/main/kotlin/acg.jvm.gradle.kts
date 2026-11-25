@@ -8,7 +8,7 @@ plugins {
 
 val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
 
-group = "me.tbsten.analysiscodegen"
+group = "me.tbsten.analysis.code.gen"
 version = providers.gradleProperty("acg.version").get()
 
 java {

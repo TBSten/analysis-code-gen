@@ -52,7 +52,7 @@ class AnaE2ETest : E2ESpec({
                         alias(libs.plugins.kotlin.jvm)
                         id("org.jetbrains.kotlin.plugin.serialization") version libs.versions.kotlin.get()
                         id("org.jetbrains.kotlin.plugin.compose") version libs.versions.kotlin.get()
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     dependencies {
                         implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")

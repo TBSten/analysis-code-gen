@@ -226,7 +226,7 @@ CLI-01,CLI（CLI）,JVM のプロジェクトモデル（JSON）を渡して CLI
 CLI-02,CLI（CLI）,KMP のプロジェクトモデルでも CLI で生成できる,I,M2,
 CLI-03,CLI（CLI）,終了コードと診断の出力形式が仕様どおり,U,M2,
 VER-01,バージョン互換と診断（VER）,対応表に無い Kotlin / KGP の組み合わせでは、原因と対応バージョンが分かる診断が出る,E,M2,
-VER-02,バージョン互換と診断（VER）,非互換な processor-api バージョンでビルドされた Native Processor では、原因が分かる診断が出る,I,M2,
+VER-02,バージョン互換と診断（VER）,非互換な analysis-code-gen-processor-api バージョンでビルドされた Native Processor では、原因が分かる診断が出る,I,M2,
 VER-03,バージョン互換と診断（VER）,対応表の最小と最新の AGP でビルドが通る,E,M2,
 VER-04,バージョン互換と診断（VER）,Kotlin の新しい stable / プレリリースが出たら、対応バージョンの一覧と CI のマトリクスが自動で更新される（更新の PR が作られる）,U,M2,
 VER-05,バージョン互換と診断（VER）,同じ入力に対して、対応するすべての Kotlin バージョンで生成物が一致する（言語機能の差が出ない入力に限る）,D,M2,

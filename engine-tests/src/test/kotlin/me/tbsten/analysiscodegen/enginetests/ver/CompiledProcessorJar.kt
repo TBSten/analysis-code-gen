@@ -22,7 +22,7 @@ internal val kotlinStdlib: File get() =
 
 /**
  * [sources]（パス → 中身）をコンパイルし、クラスの出力ディレクトリを返す。Processor は動かさない（KSP2 の経路でコンパイルだけ）。
- * [inherit] が false なら、テストの classpath を引き継がず [classpath] だけを見る（古い processor-api を作るため）。
+ * [inherit] が false なら、テストの classpath を引き継がず [classpath] だけを見る（古い analysis-code-gen-processor-api を作るため）。
  */
 internal fun compileToClasses(
     sources: Map<String, String>,

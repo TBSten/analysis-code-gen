@@ -1,0 +1,72 @@
+---
+title: Hybrid Processor
+description: KSP Processor のまま、必要な箇所だけ Analysis API で解析する方法を説明します。
+fixture: fixtures/docs/guides
+---
+
+:::note[レビューで判断してほしいこと]
+- Hybrid API はすべて実験的（`@ExperimentalAnalysisCodegenApi`）として出す
+- `KaSymbol` を戻り値で返せる API は作らず、スコープの中だけで使える形にした
+:::
+
+KSP の API では、関数の本体や式は読めません。Hybrid API を使うと、KSP Processor の中の必要な箇所だけで AA を使えます。
+
+## KSP の宣言から AA に入る
+
+`withAnalysis` を呼ぶと、対応する AA のシンボルを受け取れます。`KSType` と `KSFile` にも同じ関数があります。
+
+```kotlin title="hybrid-processor/src/main/kotlin/com/example/hybrid/DescribeProcessor.kt"
+    // KSP の宣言から AA のシンボルに入り、関数の本体の式を読む。戻り値は String にして外へ出す
+    private fun bodyOf(function: KSFunctionDeclaration): String =
+        function.withAnalysis { symbol ->
+            (symbol.psi as? KtNamedFunction)?.bodyExpression?.text ?: "なし"
+        }
+```
+
+ブロックの中は AA の `analyze { }` と同じで、`KaSession` の機能をすべて使えます。
+
+## シンボルを外へ出さない
+
+`KaSymbol` や `KaType` は、ブロックの外では使えません。必要な情報は文字列などに変えてから返します。
+
+```kotlin
+val symbol = function.withAnalysis { it } // ブロックの外で触ると例外
+```
+
+AA のシンボルに対応しない KSP の宣言（合成されたアクセサなど）では、`UnsupportedHybridConversionException` が出ます。
+
+## 素の KSP でも動かす
+
+同じ Processor を素の KSP でも使うなら、`isAnalysisCodegenBridge` で分けます。素の KSP で `withAnalysis` を呼ぶと例外になります。
+
+```kotlin title="hybrid-processor/src/main/kotlin/com/example/hybrid/DescribeProcessor.kt"
+        // 素の KSP では Hybrid API が使えないので、関数の本体は「不明」にする
+        val canAnalyze = resolver.isAnalysisCodegenBridge
+```
+
+`analysis-code-gen-ksp-bridge-api` は `implementation` で依存します。素の KSP でも、クラスが見つからずに落ちることはありません。
+
+## 増分の依存を書く
+
+`withAnalysis` の中で読んだファイルは、自動では追跡されません。KSP の `Dependencies` に明示します。
+
+```kotlin title="hybrid-processor/src/main/kotlin/com/example/hybrid/DescribeProcessor.kt"
+            // withAnalysis の中で読んだファイルも、KSP の Dependencies に書く
+            codeGenerator.createNewFile(Dependencies(aggregating = false, file), "com.example", "${klass.simpleName.asString()}Description").use {
+```
+
+この例では、読む本体がクラスと同じファイルにあるので `file` だけで足ります。
+
+## まとめ
+
+| 要素 | 役割 |
+|---|---|
+| `withAnalysis { }` | KSP の宣言・型・ファイルから AA に入る |
+| `isAnalysisCodegenBridge` | Bridge の上で動いているか |
+| `UnsupportedHybridConversionException` | AA に対応するものが無い |
+| `HybridNotSupportedException` | 素の KSP で呼んだ |
+
+## 次のステップ
+
+- [KSP Bridge](/analysis-code-gen/guides/ksp-bridge/): KSP Processor を動かす
+- [Processor と Provider](/analysis-code-gen/guides/processor/): Native Processor に書き換える

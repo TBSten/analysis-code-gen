@@ -1,7 +1,7 @@
 // 公開 DSL（ADR-016）で書いた F-AND の :app。Android は Variant を Compilation として扱う（ADR-016）。Kotlin は AGP の組み込み Kotlin
 plugins {
     alias(libs.plugins.android.application)
-    id("me.tbsten.analysiscodegen")
+    id("me.tbsten.analysis.code.gen")
 }
 
 android {

@@ -1,0 +1,92 @@
+---
+title: Gradle DSL
+description: Processor の付け方、オプションの合成、実行単位ごとのタスク、Worker の設定を説明します。
+fixture: fixtures/docs/guides
+---
+
+:::note[レビューで判断してほしいこと]
+- 同じ実行単位で同じキーに違う値の `arg` を書いたら設定エラーにした（後勝ちにしない）
+- `analysisCodeGen(...)` はルートの SourceSet（`main` / `commonMain`）だけに効く。全 SourceSet には広げない
+:::
+
+設定は `analysisCodeGen { }` に書きます。plugin id は `me.tbsten.analysis.code.gen` です。
+
+## Processor を足す
+
+`analysisCodeGen(...)` はルートの SourceSet（`main` か `commonMain`）に Processor を足します。
+
+```kotlin title="app/build.gradle.kts"
+dependencies {
+    analysisCodeGen(project(":greeting-processor"))
+    analysisCodeGen(project(":builder-processor"))
+```
+
+他の SourceSet や Compilation には、名前付きの依存か `sourceSets { }` の `processor()` を使います。
+
+```kotlin title="kmp-lib/build.gradle.kts"
+    // dependencies { } でも足せる。名前は analysisCodeGen<SourceSet> と analysisCodeGen<Compilation>Compilation
+    "analysisCodeGenJvmMain"(project(":deferred-processor"))
+    "analysisCodeGenIosArm64MainCompilation"(project(":deferred-processor"))
+```
+
+`all { }` と個別の指定は足し合わされます。同じ Processor を重ねても 1 回だけ動きます。
+
+## オプションを合成する
+
+グローバルの `arg` より、実行単位ごとの `arg` が優先します。
+
+```kotlin title="kmp-lib/build.gradle.kts"
+        jvmMain {
+            processor(project(":greeting-processor"))
+            // 実行単位の arg は、グローバルの arg より優先する
+            arg("greeting.prefix", "Hello from JVM")
+        }
+```
+
+`all { }` の中も個別の指定も同じ層です。同じキーに違う値が 2 つあると、書いた順番に頼らずエラーにします。
+
+## 実行単位とタスク
+
+Processor の付いた実行単位ごとに、タスクが 1 つできます。
+
+```bash
+./gradlew :kmp-lib:analysisCodeGenCommonMain             # SourceSet ごと
+./gradlew :kmp-lib:analysisCodeGenIosArm64MainCompilation # Compilation ごと
+```
+
+| 実行単位 | タスク | 出力先 |
+|---|---|---|
+| SourceSet | `analysisCodeGen<SourceSet>` | `build/generated/analysisCodeGen/<SourceSet>/` |
+| Compilation | `analysisCodeGen<Name>Compilation` | `build/generated/analysisCodeGen/compilations/<Name>/` |
+
+コンパイルのタスクが依存するので、普段は直接呼びません。Processor の無い実行単位にはタスクを作りません。
+
+## Worker を設定する
+
+Processor は Gradle の Worker で、ビルドスクリプトとは別の ClassLoader で動きます。ヒープを分けたいときはプロセスを分けます。
+
+```kotlin title="app/build.gradle.kts"
+    worker {
+        // 別プロセスで動かすと、ヒープを分けられる
+        isolation = WorkerIsolation.Process
+        maxHeapSize = "2g"
+    }
+```
+
+Processor の依存（Guava など）は Processor ごとの ClassLoader で読むので、他の Processor やフレームワークと衝突しません。
+
+## まとめ
+
+| 書くもの | 役割 |
+|---|---|
+| `analysisCodeGen(...)` | ルートの SourceSet に Processor を足す |
+| `sourceSets { }` / `compilations { }` | 実行単位を選んで Processor を足す |
+| `arg(key, value)` | オプション。実行単位の指定が優先 |
+| `maxRounds` / `unresolvedDeferred` | ラウンドと Deferred の扱い |
+| `worker { }` | Worker の分離方法とヒープ |
+| `analysisApiVersion` | 実行する AA の版 |
+
+## 次のステップ
+
+- [SourceSet First と KMP](/analysis-code-gen/guides/kmp/): 実行単位の選び方
+- [対応バージョン](/analysis-code-gen/guides/versions/): `analysisApiVersion` を使うとき

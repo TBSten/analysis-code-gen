@@ -108,7 +108,7 @@ def build_files(deps: list[str]) -> tuple[str, str]:
     dep_lines = "".join(f'    implementation("{d}")\n' for d in deps)
     acg = f"""plugins {{
     alias(libs.plugins.kotlin.jvm)
-    id("me.tbsten.analysiscodegen")
+    id("me.tbsten.analysis.code.gen")
 }}
 
 analysisCodeGen {{

@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":processing-engine"))
+    implementation(project(":analysis-code-gen-processing-engine"))
 }
