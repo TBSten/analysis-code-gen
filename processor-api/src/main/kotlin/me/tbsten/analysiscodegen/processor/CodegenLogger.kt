@@ -8,13 +8,25 @@ import com.intellij.psi.PsiElement
  * [element] を渡すと、ファイル名と行番号を付けて出す。
  */
 public interface CodegenLogger {
-    public fun logging(message: String, element: PsiElement? = null)
+    public fun logging(
+        message: String,
+        element: PsiElement? = null,
+    )
 
-    public fun info(message: String, element: PsiElement? = null)
+    public fun info(
+        message: String,
+        element: PsiElement? = null,
+    )
 
-    public fun warn(message: String, element: PsiElement? = null)
+    public fun warn(
+        message: String,
+        element: PsiElement? = null,
+    )
 
-    public fun error(message: String, element: PsiElement? = null)
+    public fun error(
+        message: String,
+        element: PsiElement? = null,
+    )
 
     public fun exception(throwable: Throwable)
 }

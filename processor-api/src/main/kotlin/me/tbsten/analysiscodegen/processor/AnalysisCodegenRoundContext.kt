@@ -57,7 +57,10 @@ public interface AnalysisCodegenRoundContext {
      *
      * @param payload Processor が自由に使える文字列（どの処理の途中だったか等）。
      */
-    public fun defer(pointer: KaSymbolPointer<KaSymbol>, payload: String? = null)
+    public fun defer(
+        pointer: KaSymbolPointer<KaSymbol>,
+        payload: String? = null,
+    )
 }
 
 /**

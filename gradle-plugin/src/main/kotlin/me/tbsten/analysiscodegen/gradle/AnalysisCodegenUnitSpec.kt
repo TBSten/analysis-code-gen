@@ -16,7 +16,10 @@ public interface AnalysisCodegenUnitSpec : Named {
 
     public val args: MapProperty<String, String>
 
-    public fun arg(key: String, value: String)
+    public fun arg(
+        key: String,
+        value: String,
+    )
 }
 
 public abstract class AnalysisCodegenSourceSetSpec : AnalysisCodegenUnitSpec {
@@ -25,13 +28,19 @@ public abstract class AnalysisCodegenSourceSetSpec : AnalysisCodegenUnitSpec {
 
     override fun processor(dependencyNotation: Any): Unit = TODO()
 
-    override fun arg(key: String, value: String): Unit = TODO()
+    override fun arg(
+        key: String,
+        value: String,
+    ): Unit = TODO()
 }
 
 public abstract class AnalysisCodegenCompilationSpec : AnalysisCodegenUnitSpec {
     override fun processor(dependencyNotation: Any): Unit = TODO()
 
-    override fun arg(key: String, value: String): Unit = TODO()
+    override fun arg(
+        key: String,
+        value: String,
+    ): Unit = TODO()
 }
 
 /** processor-api の ProcessingScope と同じ意味（DSL 側の型。gradle-plugin は processor-api に依存しない）。 */

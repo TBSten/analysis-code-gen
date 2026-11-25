@@ -45,5 +45,8 @@ public class UnsupportedHybridConversionException(message: String) : IllegalArgu
  */
 @InternalAnalysisCodegenApi
 public interface HybridAnalysisAccess {
-    public fun <R> withAnalysisOf(target: Any, block: KaSession.(Any) -> R): R
+    public fun <R> withAnalysisOf(
+        target: Any,
+        block: KaSession.(Any) -> R,
+    ): R
 }

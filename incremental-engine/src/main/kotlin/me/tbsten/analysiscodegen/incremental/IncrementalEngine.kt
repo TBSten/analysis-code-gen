@@ -64,5 +64,8 @@ public class DirtyFileCalculator {
 public class PersistentCache(public val dir: File) {
     public fun load(expectedFormat: String): IncrementalState? = TODO()
 
-    public fun save(format: String, state: IncrementalState): Unit = TODO()
+    public fun save(
+        format: String,
+        state: IncrementalState,
+    ): Unit = TODO()
 }

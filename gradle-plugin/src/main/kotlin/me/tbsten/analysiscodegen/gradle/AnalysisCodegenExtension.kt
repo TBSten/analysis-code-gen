@@ -34,7 +34,10 @@ public abstract class AnalysisCodegenExtension @Inject constructor(
     /** 全実行単位に渡すオプション。実行単位の指定が優先する。 */
     public abstract val args: MapProperty<String, String>
 
-    public fun arg(key: String, value: String): Unit = TODO()
+    public fun arg(
+        key: String,
+        value: String,
+    ): Unit = TODO()
 
     @get:Nested
     public abstract val worker: WorkerSpec

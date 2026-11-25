@@ -5,8 +5,8 @@ package me.tbsten.analysiscodegen.engine.spi
 import com.intellij.openapi.project.Project
 import me.tbsten.analysiscodegen.processor.AnalysisCodegenRoundContext
 import me.tbsten.analysiscodegen.processor.Dependencies
-import me.tbsten.analysiscodegen.processor.InternalAnalysisCodegenApi
 import me.tbsten.analysiscodegen.processor.ExecutionUnit
+import me.tbsten.analysiscodegen.processor.InternalAnalysisCodegenApi
 import org.jetbrains.kotlin.analysis.api.KaSession
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaLibraryModule
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaSourceModule
@@ -26,7 +26,10 @@ public interface ProcessorFrontend {
     public fun canHandle(component: ProcessorComponent): Boolean
 
     /** [component] の Provider から、この実行単位の Processor を作る。 */
-    public fun create(component: ProcessorComponent, environment: EngineProcessorEnvironment): List<EngineProcessor>
+    public fun create(
+        component: ProcessorComponent,
+        environment: EngineProcessorEnvironment,
+    ): List<EngineProcessor>
 }
 
 /** Processor の依存 1 件（Gradle の component 1 つ）。 */
@@ -103,12 +106,20 @@ public interface OutputSink {
     )
 
     /** 既存の出力に依存を足す（KSP の `associate*`）。 */
-    public fun associate(kind: OutputKind, relativePath: String, dependencies: Dependencies)
+    public fun associate(
+        kind: OutputKind,
+        relativePath: String,
+        dependencies: Dependencies,
+    )
 }
 
 @InternalAnalysisCodegenApi
 public interface EngineLogger {
-    public fun log(severity: Severity, message: String, element: KtElement? = null)
+    public fun log(
+        severity: Severity,
+        message: String,
+        element: KtElement? = null,
+    )
 
     public enum class Severity { Logging, Info, Warn, Error }
 }
@@ -120,14 +131,20 @@ public interface AnalysisAccess {
     public val sourceModule: KaSourceModule
     public val libraryModules: List<KaLibraryModule>
 
-    public fun <R> analyze(element: KtElement, block: KaSession.() -> R): R
+    public fun <R> analyze(
+        element: KtElement,
+        block: KaSession.() -> R,
+    ): R
 }
 
 /** 増分処理への参加口（KSP の Lookup 追跡の移植先）。 */
 @InternalAnalysisCodegenApi
 public interface IncrementalParticipant {
     /** 変わった・消えたファイルから、追加で dirty にすべきソースを返す。全件処理が必要なら null。 */
-    public fun expandDirtyFiles(changed: Set<String>, removed: Set<String>): Set<String>?
+    public fun expandDirtyFiles(
+        changed: Set<String>,
+        removed: Set<String>,
+    ): Set<String>?
 
     public fun load(stateDir: File)
 

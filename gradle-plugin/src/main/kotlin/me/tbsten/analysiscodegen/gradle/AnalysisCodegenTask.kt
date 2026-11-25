@@ -70,16 +70,25 @@ public object AnalysisCodegenNaming {
     public fun sourceSetTaskName(sourceSetName: String): String = TODO()
 
     /** (`jvm`, `main`) → `analysisCodeGenJvmMainCompilation`。kotlin("jvm") の target 名は空文字。 */
-    public fun compilationTaskName(targetName: String, compilationName: String): String = TODO()
+    public fun compilationTaskName(
+        targetName: String,
+        compilationName: String,
+    ): String = TODO()
 
     /** (`jvm`, `main`) → `jvmMain`。 */
-    public fun compilationUnitName(targetName: String, compilationName: String): String = TODO()
+    public fun compilationUnitName(
+        targetName: String,
+        compilationName: String,
+    ): String = TODO()
 
     /** `commonMain` → `analysisCodeGenCommonMain`（Configuration 名。タスク名と同じ形）。 */
     public fun sourceSetConfigurationName(sourceSetName: String): String = TODO()
 
     /** (`jvm`, `main`) → `analysisCodeGenJvmMainCompilation`。 */
-    public fun compilationConfigurationName(targetName: String, compilationName: String): String = TODO()
+    public fun compilationConfigurationName(
+        targetName: String,
+        compilationName: String,
+    ): String = TODO()
 
     /** `build/generated/analysisCodeGen/<SourceSet>` からの相対パス。 */
     public fun sourceSetOutputDir(sourceSetName: String): String = TODO()
