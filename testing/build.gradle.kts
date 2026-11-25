@@ -2,6 +2,7 @@
 // Gradle TestKit のフィクスチャ補助（gradle パッケージ）。コンパイルと KSP2 の実行は testing-kct（kct fork）に任せる
 plugins {
     id("acg.library")
+    id("acg.dokka")
 }
 
 dependencies {

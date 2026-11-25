@@ -43,3 +43,17 @@ available in this repository under testing-kct/, the full MPL-2.0 text is in
 porting/kct/LICENSE-MPL-2.0.txt (also bundled in the testing-kct jar under
 META-INF/), and the list of files and changes is in porting/kct/port-map.csv
 and porting/kct/patches/.
+
+------------------------------------------------------------------------
+Third-party test data
+------------------------------------------------------------------------
+
+The input pattern catalog under quality/catalog/patterns/ (files named
+*-T-*.kt and *-R-*.kt) contains test inputs and source excerpts copied from
+third-party projects licensed under the Apache License, Version 2.0 or the
+MIT License. They are used only as test data and are not part of any
+published artifact. Each file names its upstream repository, path, commit and
+license in its ORIGIN and LICENSE header lines and keeps any copyright notice
+the original file had. The list of upstream projects is in
+quality/catalog/THIRD_PARTY.md and their license texts are in
+quality/catalog/licenses/.
