@@ -10,3 +10,6 @@ dist/
 .astro/
 __pycache__/
 *.pyc
+
+# F-LARGE の生成物（fixtures/scripts/gen_large.py）
+fixtures/projects/large-*/
