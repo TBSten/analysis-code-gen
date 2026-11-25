@@ -1,0 +1,58 @@
+# ドキュメントの構成・分量チェックの基準（ADR-028、pm/14「ドキュメントの構成と分量の基準」）
+# 文字数は「本文」= コードブロック・表・リスト・見出し・コンポーネントを除いた地の文の、空白を除く文字数。
+# 基準は振り返りで調整する。値を緩めるときは ADR-028 に理由を追記する。
+
+# 検査するファイル（リポジトリ直下からの glob）。存在しないパスは無視する
+include = [
+  "docs/site/src/content/docs/**/*.md",
+  "docs/site/src/content/docs/**/*.mdx",
+  "docs/templates/**/*.md",
+]
+# 生成物（Dokka の API reference など）は除く
+exclude = [
+  "docs/site/src/content/docs/reference/api/**",
+]
+
+# Summary / Next steps として認める H2 見出し
+summary_headings = ["まとめ", "Summary"]
+next_steps_headings = ["次のステップ", "Next steps"]
+
+# プロファイル: パスの最初に一致したものを使う。frontmatter の `docLint: <名前>` で上書きできる
+[[profile]]
+name = "guide"
+match = [
+  "docs/site/src/content/docs/guides/**",
+  "docs/site/src/content/docs/start/**",
+  "docs/site/src/content/docs/testing/**",
+  "docs/site/src/content/docs/migration/**",
+  "docs/templates/guide.md",
+]
+page_chars = 1400
+paragraph_chars = 100
+section_chars = 320
+code_lines = 15
+h2_max = 8
+max_depth = 3
+guide_shape = true
+
+[[profile]]
+name = "internal"
+match = ["docs/site/src/content/docs/internal/**"]
+page_chars = 2800
+paragraph_chars = 100
+section_chars = 320
+code_lines = 25
+h2_max = 12
+max_depth = 3
+guide_shape = false
+
+[[profile]]
+name = "page"
+match = ["**"]
+page_chars = 1400
+paragraph_chars = 100
+section_chars = 320
+code_lines = 15
+h2_max = 8
+max_depth = 3
+guide_shape = false
