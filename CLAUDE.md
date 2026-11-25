@@ -44,6 +44,7 @@ python3 scripts/lic01/check_provenance.py  # 移植コードの出所検査（AD
 | `docs/design/` | 実装者向けの設計メモ（ADR の「守ること」だけを抜き出したもの） |
 | `porting/` | 移植元の固定と出所記録（ADR-018） |
 | `fixtures/processors/` | 移植・検証する既存 Processor の一覧（ADR-019） |
+| `fixtures/projects/`・`test-processors/` | 共通フィクスチャ F-* とテスト用 Processor TP-*（ADR-027。`fixtures/README.md`） |
 | `gradle/kotlin-versions.txt` | 対応 Kotlin の唯一の一覧（ADR-011） |
 | `quality/` | テストケース一覧・候補置き場（ACG-37 で共有フォルダから移す） |
 | 共有フォルダ `pm/` | PM 資料・ADR・P1 計画（クラウドでは `/mnt/project-files/pm/`） |

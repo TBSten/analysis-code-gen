@@ -28,6 +28,7 @@ include(
     ":gradle-plugin",
     ":cli",
     ":testing",
+    ":testing-kct",
     ":benchmarks",
     ":ksp-bridge",
     ":ksp-bridge-api",
@@ -39,4 +40,13 @@ include(
     ":quality",
     // PBT 基盤（ACG-40、ADR-022）
     ":pbt",
+    // テスト用 Processor（ADR-027）
+    ":test-processors:core",
+    ":test-processors:ksp",
 )
+
+// TP-* の Native 版は processor-api のシグネチャ（ACG-34）と AA の依存（acg.analysis-api）が main に入るまで既定では外す。
+// 入ったら既定で含める（ADR-027）
+if (providers.gradleProperty("acg.nativeTestProcessors").orNull == "true") {
+    include(":test-processors:native")
+}
