@@ -7,6 +7,10 @@ dependencies {
     testImplementation(gradleTestKit())
     testImplementation(project(":test-processors:ksp"))
     testImplementation(libs.kotlinpoet.ksp)
+    // GCC-04（U）: ProjectBuilder で plugin を適用してタスクの入力を調べる。gradle-plugin は AA に依存しない（ADR-012）
+    testImplementation(project(":gradle-plugin"))
+    testImplementation(gradleApi())
+    testImplementation(libs.kotlin.gradle.plugin)
 }
 
 tasks.withType<Test>().configureEach {

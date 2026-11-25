@@ -54,7 +54,11 @@ class IncrementalEngineTest : IntegrationSpec({
                 InputSnapshot(sources, "g", emptyMap()),
                 listOf(OutputRecord("kotlin/gen/Count.kt", "test", OutputDependencyKind.All, emptySet(), emptySet())),
             )
-        val plan = DirtyFileCalculator().plan(previous, InputSnapshot(sources + ("src/main/kotlin/B.kt" to "b2"), "g", emptyMap())) { _, _ -> emptySet() }
+        val plan =
+            DirtyFileCalculator().plan(
+                previous,
+                InputSnapshot(sources + ("src/main/kotlin/B.kt" to "b2"), "g", emptyMap()),
+            ) { _, _ -> emptySet() }
         when (plan) {
             is IncrementalPlan.Full -> {}
             is IncrementalPlan.Incremental -> {
@@ -70,7 +74,9 @@ class IncrementalEngineTest : IntegrationSpec({
                 kotlin("B.kt", "class B")
                 nativeProcessor(UndeclaredDepsProvider::class)
             }
-        val engine = me.tbsten.analysiscodegen.engine.AnalysisCodegenEngine()
+        val engine =
+            me.tbsten.analysiscodegen.engine
+                .AnalysisCodegenEngine()
         project.run(engine).success shouldBe true
         project.generated().values.single() shouldBe "package gen\n\nconst val DECLS = 2\n"
         project.kotlin("B.kt", "class B\nclass B2")
@@ -87,9 +93,17 @@ class IncrementalEngineTest : IntegrationSpec({
         // キャッシュ形式が違えば読まない
         cache.load("format-2").shouldBeNull()
         // Kotlin・analysisCodeGen のバージョンは globalFingerprint に入り、違えば全件処理
-        val plan = DirtyFileCalculator().plan(state, state.snapshot.copy(globalFingerprint = "kotlin=2.4.30;acg=0.1.0")) { _, _ -> emptySet() }
+        val plan =
+            DirtyFileCalculator().plan(
+                state,
+                state.snapshot.copy(globalFingerprint = "kotlin=2.4.30;acg=0.1.0"),
+            ) { _, _ -> emptySet() }
         plan.shouldBeInstanceOf<IncrementalPlan.Full>()
-        val plan2 = DirtyFileCalculator().plan(state, state.snapshot.copy(globalFingerprint = "kotlin=2.4.21;acg=0.2.0")) { _, _ -> emptySet() }
+        val plan2 =
+            DirtyFileCalculator().plan(
+                state,
+                state.snapshot.copy(globalFingerprint = "kotlin=2.4.21;acg=0.2.0"),
+            ) { _, _ -> emptySet() }
         plan2.shouldBeInstanceOf<IncrementalPlan.Full>()
     }
 })

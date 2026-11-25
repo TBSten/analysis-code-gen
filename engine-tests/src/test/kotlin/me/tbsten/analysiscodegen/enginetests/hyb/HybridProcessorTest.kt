@@ -60,9 +60,15 @@ class HybridInspectProvider : SymbolProcessorProvider {
                                 HybridRecord.leaked = symbol
                             }
                             // HYB-02: KSType → KaType
-                            node.returnType!!.resolve().withAnalysis { type -> HybridRecord.lines += "returnType=${type.isMarkedNullable}:${type}" }
+                            node.returnType!!.resolve().withAnalysis { type ->
+                                HybridRecord.lines +=
+                                    "returnType=${type.isMarkedNullable}:$type"
+                            }
                             // HYB-02: KSFile → KtFile
-                            node.containingFile!!.withAnalysis { ktFile -> HybridRecord.lines += "file=${ktFile.name}:${ktFile.declarations.size}" }
+                            node.containingFile!!.withAnalysis { ktFile ->
+                                HybridRecord.lines +=
+                                    "file=${ktFile.name}:${ktFile.declarations.size}"
+                            }
                         }
                         is KSClassDeclaration -> {
                             // HYB-02: 1:1 に対応しないもの（合成されたプロパティのアクセサ）は ADR どおりの例外

@@ -85,12 +85,18 @@ class EngineProject(
 
     /** Native Processor を足す。[provider] のクラスを `META-INF/services` に書いた classpath を作る。 */
     fun nativeProcessor(provider: KClass<out AnalysisCodegenProcessorProvider>) {
-        processors += serviceComponent("native-${provider.simpleName}", AnalysisCodegenProcessorProvider::class.java.name, provider.java.name)
+        processors +=
+            serviceComponent("native-${provider.simpleName}", AnalysisCodegenProcessorProvider::class.java.name, provider.java.name)
     }
 
     /** KSP Processor を足す（Bridge で動く）。 */
     fun kspProcessor(providerClassName: String) {
-        processors += serviceComponent("ksp-${providerClassName.substringAfterLast('.')}", "com.google.devtools.ksp.processing.SymbolProcessorProvider", providerClassName)
+        processors +=
+            serviceComponent(
+                "ksp-${providerClassName.substringAfterLast('.')}",
+                "com.google.devtools.ksp.processing.SymbolProcessorProvider",
+                providerClassName,
+            )
     }
 
     private fun serviceComponent(
@@ -115,7 +121,15 @@ class EngineProject(
     fun generated(sourceSet: String = sourceSets.first().name): Map<String, String> {
         val dir = outputDir(sourceSet)
         if (!dir.isDirectory) return emptyMap()
-        return dir.walkTopDown().filter { it.isFile }.associate { it.relativeTo(dir).invariantSeparatorsPath to it.readText() }.toSortedMap()
+        return dir
+            .walkTopDown()
+            .filter { it.isFile }
+            .associate {
+                it
+                    .relativeTo(
+                        dir,
+                    ).invariantSeparatorsPath to it.readText()
+            }.toSortedMap()
     }
 
     fun model(): ProjectModel {
@@ -133,6 +147,7 @@ class EngineProject(
             }
         // 依存の末端（どこからも dependsOn されない SourceSet）ごとに Compilation を 1 つ作る
         val leaves = sourceSets.filter { s -> sourceSets.none { s.name in it.dependsOn } }
+
         fun closure(name: String): List<String> = listOf(name) + sourceSets.first { it.name == name }.dependsOn.flatMap(::closure)
         val compilations =
             leaves.map { leaf ->
@@ -205,7 +220,11 @@ class RecordingEnvironmentFactory(
         created.incrementAndGet()
         val env = delegate.create(model, unitName)
         return object : AnalysisEnvironment by env {
-            override fun applyChanges(changes: SourceChangeSet): AnalysisInvalidationResult = env.applyChanges(changes).also { invalidations += changes to it }
+            override fun applyChanges(changes: SourceChangeSet): AnalysisInvalidationResult =
+                env.applyChanges(changes).also {
+                    invalidations +=
+                        changes to it
+                }
         }
     }
 }

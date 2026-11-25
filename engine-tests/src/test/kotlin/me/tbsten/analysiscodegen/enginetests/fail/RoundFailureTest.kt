@@ -29,7 +29,12 @@ class FailInRound2Provider : AnalysisCodegenProcessorProvider {
                     shouldFail = context.allFiles.any { "FAIL_IN_ROUND_2" in it.text }
                     context.newFiles.forEach { f ->
                         val name = f.name.removeSuffix(".kt")
-                        context.codeGenerator.generateKotlin("gen", "${name}Gen", Dependencies.isolating(f), "package gen\n\nobject ${name}Gen\n")
+                        context.codeGenerator.generateKotlin(
+                            "gen",
+                            "${name}Gen",
+                            Dependencies.isolating(f),
+                            "package gen\n\nobject ${name}Gen\n",
+                        )
                     }
                 } else if (context.round == 2 && shouldFail) {
                     error("FAIL-04: intentional failure in round 2")
@@ -39,7 +44,14 @@ class FailInRound2Provider : AnalysisCodegenProcessorProvider {
 }
 
 private fun File.snapshot(): Map<String, String> =
-    if (!isDirectory) emptyMap() else walkTopDown().filter { it.isFile }.associate { it.relativeTo(this).invariantSeparatorsPath to it.readBytes().contentHashCode().toString() }
+    if (!isDirectory) {
+        emptyMap()
+    } else {
+        walkTopDown().filter { it.isFile }.associate {
+            it.relativeTo(this).invariantSeparatorsPath to
+                it.readBytes().contentHashCode().toString()
+        }
+    }
 
 class RoundFailureTest : IntegrationSpec({
     case("FAIL-04", "ラウンド 2 で失敗したとき、永続キャッシュは前回成功時のまま（ラウンドの commit と永続の commit が分かれている）", pending = PendingCase(Milestone.M2)) {
@@ -64,6 +76,10 @@ class RoundFailureTest : IntegrationSpec({
         // 直したら、前回成功時からの増分で正しく作り直せる
         project.kotlin("B.kt", "class B")
         project.run(engine).success shouldBe true
-        project.generated().keys.map { it.substringAfterLast('/') }.toSet() shouldBe setOf("AGen.kt", "BGen.kt")
+        project
+            .generated()
+            .keys
+            .map { it.substringAfterLast('/') }
+            .toSet() shouldBe setOf("AGen.kt", "BGen.kt")
     }
 })

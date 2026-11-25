@@ -69,10 +69,20 @@ class NativeRegistryProvider : AnalysisCodegenProcessorProvider {
                         val targetType =
                             analyze(context.sourceSet.module) {
                                 val symbol = mapper.symbol as KaClassSymbol
-                                symbol.memberScope.constructors.first().valueParameters.first().returnType.toString()
+                                symbol.memberScope.constructors
+                                    .first()
+                                    .valueParameters
+                                    .first()
+                                    .returnType
+                                    .toString()
                             }
                         seenByNative += "${mapper.name}:$targetType"
-                        context.codeGenerator.generateKotlin("mix", "UserRegistry", Dependencies.isolating(f), "package mix\n\nobject UserRegistry { val mapper = \"${mapper.name}\" }\n")
+                        context.codeGenerator.generateKotlin(
+                            "mix",
+                            "UserRegistry",
+                            Dependencies.isolating(f),
+                            "package mix\n\nobject UserRegistry { val mapper = \"${mapper.name}\" }\n",
+                        )
                     }
                 }
             }

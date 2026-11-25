@@ -52,9 +52,19 @@ class ChainGenProvider : AnalysisCodegenProcessorProvider {
                     val pkg = file.packageFqName.asString()
                     when {
                         cls.annotationEntries.any { it.shortName?.asString() == "Gen" } ->
-                            context.codeGenerator.generateKotlin(pkg, "${name}Gen1", Dependencies.isolating(file), "package $pkg\n\nclass ${name}Gen1(val origin: $name)")
+                            context.codeGenerator.generateKotlin(
+                                pkg,
+                                "${name}Gen1",
+                                Dependencies.isolating(file),
+                                "package $pkg\n\nclass ${name}Gen1(val origin: $name)",
+                            )
                         name.endsWith("Gen1") ->
-                            context.codeGenerator.generateKotlin(pkg, name.replace("Gen1", "Gen2"), Dependencies.isolating(file), "package $pkg\n\nclass ${name.replace("Gen1", "Gen2")}(val prev: $name)")
+                            context.codeGenerator.generateKotlin(
+                                pkg,
+                                name.replace("Gen1", "Gen2"),
+                                Dependencies.isolating(file),
+                                "package $pkg\n\nclass ${name.replace("Gen1", "Gen2")}(val prev: $name)",
+                            )
                     }
                 }
             }
@@ -68,7 +78,8 @@ class LibraryProbeProvider : AnalysisCodegenProcessorProvider {
             override fun process(context: AnalysisCodegenRoundContext) {
                 val libs =
                     analyze(context.sourceSet.module) {
-                        context.sourceSet.module.directRegularDependencies.filterIsInstance<KaLibraryModule>()
+                        context.sourceSet.module.directRegularDependencies
+                            .filterIsInstance<KaLibraryModule>()
                     }
                 libraryIdentities += libs.map { System.identityHashCode(it) }.sorted()
                 if (context.round == 1) {
@@ -83,11 +94,24 @@ class LibraryProbeProvider : AnalysisCodegenProcessorProvider {
     }
 }
 
-private fun genClass(name: String) = "package com.example\n\nannotation class Gen\n\n@Gen class $name".let { if (name == "A") it else "package com.example\n\n@Gen class $name" }
+private fun genClass(name: String) =
+    "package com.example\n\nannotation class Gen\n\n@Gen class $name".let {
+        if (name ==
+            "A"
+        ) {
+            it
+        } else {
+            "package com.example\n\n@Gen class $name"
+        }
+    }
 
 class CacheReuseIntegrationTest : IntegrationSpec({
     case("CCH-01", "ラウンド間で IntelliJ Project・Module Graph・Library Index を作り直さない（構築回数が 1 回）", pending = PendingCase(Milestone.M2)) {
-        val project = EngineProject().apply { kotlin("com/example/A.kt", genClass("A")); nativeProcessor(ChainGenProvider::class) }
+        val project =
+            EngineProject().apply {
+                kotlin("com/example/A.kt", genClass("A"))
+                nativeProcessor(ChainGenProvider::class)
+            }
         val factory = RecordingEnvironmentFactory()
         val result = project.run(engineWith(factory))
         result.success shouldBe true
@@ -98,7 +122,11 @@ class CacheReuseIntegrationTest : IntegrationSpec({
 
     case("CCH-02", "ラウンド間でライブラリ / バイナリのキャッシュを捨てない（KSP のコミット 958d32f 相当）", pending = PendingCase(Milestone.M2)) {
         LibraryProbeProvider.libraryIdentities.clear()
-        val project = EngineProject().apply { kotlin("com/example/A.kt", "package com.example\n\nclass A"); nativeProcessor(LibraryProbeProvider::class) }
+        val project =
+            EngineProject().apply {
+                kotlin("com/example/A.kt", "package com.example\n\nclass A")
+                nativeProcessor(LibraryProbeProvider::class)
+            }
         project.run().success shouldBe true
         // ラウンド 1 と 2 で、同じライブラリモジュールのインスタンスが見えている
         LibraryProbeProvider.libraryIdentities.size shouldBe 2
@@ -119,7 +147,9 @@ class CacheReuseIntegrationTest : IntegrationSpec({
         // 差分反映はラウンドごとに生成物だけを足す（既存ソースの再読み込み・削除は無い）
         factory.invalidations.size shouldBe 2
         factory.invalidations.forEach { (change, result) ->
-            change.added.keys.map { it.path.substringAfterLast('/') }.all { "Gen" in it } shouldBe true
+            change.added.keys
+                .map { it.path.substringAfterLast('/') }
+                .all { "Gen" in it } shouldBe true
             change.modified shouldBe emptyMap()
             change.removed shouldBe emptySet()
             result.modifiedFiles shouldBe emptySet()
@@ -146,7 +176,11 @@ class CacheReuseIntegrationTest : IntegrationSpec({
             env.applyChanges(
                 SourceChangeSet(
                     ModuleId("iosMain"),
-                    added = mapOf(SourceFileId("build/generated/analysisCodeGen/iosMain/kotlin/com/example/AGen1.kt") to "package com.example\n\nclass AGen1(val origin: A)"),
+                    added =
+                        mapOf(
+                            SourceFileId("build/generated/analysisCodeGen/iosMain/kotlin/com/example/AGen1.kt") to
+                                "package com.example\n\nclass AGen1(val origin: A)",
+                        ),
                     modified = emptyMap(),
                     removed = emptySet(),
                 ),
@@ -161,7 +195,12 @@ class CacheReuseIntegrationTest : IntegrationSpec({
     case("MOD-02", "無効化のあと、影響を受けたモジュールで新しい宣言が解決できる（無効化漏れが無い）", pending = PendingCase(Milestone.M2)) {
         // jvmMain に生成した宣言を、jvmMain のソースと次のラウンドの生成物から参照できる（ChainGen の Gen2 は Gen1 を参照する）
         val kmp =
-            EngineProject(listOf(EngineSourceSet("commonMain", PlatformKind.Common), EngineSourceSet("jvmMain", PlatformKind.Jvm, listOf("commonMain"))))
+            EngineProject(
+                listOf(
+                    EngineSourceSet("commonMain", PlatformKind.Common),
+                    EngineSourceSet("jvmMain", PlatformKind.Jvm, listOf("commonMain")),
+                ),
+            )
         kmp.kotlin("com/example/A.kt", genClass("A"), sourceSet = "commonMain")
         kmp.kotlin("com/example/UsesGen.kt", "package com.example\n\nfun use(x: AGen1): A = x.origin", sourceSet = "commonMain")
         kmp.nativeProcessor(ChainGenProvider::class)
@@ -187,7 +226,11 @@ class CacheReuseIntegrationTest : IntegrationSpec({
             env.applyChanges(
                 SourceChangeSet(
                     ModuleId("commonMain"),
-                    added = mapOf(SourceFileId("build/generated/analysisCodeGen/commonMain/kotlin/com/example/New.kt") to "package com.example\n\nexpect class New"),
+                    added =
+                        mapOf(
+                            SourceFileId("build/generated/analysisCodeGen/commonMain/kotlin/com/example/New.kt") to
+                                "package com.example\n\nexpect class New",
+                        ),
                     modified = emptyMap(),
                     removed = emptySet(),
                 ),
