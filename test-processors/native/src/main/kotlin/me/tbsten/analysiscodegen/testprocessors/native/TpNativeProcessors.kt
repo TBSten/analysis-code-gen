@@ -52,7 +52,10 @@ import org.jetbrains.kotlin.psi.psiUtil.containingClassOrObject
 // ---- TP-Mapper（isolating） ----
 
 public class MapperNativeProvider : TpNativeProvider(TpId.Mapper) {
-    override fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor =
+    override fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor =
         object : AnalysisCodegenProcessor {
             override fun process(context: AnalysisCodegenRoundContext) {
                 val models =
@@ -73,16 +76,23 @@ public class MapperNativeProvider : TpNativeProvider(TpId.Mapper) {
 // ---- TP-Registry（aggregating。ラウンド 1 だけ。Processing Scope の全ファイルを見る） ----
 
 public class RegistryNativeProvider : TpNativeProvider(TpId.Registry) {
-    override fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor =
+    override fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor =
         object : AnalysisCodegenProcessor {
             override fun process(context: AnalysisCodegenRoundContext) {
                 if (context.round != 1) return
                 val found =
                     analyze(context.sourceSet.module) {
-                        classesWith(context.allFiles, TpAnnotations.REGISTERED).map { (psi, symbol) -> psi.containingKtFile to symbol.classId!!.asFqNameString() }
+                        classesWith(context.allFiles, TpAnnotations.REGISTERED).map { (psi, symbol) ->
+                            psi.containingKtFile to
+                                symbol.classId!!.asFqNameString()
+                        }
                     }
                 if (found.isEmpty()) return
-                val model = RegistryModel(options.registryPackage, options.registryName, found.map { it.second }, platformName(context.platform))
+                val model =
+                    RegistryModel(options.registryPackage, options.registryName, found.map { it.second }, platformName(context.platform))
                 context.codeGenerator.write(Dependencies.aggregating(found.map { it.first }.distinct()), RegistryRender.render(model))
             }
         }
@@ -91,7 +101,10 @@ public class RegistryNativeProvider : TpNativeProvider(TpId.Registry) {
 // ---- TP-Chain（ラウンドをまたいで N 段） ----
 
 public class ChainNativeProvider : TpNativeProvider(TpId.Chain) {
-    override fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor =
+    override fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor =
         object : AnalysisCodegenProcessor {
             override fun process(context: AnalysisCodegenRoundContext) {
                 val models =
@@ -107,7 +120,9 @@ public class ChainNativeProvider : TpNativeProvider(TpId.Chain) {
                                 )
                         }
                     }
-                models.forEach { (file, model) -> ChainRender.render(model)?.let { context.codeGenerator.write(Dependencies.isolating(file), it) } }
+                models.forEach { (file, model) ->
+                    ChainRender.render(model)?.let { context.codeGenerator.write(Dependencies.isolating(file), it) }
+                }
             }
         }
 }
@@ -115,26 +130,44 @@ public class ChainNativeProvider : TpNativeProvider(TpId.Chain) {
 // ---- TP-Actual（プラットフォームの実行単位だけ。ラウンド 1 だけ） ----
 
 public class ActualNativeProvider : TpNativeProvider(TpId.Actual) {
-    override fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor =
+    override fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor =
         object : AnalysisCodegenProcessor {
             override fun process(context: AnalysisCodegenRoundContext) {
                 val platform = platformName(context.platform)
                 if (context.round != 1 || platform == PlatformNames.COMMON) return
                 // expect は上流（commonMain など）にある。Compilation 単位なら参加する全 SourceSet、SourceSet 単位なら dependsOn の上流まで見る
-                val files = context.compilation?.sourceSets?.flatMap { it.ownFiles }?.distinct() ?: context.sourceSet.visibleFiles
+                val files =
+                    context.compilation
+                        ?.sourceSets
+                        ?.flatMap { it.ownFiles }
+                        ?.distinct() ?: context.sourceSet.visibleFiles
                 val generateActual = classIdOf(TpAnnotations.GENERATE_ACTUAL)
                 val models =
                     analyze(context.sourceSet.module) {
                         files.sortedBy { it.virtualFilePath }.mapNotNull { file ->
                             val functions =
-                                file.declarations.filterIsInstance<KtNamedFunction>()
+                                file.declarations
+                                    .filterIsInstance<KtNamedFunction>()
                                     .filter { it.hasModifier(KtTokens.EXPECT_KEYWORD) && generateActual in it.symbol.annotations }
                                     .filter { fn ->
                                         val ok = fn.valueParameters.isEmpty() && notation(fn.symbol.returnType) == "kotlin.String"
                                         if (!ok) context.logger.error("TP-Actual は `expect fun name(): String` だけを扱う", fn)
                                         ok
-                                    }.map { ActualFunction(it.name!!, if (it.hasModifier(KtTokens.INTERNAL_KEYWORD)) "internal" else "public") }
-                            if (functions.isEmpty()) null else file to ActualModel(file.packageFqName.asString(), file.name.removeSuffix(".kt"), functions, platform)
+                                    }.map {
+                                        ActualFunction(
+                                            it.name!!,
+                                            if (it.hasModifier(KtTokens.INTERNAL_KEYWORD)) "internal" else "public",
+                                        )
+                                    }
+                            if (functions.isEmpty()) {
+                                null
+                            } else {
+                                file to
+                                    ActualModel(file.packageFqName.asString(), file.name.removeSuffix(".kt"), functions, platform)
+                            }
                         }
                     }
                 models.forEach { (file, model) -> context.codeGenerator.write(Dependencies.isolating(file), ActualRender.render(model)) }
@@ -145,19 +178,31 @@ public class ActualNativeProvider : TpNativeProvider(TpId.Actual) {
 // ---- TP-Body（関数本体の呼び出し先。AA でしかできない解析なので Native 版だけ） ----
 
 public class BodyNativeProvider : TpNativeProvider(TpId.Body) {
-    override fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor =
+    override fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor =
         object : AnalysisCodegenProcessor {
             override fun process(context: AnalysisCodegenRoundContext) {
                 val callGraph = classIdOf(TpAnnotations.CALL_GRAPH)
                 val models =
                     analyze(context.sourceSet.module) {
                         context.newFiles.flatMap { file ->
-                            file.collectDescendantsOfType<KtNamedFunction>()
+                            file
+                                .collectDescendantsOfType<KtNamedFunction>()
                                 .filter { callGraph in it.symbol.annotations }
                                 .map { fn ->
                                     val callees =
                                         fn.bodyExpression?.collectDescendantsOfType<KtCallExpression>().orEmpty().mapNotNull { call ->
-                                            when (val callee = call.resolveToCall()?.successfulFunctionCallOrNull()?.partiallyAppliedSymbol?.signature?.symbol) {
+                                            when (
+                                                val callee =
+                                                    call
+                                                        .resolveToCall()
+                                                        ?.successfulFunctionCallOrNull()
+                                                        ?.partiallyAppliedSymbol
+                                                        ?.signature
+                                                        ?.symbol
+                                            ) {
                                                 is KaConstructorSymbol -> callee.containingClassId?.asFqNameString()?.let { "$it.<init>" }
                                                 is KaNamedFunctionSymbol -> callee.callableId?.asSingleFqName()?.asString()
                                                 else -> null
@@ -176,7 +221,10 @@ public class BodyNativeProvider : TpNativeProvider(TpId.Body) {
 // ---- TP-Defer（解決できるまで持ち越す） ----
 
 public class DeferNativeProvider : TpNativeProvider(TpId.Defer) {
-    override fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor =
+    override fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor =
         object : AnalysisCodegenProcessor {
             override fun process(context: AnalysisCodegenRoundContext) {
                 val ready = mutableListOf<Pair<KtFile, DeferModel>>()
@@ -203,7 +251,10 @@ public class DeferNativeProvider : TpNativeProvider(TpId.Defer) {
 // ---- TP-Resource（Java・リソース・次のラウンドで Kotlin） ----
 
 public class ResourceNativeProvider : TpNativeProvider(TpId.Resource) {
-    override fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor =
+    override fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor =
         object : AnalysisCodegenProcessor {
             // ラウンドをまたいで持つのは文字列とファイルの相対パスだけ（ADR-014）
             private val pending = mutableListOf<Pair<ResourceModel, String>>()
@@ -219,14 +270,21 @@ public class ResourceNativeProvider : TpNativeProvider(TpId.Resource) {
                     pending -= ready.toSet()
 
                     val classes = classesWith(context.newFiles, TpAnnotations.GENERATE_JAVA)
-                    val models = classes.map { (psi, symbol) -> psi.containingKtFile to ResourceModel(symbol.packageName, symbol.nameInPackage) }
+                    val models =
+                        classes.map { (psi, symbol) ->
+                            psi.containingKtFile to
+                                ResourceModel(symbol.packageName, symbol.nameInPackage)
+                        }
                     models.forEach { (file, model) ->
                         gen.write(Dependencies.isolating(file), ResourceRender.java(model))
                         gen.write(Dependencies.isolating(file), ResourceRender.properties(model))
                         pending += model to file.virtualFilePath
                     }
                     if (context.round == 1 && models.isNotEmpty()) {
-                        gen.write(Dependencies.aggregating(models.map { it.first }.distinct()), ResourceRender.services(models.map { it.second }))
+                        gen.write(
+                            Dependencies.aggregating(models.map { it.first }.distinct()),
+                            ResourceRender.services(models.map { it.second }),
+                        )
                     }
                 }
             }
@@ -240,7 +298,10 @@ public class ResourceNativeProvider : TpNativeProvider(TpId.Resource) {
 // ---- TP-Bad（わざと壊れる） ----
 
 public class BadNativeProvider : TpNativeProvider(TpId.Bad) {
-    override fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor =
+    override fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor =
         object : AnalysisCodegenProcessor {
             override fun process(context: AnalysisCodegenRoundContext) {
                 val gen = context.codeGenerator
@@ -250,7 +311,10 @@ public class BadNativeProvider : TpNativeProvider(TpId.Bad) {
                     if (BadMode.Collide in modes) {
                         val mapped =
                             analyze(context.sourceSet.module) {
-                                classesWith(context.newFiles, TpAnnotations.MAPPED).map { (psi, s) -> psi.containingKtFile to BadRender.collide(s.packageName, s.nameInPackage) }
+                                classesWith(context.newFiles, TpAnnotations.MAPPED).map { (psi, s) ->
+                                    psi.containingKtFile to
+                                        BadRender.collide(s.packageName, s.nameInPackage)
+                                }
                             }
                         mapped.forEach { (file, out) -> gen.write(Dependencies.isolating(file), out) }
                     }
@@ -263,7 +327,9 @@ public class BadNativeProvider : TpNativeProvider(TpId.Bad) {
                     }
                     if (BadMode.LogError in modes) {
                         val target =
-                            analyze(context.sourceSet.module) { classesWith(context.newFiles, TpAnnotations.BAD_TARGET).firstOrNull()?.first }
+                            analyze(
+                                context.sourceSet.module,
+                            ) { classesWith(context.newFiles, TpAnnotations.BAD_TARGET).firstOrNull()?.first }
                         context.logger.error(BadRender.LOG_ERROR_MESSAGE, target)
                     }
                     if (BadMode.Throw in modes) {
@@ -280,7 +346,12 @@ public class BadNativeProvider : TpNativeProvider(TpId.Bad) {
                             classesWith(context.newFiles, TpAnnotations.BAD_TARGET).map { it.second } +
                                 context.deferred.mapNotNull { it.pointer.restoreSymbol() as? KaClassLikeSymbol }
                         @Suppress("UNCHECKED_CAST")
-                        targets.distinctBy { it.classId }.forEach { context.defer(it.createPointer() as KaSymbolPointer<KaSymbol>, "stuck") }
+                        targets.distinctBy { it.classId }.forEach {
+                            context.defer(
+                                it.createPointer() as KaSymbolPointer<KaSymbol>,
+                                "stuck",
+                            )
+                        }
                     }
                 }
             }
@@ -290,9 +361,13 @@ public class BadNativeProvider : TpNativeProvider(TpId.Bad) {
 // ---- TP-Probe（見えたものを記録する） ----
 
 public class ProbeNativeProvider : TpNativeProvider(TpId.Probe) {
-    override fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor {
+    override fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor {
         val instance = Integer.toHexString(System.identityHashCode(Any()))
         val unit = environment.executionUnit
+
         fun record(event: ProbeEvent) {
             options.probeOut?.let { ProbeEvent.append(it, event) }
         }
@@ -317,7 +392,13 @@ public class ProbeNativeProvider : TpNativeProvider(TpId.Probe) {
             override fun process(context: AnalysisCodegenRoundContext) {
                 lastRound = context.round
                 if (context.round == 1) emitLogs(context.logger, context.allFiles.firstOrNull())
-                val deferred = analyze(context.sourceSet.module) { context.deferred.map { d -> d.payload ?: d.pointer.restoreSymbol().toString() } }
+                val deferred =
+                    analyze(context.sourceSet.module) {
+                        context.deferred.map { d ->
+                            d.payload
+                                ?: d.pointer.restoreSymbol().toString()
+                        }
+                    }
                 record(
                     ProbeEvent(
                         "process",
@@ -337,8 +418,12 @@ public class ProbeNativeProvider : TpNativeProvider(TpId.Probe) {
                         deferred = deferred,
                         extra =
                             mapOf(
-                                "ownFiles" to context.sourceSet.ownFiles.size.toString(),
-                                "visibleFiles" to context.sourceSet.visibleFiles.size.toString(),
+                                "ownFiles" to
+                                    context.sourceSet.ownFiles.size
+                                        .toString(),
+                                "visibleFiles" to
+                                    context.sourceSet.visibleFiles.size
+                                        .toString(),
                                 "dependsOn" to context.sourceSet.dependencies.joinToString(",") { it.name },
                             ),
                     ),
@@ -349,7 +434,10 @@ public class ProbeNativeProvider : TpNativeProvider(TpId.Probe) {
 
             override fun onError() = record(ProbeEvent("onError", "native", instance, unit = unit.name, round = lastRound))
 
-            private fun emitLogs(logger: CodegenLogger, anchor: KtFile?) {
+            private fun emitLogs(
+                logger: CodegenLogger,
+                anchor: KtFile?,
+            ) {
                 options.probeLogs.forEach { log ->
                     when (log.level) {
                         "logging" -> logger.logging(log.message, anchor)

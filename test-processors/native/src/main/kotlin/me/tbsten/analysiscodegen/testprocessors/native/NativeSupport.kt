@@ -13,8 +13,8 @@ import me.tbsten.analysiscodegen.testprocessors.TpOptions
 import me.tbsten.analysiscodegen.testprocessors.TpResourceFile
 import me.tbsten.analysiscodegen.testprocessors.TypeNotation
 import org.jetbrains.kotlin.analysis.api.KaSession
-import org.jetbrains.kotlin.analysis.api.symbols.KaClassLikeSymbol
 import org.jetbrains.kotlin.analysis.api.annotations.KaAnnotated
+import org.jetbrains.kotlin.analysis.api.symbols.KaClassLikeSymbol
 import org.jetbrains.kotlin.analysis.api.types.KaClassType
 import org.jetbrains.kotlin.analysis.api.types.KaErrorType
 import org.jetbrains.kotlin.analysis.api.types.KaStarTypeProjection
@@ -43,14 +43,20 @@ public abstract class TpNativeProvider(private val id: TpId) : AnalysisCodegenPr
         return if (options.isEnabled(id)) createEnabled(environment, options) else NoopProcessor
     }
 
-    protected abstract fun createEnabled(environment: AnalysisCodegenProcessorEnvironment, options: TpOptions): AnalysisCodegenProcessor
+    protected abstract fun createEnabled(
+        environment: AnalysisCodegenProcessorEnvironment,
+        options: TpOptions,
+    ): AnalysisCodegenProcessor
 }
 
 internal object NoopProcessor : AnalysisCodegenProcessor {
     override fun process(context: AnalysisCodegenRoundContext) {}
 }
 
-internal fun CodeGenerator.write(dependencies: Dependencies, file: TpFile) {
+internal fun CodeGenerator.write(
+    dependencies: Dependencies,
+    file: TpFile,
+) {
     when (file.extension) {
         "kt" -> generateKotlin(file.packageName, file.fileName, dependencies, file.content)
         "java" -> generateJava(file.packageName, file.fileName, dependencies, file.content)
@@ -58,14 +64,20 @@ internal fun CodeGenerator.write(dependencies: Dependencies, file: TpFile) {
     }
 }
 
-internal fun CodeGenerator.write(dependencies: Dependencies, file: TpResourceFile) {
+internal fun CodeGenerator.write(
+    dependencies: Dependencies,
+    file: TpResourceFile,
+) {
     generateResource(file.relativePath, dependencies, file.content.toByteArray(Charsets.UTF_8))
 }
 
 internal fun classIdOf(fqn: String): ClassId = ClassId.topLevel(FqName(fqn))
 
 /** ファイル内のクラス（ネストも含む）のうち、[annotationFqn] が付いたもの。FQN 順。 */
-internal fun KaSession.classesWith(files: List<KtFile>, annotationFqn: String): List<Pair<KtClassOrObject, KaClassLikeSymbol>> {
+internal fun KaSession.classesWith(
+    files: List<KtFile>,
+    annotationFqn: String,
+): List<Pair<KtClassOrObject, KaClassLikeSymbol>> {
     val classId = classIdOf(annotationFqn)
     return files
         .flatMap { it.collectDescendantsOfType<KtClassOrObject>() }
@@ -76,7 +88,11 @@ internal fun KaSession.classesWith(files: List<KtFile>, annotationFqn: String): 
 }
 
 /** 名前付き引数の定数値。省略された引数（既定値）は null。 */
-internal fun annotationArgument(symbol: KaAnnotated, annotationFqn: String, name: String): Any? {
+internal fun annotationArgument(
+    symbol: KaAnnotated,
+    annotationFqn: String,
+    name: String,
+): Any? {
     val annotation = symbol.annotations[classIdOf(annotationFqn)].firstOrNull() ?: return null
     val value = annotation.arguments.firstOrNull { it.name.asString() == name }?.expression ?: return null
     return (value as? org.jetbrains.kotlin.analysis.api.annotations.KaAnnotationValue.ConstantValue)?.value?.value
