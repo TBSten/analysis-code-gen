@@ -12,6 +12,8 @@ kotlinx-serialization = "1.9.0"
 okio = "3.18.2"
 classgraph = "4.8.200"
 dokka = "2.3.0"
+# BRG-11（KotlinPoet の KSP 拡張が Bridge で動く）のテストだけが使う
+kotlinpoet = "2.2.0"
 # フィクスチャ（fixtures/projects/*）だけが使う Android Gradle Plugin（ADR-027）
 agp = "9.0.0"
 
@@ -32,6 +34,7 @@ ksp-common-deps = { module = "com.google.devtools.ksp:symbol-processing-common-d
 kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+kotlinpoet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
 
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
