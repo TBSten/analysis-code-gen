@@ -2,16 +2,17 @@ plugins {
     id("acg.gradle-plugin")
 }
 
+// ADR-012: ビルドスクリプトの classpath に載るのは project-model と Gradle 連携だけ。エンジンと AA は Worker 側で読む
 dependencies {
     implementation(project(":project-model"))
 }
 
 gradlePlugin {
     plugins {
-        // プラグイン ID は ACG-34（Gradle DSL の設計）で確定する
+        // ADR-016
         create("analysisCodegen") {
             id = "me.tbsten.analysiscodegen"
-            implementationClass = "me.tbsten.analysiscodegen.gradleplugin.AnalysisCodegenGradlePlugin"
+            implementationClass = "me.tbsten.analysiscodegen.gradle.AnalysisCodegenPlugin"
         }
     }
 }

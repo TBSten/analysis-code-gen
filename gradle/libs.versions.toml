@@ -4,6 +4,11 @@ kotlin = "2.4.21"
 ksp = "2.3.14"
 kotest = "6.2.7"
 ktlint-gradle = "14.2.0"
+# Analysis API（ADR-011）。いまは全モジュールを最新 stable でコンパイルする。processor-api を最小版（2.4.0）でコンパイルする切り替えは ACG-28 の版マトリクスで足す
+analysis-api = "2.4.21"
+# AA が前提とする IntelliJ Platform の版（KSP2 の aa-intellij に当たる）
+aa-intellij = "251.27812.49"
+kotlinx-serialization = "1.9.0"
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -12,6 +17,21 @@ kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref 
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+
+kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
+# Analysis API と IntelliJ Platform（非推移で使う。acg.analysis-api convention plugin が追加する）
+aa-api = { module = "org.jetbrains.kotlin:analysis-api-for-ide", version.ref = "analysis-api" }
+aa-compiler-common = { module = "org.jetbrains.kotlin:kotlin-compiler-common-for-ide", version.ref = "analysis-api" }
+ij-core = { module = "com.jetbrains.intellij.platform:core", version.ref = "aa-intellij" }
+ij-core-impl = { module = "com.jetbrains.intellij.platform:core-impl", version.ref = "aa-intellij" }
+ij-util = { module = "com.jetbrains.intellij.platform:util", version.ref = "aa-intellij" }
+ij-util-base = { module = "com.jetbrains.intellij.platform:util-base", version.ref = "aa-intellij" }
+ij-util-rt = { module = "com.jetbrains.intellij.platform:util-rt", version.ref = "aa-intellij" }
+ij-extensions = { module = "com.jetbrains.intellij.platform:extensions", version.ref = "aa-intellij" }
+ij-java-psi = { module = "com.jetbrains.intellij.java:java-psi", version.ref = "aa-intellij" }
+ij-java-frontback-psi = { module = "com.jetbrains.intellij.java:java-frontback-psi", version.ref = "aa-intellij" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
