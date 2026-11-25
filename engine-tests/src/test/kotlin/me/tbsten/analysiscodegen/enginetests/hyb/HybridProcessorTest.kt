@@ -2,7 +2,6 @@
 
 package me.tbsten.analysiscodegen.enginetests.hyb
 
-import com.google.devtools.ksp.getDeclaredProperties
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
@@ -10,7 +9,10 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.Origin
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import me.tbsten.analysiscodegen.enginetests.support.EngineProject
@@ -71,10 +73,18 @@ class HybridInspectProvider : SymbolProcessorProvider {
                             }
                         }
                         is KSClassDeclaration -> {
-                            // HYB-02: 1:1 に対応しないもの（合成されたプロパティのアクセサ）は ADR どおりの例外
-                            val accessor = node.getDeclaredProperties().first().getter!!
-                            val error = runCatching { accessor.withAnalysis { it } }.exceptionOrNull()
-                            HybridRecord.lines += "synthetic=${error?.let { it::class.simpleName }}"
+                            // HYB-02: KSP が合成した宣言（data class の copy・componentN など）は、AA に対応するシンボルがあれば使え、
+                            // 無ければ ADR-017 どおり UnsupportedHybridConversionException になる。それ以外の例外は出さない。
+                            // 公開 API の withAnalysis は KSDeclaration・KSType・KSFile だけを受けるため、アクセサ（KSPropertyAccessor）は対象外
+                            val synthetic =
+                                (node.getAllFunctions() + node.getAllProperties()).filter { it.origin == Origin.SYNTHETIC }.toList()
+                            HybridRecord.lines += "syntheticCount=${synthetic.size}"
+                            synthetic.forEach { decl ->
+                                val error = runCatching { decl.withAnalysis { symbol -> symbol.toString() } }.exceptionOrNull()
+                                if (error != null && error !is UnsupportedHybridConversionException) {
+                                    HybridRecord.lines += "syntheticUnexpected=${decl.simpleName.asString()}:${error::class.simpleName}"
+                                }
+                            }
                         }
                         else -> {}
                     }
@@ -104,7 +114,7 @@ private fun hybridProject(): EngineProject =
             fun entry(): Int? = helper() + other()
 
             @Hybrid
-            class Holder(val value: Int)
+            data class Holder(val value: Int)
             """,
         )
         kspProcessor(HybridInspectProvider::class.java.name)
@@ -123,7 +133,8 @@ class HybridProcessorTest : IntegrationSpec({
         hybridProject().run().success shouldBe true
         HybridRecord.lines.single { it.startsWith("returnType=") } shouldContain "returnType=true:"
         HybridRecord.lines shouldContain "file=Sources.kt:5"
-        HybridRecord.lines shouldContain "synthetic=${UnsupportedHybridConversionException::class.simpleName}"
+        HybridRecord.lines.filter { it.startsWith("syntheticUnexpected=") }.shouldBeEmpty()
+        HybridRecord.lines shouldNotContain "syntheticCount=0"
     }
 
     case("HYB-03", "スコープの外に KaSymbol を持ち出すと検出される", pending = PendingCase(Milestone.M3)) {
