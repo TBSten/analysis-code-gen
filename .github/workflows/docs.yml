@@ -13,9 +13,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# main ではマージが続くと前のデプロイが取り消され続けるので、取り消すのは PR だけにする（main は順に流す）
 concurrency:
   group: docs-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read

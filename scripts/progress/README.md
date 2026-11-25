@@ -25,13 +25,15 @@ python3 scripts/progress/progress_report.py report \
 | 状態 | 条件 |
 |---|---|
 | passing | `case-status.csv` で enabled、かつ main の直近 3 回の CI すべてで pass |
-| flaky | 直近 3 回のうち一部だけ pass。通過に数えない |
-| failing | enabled だが上のどちらでもない（記録が無いときも） |
+| unconfirmed | fail は無いが 3 回の pass がそろっていない（有効にした直後・まだ走っていない）。通過に数えない |
+| flaky | pass と fail が混ざる。通過に数えない |
+| failing | 直近 3 回に fail があり pass が無い |
 | pending / missing | `case-status.csv` のまま |
 
 - 任意（M 列が `任意`）のケースは合格ラインの外なので数えない。ベンチマーク（種別 B）は正しさに数えない
 - 成果物とケースの対応は `progress_report.py` の `DELIVERABLES`。一覧に区分が増えたらそこに足す（自己テストが漏れを落とす）
 - 数字がおかしいときは `auto.json` を手で直さず、このコマンドを直す
+- **マイルストーンの予定（グラフの薄い帯）は人の指示なしに変えない**（てべすてん、2026-11-26）。`milestones` の `start` / `guide` / `p50` / `p80`、`phases` の `start` / `end`、`goOffset`、`projectStart` が対象。コマンドは前回の値を引き継ぐだけで、Agent も `--prev` に渡す前に書き換えない。変えたいときは notes.json の `scheduleProposals` に相談を書く（`{"target":"P1","field":"start","from":4,"to":2.05,"reason":"…","since":"11/26 03:30","ifNot":"…"}`、数値で書けないときは field/from/to の代わりに `change`。詳細は `pm/progress-report-format.md`）。マイルストーンの下に相談として出るので、てべすてん が認めたら `--prev` の値を直す
 
 ## 自己テスト
 

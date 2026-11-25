@@ -35,12 +35,13 @@ JST = dt.timezone(dt.timedelta(hours=9))
 REPO = Path(__file__).resolve().parents[2]
 
 # テスト名は "[ID] タイトル"（ADR-030）。ID の書式は CaseDeclaration.ID_PATTERN と同じ
-CASE_NAME = re.compile(r"\[([A-Z]+(?:-[A-Z]+)*-[A-Z0-9]+[a-z]?)\]")
+CASE_NAME = re.compile(r"\[([A-Z]+(?:-[A-Z]+)*-[A-Z0-9]+[a-z]?|KSPT-[A-Za-z0-9_]+)\]")
 
 # 「直近 3 回の CI がすべて成功したものだけを通過とする」（pm/progress-report-format.md）
 PASS_WINDOW = 3
 # 定期 PBT が「24 時間続けて成功」とみなす最低回数（1 時間ごと。取りこぼしを 4 回まで許す）
 PBT_MIN_RUNS_24H = 20
+ENABLED = ("passing", "unconfirmed", "flaky", "failing")
 # 進捗履歴に残す点の数（2 時間ごと × 約 3 日）
 HISTORY_KEEP = 36
 
@@ -50,7 +51,7 @@ DELIVERABLES: list[tuple[str, list[str]]] = [
     ("Processor 向け API", [r"API", r"DEF", r"LIF", r"HYB"]),
     ("解析・コード生成エンジン", [r"ANA", r"INC", r"RND", r"CCH", r"MOD", r"OUT", r"FAIL", r"TRM", r"DET", r"MEM", r"PERF"]),
     ("Gradle plugin", [r"GRD", r"KMP", r"GCC", r"CLI", r"VER"]),
-    ("KSP Bridge", [r"BRG", r"BINC", r"BKMP", r"BIN", r"MIX", r"LIC"]),
+    ("KSP Bridge", [r"BRG", r"BINC", r"BKMP", r"BIN", r"MIX", r"LIC", r"KSPT-[A-Za-z0-9_]+"]),
     ("既存 Processor 移植 (Bridge)", [r"RW-[A-Z]+-B\d+", r"RW-CMB-0[13]", r"RW-ALL-[A-Z]\d+"]),
     ("既存 Processor 移植 (Rewrite)", [r"RW-[A-Z]+-N\d+", r"RW-CMB-02"]),
     ("E2E テストフレームワーク", [r"TST", r"PBT", r"XD"]),
@@ -165,10 +166,11 @@ def parse_time(s: str) -> dt.datetime:
 
 
 def case_states(cases: list[Case], ci_runs: list[dict]) -> dict[str, str]:
-    """ケース → passing / flaky / failing / pending / missing。
+    """ケース → passing / unconfirmed / flaky / failing / pending / missing。
 
     passing は「有効」かつ直近 PASS_WINDOW 回の main の CI すべてで pass。
-    一部だけ pass は flaky（通過に数えない）。実行記録が 1 つも無い有効ケースは failing。
+    pass と fail が混ざれば flaky、fail だけなら failing。fail が無いのに 3 回そろわない（有効にした
+    直後で、まだ CI で走っていない・前の実行にそのケースが無い）なら unconfirmed。passing 以外は通過に数えない。
     """
     recent = sorted(ci_runs, key=lambda r: r["finishedAt"])[-PASS_WINDOW:]
     out = {}
@@ -179,10 +181,10 @@ def case_states(cases: list[Case], ci_runs: list[dict]) -> dict[str, str]:
         res = [r["cases"].get(c.id) for r in recent]
         if res and all(x == "pass" for x in res):
             out[c.id] = "passing"
-        elif any(x == "pass" for x in res):
-            out[c.id] = "flaky"
+        elif any(x == "fail" for x in res):
+            out[c.id] = "flaky" if any(x == "pass" for x in res) else "failing"
         else:
-            out[c.id] = "failing"
+            out[c.id] = "unconfirmed"
     return out
 
 
@@ -203,7 +205,7 @@ def correctness(cs: list[Case], state: dict[str, str], pbt_green: bool) -> float
     ベンチマーク（種別 B）は性能の側で見るので、正しさには数えない。
     """
     cs = [c for c in cs if c.kind != "B" and c.milestone != "任意"]
-    if not any(state[c.id] in ("passing", "flaky", "failing") for c in cs):
+    if not any(state[c.id] in ENABLED for c in cs):
         return 0.0
 
     def rate(ms: str) -> float:
@@ -257,6 +259,8 @@ def build_report(
     counted = [c for c in cases if c.milestone != "任意"]  # 任意のケースは合格ラインの外
     passed = {c.id for c in counted if state[c.id] == "passing"}
 
+    # マイルストーンの予定（start / guide / p50 / p80）・phases・goOffset・projectStart は人が決める枠。
+    # てべすてん の指示なしに変えない（2026-11-26）。コマンドは前回の値をそのまま引き継ぎ、通過数だけを書く
     milestones = []
     for m in prev.get("milestones", []):
         mine = [c for c in counted if c.milestone == m["id"]]
@@ -279,12 +283,13 @@ def build_report(
         return sorted(c.id for c in counted if state[c.id] == s)
 
     prev_cases = prev.get("cases", {})
-    prev_enabled = set(prev_cases.get("passing", []) + prev_cases.get("flaky", []) + prev_cases.get("failing", []))
+    prev_enabled = {i for k in ENABLED for i in prev_cases.get(k, [])}
     prev_passing = set(prev_cases.get("passing", []))
-    enabled_now = {c.id for c in counted if state[c.id] in ("passing", "flaky", "failing")}
+    enabled_now = {c.id for c in counted if state[c.id] in ENABLED}
     case_block = {
         "total": len(counted),
         "passing": ids("passing"),
+        "unconfirmed": ids("unconfirmed"),
         "flaky": ids("flaky"),
         "failing": ids("failing"),
         "pending": len(ids("pending")),
@@ -357,7 +362,7 @@ def cmd_report(a: argparse.Namespace) -> int:
     Path(a.out).write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     c = out["cases"]
     print(
-        f"{a.out}: 通過 {len(c['passing'])}/{c['total']}（flaky {len(c['flaky'])}・失敗 {len(c['failing'])}・"
+        f"{a.out}: 通過 {len(c['passing'])}/{c['total']}（確認中 {len(c['unconfirmed'])}・flaky {len(c['flaky'])}・失敗 {len(c['failing'])}・"
         f"保留 {c['pending']}・未作成 {c['missing']}）、CI {len(c['ciRuns'])} 回分、PBT 24h {out['pbt']['runs24h']} 回、"
         f"ベンチ {len(ratios)} 件"
     )

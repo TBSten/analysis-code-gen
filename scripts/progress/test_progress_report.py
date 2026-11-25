@@ -61,18 +61,18 @@ class CollectTest(unittest.TestCase):
 
 class StateTest(unittest.TestCase):
     def test_pass_only_when_last_three_runs_pass(self) -> None:
-        cases = [case("A-01"), case("A-02"), case("A-03"), case("A-04", status="pending"), case("A-05", status="missing"), case("A-06")]
+        cases = [case("A-01"), case("A-02"), case("A-03"), case("A-04", status="pending"), case("A-05", status="missing"), case("A-06"), case("A-07")]
         runs = [
             run("1", {"A-01": "fail", "A-02": "pass"}, hours_ago=4),  # 4 回前は窓の外
             run("2", {"A-01": "pass", "A-02": "pass", "A-03": "fail"}, hours_ago=3),
             run("3", {"A-01": "pass", "A-02": "fail", "A-03": "fail"}, hours_ago=2),
-            run("4", {"A-01": "pass", "A-02": "pass", "A-03": "fail", "A-04": "pass"}, hours_ago=1),
+            run("4", {"A-01": "pass", "A-02": "pass", "A-03": "fail", "A-04": "pass", "A-07": "pass"}, hours_ago=1),  # A-07 は有効にした直後
         ]
         got = pr.case_states(cases, runs)
-        self.assertEqual(got, {"A-01": "passing", "A-02": "flaky", "A-03": "failing", "A-04": "pending", "A-05": "missing", "A-06": "failing"})
+        self.assertEqual(got, {"A-01": "passing", "A-02": "flaky", "A-03": "failing", "A-04": "pending", "A-05": "missing", "A-06": "unconfirmed", "A-07": "unconfirmed"})
 
     def test_no_runs_means_nothing_passes(self) -> None:
-        self.assertEqual(pr.case_states([case("A-01")], []), {"A-01": "failing"})
+        self.assertEqual(pr.case_states([case("A-01")], []), {"A-01": "unconfirmed"})
 
 
 class CorrectnessTest(unittest.TestCase):
@@ -170,6 +170,17 @@ class ReportTest(unittest.TestCase):
         self.assertEqual(out["history"]["series"][0]["name"], "通過したケース（全 4）")
         self.assertEqual(out["history"]["series"][3]["values"], [None, 1.5])
         self.assertNotIn("sample", {k for k, v in out.items() if v is True})
+
+    def test_schedule_is_never_changed(self) -> None:
+        # マイルストーンの予定（薄い帯）は人の指示なしに変えない（てべすてん、2026-11-26）
+        prev = {**self.PREV, "goOffset": 7,
+                "milestones": [{"id": "M1", "name": "最小限動く", "guide": 3, "p50": 4.5, "p80": 5.5, "start": 0, "passed": 0, "total": 1}],
+                "phases": [{"id": "P1", "name": "検証", "start": 4, "end": 6, "state": "次"}]}
+        out = pr.build_report(prev, [case("API-01")], [], NOW, None, [])
+        keys = ("id", "name", "guide", "p50", "p80", "start")
+        self.assertEqual([{k: m[k] for k in keys} for m in out["milestones"]], [{k: m[k] for k in keys} for m in prev["milestones"]])
+        self.assertEqual(out["phases"], prev["phases"])
+        self.assertEqual((out["goOffset"], out["projectStart"]), (7, "2026-11-24"))
 
     def test_report_command_from_runs_dir(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
