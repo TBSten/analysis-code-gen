@@ -4,7 +4,7 @@ description: 既存の KSP Processor が、Native の Processor と同じエン�
 ---
 
 :::note[レビューで判断してほしいこと]
-- KSP API の実装を KSP2 2.3.14 から移植し、エンジンとは engine-spi だけでつなぐ方式でよいか
+- KSP API の実装を KSP2 2.3.14 から移植し、エンジンとは analysis-code-gen-engine-spi だけでつなぐ方式でよいか
 :::
 
 KSP Bridge は、公式の KSP API（`Resolver` や `KSClassDeclaration`）を analysisCodeGen のエンジンの上に実装したものです。
@@ -17,8 +17,8 @@ Bridge はエンジンに直接依存しません。エンジンは ServiceLoade
 
 ```mermaid
 flowchart LR
-    E["processing-engine"] -->|"ServiceLoader"| F1["Native 用 Frontend<br/>（内蔵）"]
-    E -->|"ServiceLoader"| F2["KSP 用 Frontend<br/>（ksp-bridge）"]
+    E["analysis-code-gen-processing-engine"] -->|"ServiceLoader"| F1["Native 用 Frontend<br/>（内蔵）"]
+    E -->|"ServiceLoader"| F2["KSP 用 Frontend<br/>（analysis-code-gen-ksp-bridge）"]
     F1 --> P1["EngineProcessor"]
     F2 --> P2["EngineProcessor"]
     P1 --> R["同じラウンド・同じ解析環境・同じ出力管理"]
@@ -27,7 +27,7 @@ flowchart LR
 
 Native の Processor も、エンジンの中では同じ `EngineProcessor` として回ります。このため Bridge のテストが、そのままエンジンの検証にもなります。
 
-## engine-spi の型
+## analysis-code-gen-engine-spi の型
 
 すべて `@InternalAnalysisCodegenApi` で、利用者には見せません。
 

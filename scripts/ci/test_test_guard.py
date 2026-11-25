@@ -44,7 +44,7 @@ class DisableTest(unittest.TestCase):
         self.assertEqual(len(g.find_disables(lines)), 1)
 
     def test_test_path(self):
-        for p in ["e2e-tests/src/test/kotlin/A.kt", "x/src/integrationTest/java/B.java", "testing/src/testFixtures/kotlin/C.kt"]:
+        for p in ["e2e-tests/src/test/kotlin/A.kt", "x/src/integrationTest/java/B.java", "analysis-code-gen-testing/src/testFixtures/kotlin/C.kt"]:
             self.assertTrue(g.TEST_PATH_RE.search(p), p)
         self.assertFalse(g.TEST_PATH_RE.search("x/src/main/kotlin/A.kt"))
 

@@ -21,7 +21,7 @@ import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 import java.nio.file.Files
 
-// 5.23 バージョン互換と診断（VER）。VER-02（processor-api の版違い、I）は AA の型に触れるので :engine-tests に置く
+// 5.23 バージョン互換と診断（VER）。VER-02（analysis-code-gen-processor-api の版違い、I）は AA の型に触れるので :engine-tests に置く
 // 対応 Kotlin の唯一の一覧は gradle/kotlin-versions.txt（ADR-011）。AGP の対応表は gradle/agp-versions.txt（ADR-037 で置き場を決めた）
 
 /** 対応表の 1 行（`<版> <役割> [pr]`）。 */

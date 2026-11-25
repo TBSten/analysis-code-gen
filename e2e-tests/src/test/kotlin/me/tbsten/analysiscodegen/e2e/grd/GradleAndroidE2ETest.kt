@@ -96,7 +96,7 @@ class GradleAndroidE2ETest : E2ESpec({
                     plugins {
                         alias(libs.plugins.kotlin.multiplatform)
                         alias(libs.plugins.android.kotlin.multiplatform.library)
-                        id("me.tbsten.analysiscodegen")
+                        id("me.tbsten.analysis.code.gen")
                     }
                     kotlin {
                         androidLibrary {

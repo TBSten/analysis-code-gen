@@ -36,12 +36,12 @@ AA は利用者の Kotlin と同じ版を、実行時にここから取ります
 
 ## plugin を適用する
 
-Kotlin の plugin と一緒に `me.tbsten.analysiscodegen` を適用し、`analysisCodeGen` の依存に Processor を足します。
+Kotlin の plugin と一緒に `me.tbsten.analysis.code.gen` を適用し、`analysisCodeGen` の依存に Processor を足します。
 
 ```kotlin title="jvm-app/build.gradle.kts"
 plugins {
     kotlin("jvm") version "2.4.21"
-    id("me.tbsten.analysiscodegen") version "0.1.0"
+    id("me.tbsten.analysis.code.gen") version "0.1.0"
 }
 
 dependencies {
@@ -77,7 +77,7 @@ analysisCodeGen {
 ```kotlin title="bridge-app/build.gradle.kts"
 plugins {
     kotlin("jvm") version "2.4.21"
-    id("me.tbsten.analysiscodegen.ksp-bridge") version "0.1.0"
+    id("me.tbsten.analysis.code.gen.ksp-bridge") version "0.1.0"
 }
 
 dependencies {
@@ -90,7 +90,7 @@ dependencies {
 
 ## Processor を作る
 
-Processor を作るモジュールは、`processor-api` に `compileOnly` で依存します。AA も一緒にコンパイル時だけ見えます。
+Processor を作るモジュールは、`analysis-code-gen-processor-api` に `compileOnly` で依存します。AA も一緒にコンパイル時だけ見えます。
 
 ```kotlin title="hello-processor/build.gradle.kts"
 plugins {
@@ -98,8 +98,8 @@ plugins {
 }
 
 dependencies {
-    // Analysis API も processor-api 経由でコンパイル時に見える。実行時は analysisCodeGen が用意する
-    compileOnly("me.tbsten.analysiscodegen:processor-api:0.1.0")
+    // Analysis API も analysis-code-gen-processor-api 経由でコンパイル時に見える。実行時は analysisCodeGen が用意する
+    compileOnly("me.tbsten.analysis.code.gen:analysis-code-gen-processor-api:0.1.0")
 }
 ```
 
@@ -110,10 +110,10 @@ dependencies {
 | やりたいこと | 書くもの |
 |---|---|
 | AA の置き場を足す | `settings.gradle.kts` の `repositories` |
-| Processor を動かす | `me.tbsten.analysiscodegen` と `analysisCodeGen(...)` |
+| Processor を動かす | `me.tbsten.analysis.code.gen` と `analysisCodeGen(...)` |
 | KMP で SourceSet を選ぶ | `analysisCodeGen { sourceSets { } }` |
-| KSP Processor を動かす | `me.tbsten.analysiscodegen.ksp-bridge` |
-| Processor を作る | `compileOnly` の `processor-api` |
+| KSP Processor を動かす | `me.tbsten.analysis.code.gen.ksp-bridge` |
+| Processor を作る | `compileOnly` の `analysis-code-gen-processor-api` |
 
 ## 次のステップ
 

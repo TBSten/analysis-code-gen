@@ -31,22 +31,23 @@ dependencyResolutionManagement {
 
 rootProject.name = "analysis-code-gen"
 
-// モジュール構成は設計文書 16 章の案に ACG-34 の決め打ち（engine-spi の追加、ksp-bridge → engine-spi）を反映。境界の確定は ADR-012〜017
+// モジュール構成は設計文書 16 章の案に ACG-34 の決め打ち（analysis-code-gen-engine-spi の追加、
+// analysis-code-gen-ksp-bridge → analysis-code-gen-engine-spi）を反映。境界の確定は ADR-012〜017。名前は ADR-042
 include(
-    ":processor-api",
-    ":project-model",
-    ":engine-spi",
-    ":analysis-engine",
-    ":processing-engine",
-    ":incremental-engine",
-    ":gradle-plugin",
-    ":cli",
-    ":testing",
-    ":testing-kct",
+    ":analysis-code-gen-processor-api",
+    ":analysis-code-gen-project-model",
+    ":analysis-code-gen-engine-spi",
+    ":analysis-code-gen-analysis-engine",
+    ":analysis-code-gen-processing-engine",
+    ":analysis-code-gen-incremental-engine",
+    ":analysis-code-gen-gradle-plugin",
+    ":analysis-code-gen-cli",
+    ":analysis-code-gen-testing",
+    ":analysis-code-gen-testing-kct",
     ":benchmarks",
-    ":ksp-bridge",
-    ":ksp-bridge-api",
-    ":ksp-bridge-gradle-plugin",
+    ":analysis-code-gen-ksp-bridge",
+    ":analysis-code-gen-ksp-bridge-api",
+    ":analysis-code-gen-ksp-bridge-gradle-plugin",
     ":ksp-compatibility-tests",
     ":e2e-tests",
     // AA の型に触れる I / U の保留テスト（ACG-45、ADR-034）。e2e-tests は AA なしでコンパイルできるままにする
@@ -64,3 +65,23 @@ include(
     ":test-processors:native",
 )
 
+
+// ADR-042: 公開しうるモジュールは `analysis-code-gen-` で始める（group は me.tbsten.analysis.code.gen）。
+// 公開しない検査用・テスト用のモジュールだけを例外にする。新しい内部モジュールを足すときはここにも足す
+val internalOnlyModules = setOf(
+    "benchmarks",
+    "ksp-compatibility-tests",
+    "e2e-tests",
+    "engine-tests",
+    "differential",
+    "test-foundation",
+    "quality",
+    "pbt",
+    "test-processors",
+)
+rootProject.children.forEach { module ->
+    check(module.name.startsWith("analysis-code-gen-") || module.name in internalOnlyModules) {
+        "モジュール ${module.path} の名前は analysis-code-gen- で始める（内部専用なら settings.gradle.kts の internalOnlyModules に足す。ADR-042）"
+    }
+    check(module.projectDir.name == module.name) { "モジュール ${module.path} のディレクトリ名をモジュール名と同じにする（ADR-042）" }
+}

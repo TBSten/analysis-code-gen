@@ -10,12 +10,12 @@ import me.tbsten.analysiscodegen.testfoundation.PendingCase
 import me.tbsten.analysiscodegen.testing.TestEngine
 import me.tbsten.analysiscodegen.testing.runCodegenTest
 
-// 5.23 バージョン互換（VER）のうち processor-api の版違い（VER-02）。診断の決まりは ADR-013「バージョン非互換の診断」:
-// Processor の呼び出しで LinkageError が出たら、Processor 名・framework のバージョン・「processor-api の非互換の可能性」を出して失敗させる
+// 5.23 バージョン互換（VER）のうち analysis-code-gen-processor-api の版違い（VER-02）。診断の決まりは ADR-013「バージョン非互換の診断」:
+// Processor の呼び出しで LinkageError が出たら、Processor 名・framework のバージョン・「analysis-code-gen-processor-api の非互換の可能性」を出して失敗させる
 
 /**
- * 「新しすぎる processor-api」の写し。本物にない `buildId` を環境に足してある。
- * これでコンパイルした Processor は、本物の processor-api の上では `buildId` を呼んだところで LinkageError になる。
+ * 「新しすぎる analysis-code-gen-processor-api」の写し。本物にない `buildId` を環境に足してある。
+ * これでコンパイルした Processor は、本物の analysis-code-gen-processor-api の上では `buildId` を呼んだところで LinkageError になる。
  */
 private val FUTURE_PROCESSOR_API =
     mapOf(
@@ -36,7 +36,7 @@ private val FUTURE_PROCESSOR_API =
             interface AnalysisCodegenProcessorEnvironment {
                 val options: Map<String, String>
 
-                // 本物の processor-api に無いメンバー（将来の版で足された想定）
+                // 本物の analysis-code-gen-processor-api に無いメンバー（将来の版で足された想定）
                 val buildId: String
             }
 
@@ -79,13 +79,13 @@ private val FUTURE_PROCESSOR =
 class ProcessorApiCompatibilityIntegrationTest : IntegrationSpec({
     case(
         "VER-02",
-        "非互換な processor-api バージョンでビルドされた Native Processor では、原因が分かる診断が出る",
+        "非互換な analysis-code-gen-processor-api バージョンでビルドされた Native Processor では、原因が分かる診断が出る",
         pending = PendingCase(Milestone.M2),
     ) {
-        // 1. 将来の processor-api の写しをコンパイルし、2. それだけを見て Processor をコンパイルする（本物の processor-api は見ない）
+        // 1. 将来の analysis-code-gen-processor-api の写しをコンパイルし、2. それだけを見て Processor をコンパイルする（本物の analysis-code-gen-processor-api は見ない）
         val futureApi = compileToClasses(FUTURE_PROCESSOR_API, classpath = listOf(kotlinStdlib), inherit = false)
         val processorClasses = compileToClasses(FUTURE_PROCESSOR, classpath = listOf(futureApi, kotlinStdlib), inherit = false)
-        // JAR には Processor だけを入れる（processor-api は実行時にエンジンが渡す本物を使う）
+        // JAR には Processor だけを入れる（analysis-code-gen-processor-api は実行時にエンジンが渡す本物を使う）
         val jar = processorJar(processorClasses, mapOf(NATIVE_SERVICE to listOf(FUTURE_PROVIDER)))
 
         val result =
@@ -99,7 +99,7 @@ class ProcessorApiCompatibilityIntegrationTest : IntegrationSpec({
             val error = result.errors.single().message
             // どの Processor か・何が原因か・どの版の framework で動かしたか
             error shouldContain FUTURE_PROVIDER
-            error shouldContain "processor-api の非互換の可能性"
+            error shouldContain "analysis-code-gen-processor-api の非互換の可能性"
             error shouldContain Regex("""\d+\.\d+""")
         }
     }

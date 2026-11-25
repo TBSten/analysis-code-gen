@@ -3,7 +3,7 @@ paths:
   - "**/src/test/**"
   - "e2e-tests/**"
   - "ksp-compatibility-tests/**"
-  - "testing/**"
+  - "analysis-code-gen-testing/**"
   - "quality/**"
 ---
 

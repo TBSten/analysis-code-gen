@@ -14,7 +14,7 @@ class HelloGradleTest {
             buildScript = """
                 plugins {
                     kotlin("jvm") version "{{kotlinVersion}}"
-                    id("me.tbsten.analysiscodegen") version "0.1.0"
+                    id("me.tbsten.analysis.code.gen") version "0.1.0"
                 }
                 dependencies { analysisCodeGen(files("$processorJar")) }
             """

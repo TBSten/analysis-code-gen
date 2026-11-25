@@ -1,4 +1,4 @@
-// テスト用 Processor（TP-*）の Native API 版（本命）。processor-api と AA は実行時にエンジンが渡すので compileOnly（ADR-027）
+// テスト用 Processor（TP-*）の Native API 版（本命）。analysis-code-gen-processor-api と AA は実行時にエンジンが渡すので compileOnly（ADR-027）
 plugins {
     id("acg.library")
     id("acg.analysis-api")
@@ -7,5 +7,5 @@ plugins {
 
 dependencies {
     api(project(":test-processors:core"))
-    compileOnly(project(":processor-api"))
+    compileOnly(project(":analysis-code-gen-processor-api"))
 }

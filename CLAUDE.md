@@ -54,3 +54,4 @@ python3 scripts/lic01/check_provenance.py  # 移植コードの出所検査（AD
 - ドキュメント・コメント・コミット・PR は**日本語**。識別子は英語
 - ドキュメントは短く（1 ページ 1,400 字以下など。[docs-style](.claude/rules/docs-style.md)）
 - Kotlin のコードの決まりは [kotlin-code](.claude/rules/kotlin-code.md)
+- モジュール名は `analysis-code-gen-xxx`（ディレクトリ名も同じ）、group は `me.tbsten.analysis.code.gen`。検査・テスト用の内部モジュールは例外（[module-naming](docs/design/module-naming.md)、ADR-042）

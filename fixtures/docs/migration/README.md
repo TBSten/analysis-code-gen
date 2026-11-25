@@ -15,6 +15,6 @@ docs サイトの「既存の KSP Processor を移行する」（`docs/site/src/
 
 - `./gradlew :ksp-app:run` と `./gradlew :app:run` が同じ `Hello, Greeter!` を出し、生成物が一致する
 - `:hello-ksp-processor:test`（KSP2 と Bridge の比較）が通る
-- `app` の依存を `hello-hybrid-processor` に替えると `Hi, Greeter!`、`hello-native-processor`（plugin は `me.tbsten.analysiscodegen`）に替えても `Hi, Greeter!`
+- `app` の依存を `hello-hybrid-processor` に替えると `Hi, Greeter!`、`hello-native-processor`（plugin は `me.tbsten.analysis.code.gen`）に替えても `Hi, Greeter!`
 
 このディレクトリはリポジトリのビルドには入らない。実装（M3）後に E2E（DOC-05）がこのプロジェクトをビルド・実行する。

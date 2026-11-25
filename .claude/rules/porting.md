@@ -1,7 +1,7 @@
 ---
 paths:
-  - "ksp-bridge/**"
-  - "ksp-bridge-api/**"
+  - "analysis-code-gen-ksp-bridge/**"
+  - "analysis-code-gen-ksp-bridge-api/**"
   - "ksp-compatibility-tests/**"
   - "porting/**"
   - "NOTICE"

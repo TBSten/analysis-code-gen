@@ -5,11 +5,11 @@ plugins {
 }
 
 dependencies {
-    dokka(project(":processor-api"))
-    dokka(project(":gradle-plugin"))
-    dokka(project(":testing"))
-    dokka(project(":ksp-bridge-api"))
-    dokka(project(":ksp-bridge-gradle-plugin"))
+    dokka(project(":analysis-code-gen-processor-api"))
+    dokka(project(":analysis-code-gen-gradle-plugin"))
+    dokka(project(":analysis-code-gen-testing"))
+    dokka(project(":analysis-code-gen-ksp-bridge-api"))
+    dokka(project(":analysis-code-gen-ksp-bridge-gradle-plugin"))
 }
 
 // 例外: フィクスチャ（fixtures/projects/*）が読むローカルリポジトリ build/fixture-repo へ、必要なモジュールを publish する（ADR-027）。
@@ -18,7 +18,13 @@ tasks.register("publishFixtureDeps") {
     group = "fixtures"
     description = "フィクスチャが使うテスト用 Processor と Gradle plugin を build/fixture-repo に publish する"
     dependsOn(
-        listOf(":project-model", ":gradle-plugin", ":test-processors:core", ":test-processors:ksp", ":test-processors:native")
+        listOf(
+            ":analysis-code-gen-project-model",
+            ":analysis-code-gen-gradle-plugin",
+            ":test-processors:core",
+            ":test-processors:ksp",
+            ":test-processors:native",
+        )
             .filter { findProject(it) != null }
             .map { "$it:publishAllPublicationsToFixtureRepoRepository" },
     )
