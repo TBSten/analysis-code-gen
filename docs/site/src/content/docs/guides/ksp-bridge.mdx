@@ -1,0 +1,76 @@
+---
+title: KSP Bridge
+description: 既存の KSP Processor を、analysisCodeGen の実行基盤の上でそのまま動かす方法を説明します。
+fixture: fixtures/docs/guides
+---
+
+:::note[レビューで判断してほしいこと]
+- KMP での既定を `Compatible`（KSP2 と同じ見え方）にした。共通の生成を 1 回にしたいときだけ `SourceSet` を選ぶ
+- 1 つの依存に Native と KSP の両方の Provider があれば、Native だけを使う
+:::
+
+KSP Bridge は、KSP の API を analysisCodeGen の上で実装したものです。既存の KSP Processor を変更せずに動かせます。
+
+## KSP の Processor を動かす
+
+Bridge の plugin を適用し、KSP の Processor を `analysisCodeGen(...)` で足します。本体の plugin も自動で適用されます。
+
+```kotlin title="bridge-app/build.gradle.kts"
+plugins {
+    kotlin("jvm") version "2.4.21"
+    // Bridge の plugin。本体の me.tbsten.analysiscodegen も自動で適用される
+    id("me.tbsten.analysiscodegen.ksp-bridge") version "0.1.0"
+}
+```
+
+Bridge を適用せずに KSP の Processor を足すと、Bridge の適用を促すエラーで止まります。
+
+## Native と一緒に動かす
+
+KSP の Processor と Native の Processor は、同じラウンドで動きます。お互いの生成物は次のラウンドから見えます。
+
+```kotlin title="bridge-app/build.gradle.kts"
+    // KSP の Processor と Native の Processor を同じように足せる
+    analysisCodeGen("com.squareup.moshi:moshi-kotlin-codegen:1.15.2")
+    analysisCodeGen(project(":greeting-processor"))
+```
+
+どちらの Processor として使うかは、依存ごとに Provider を探して決めます。KSP の Processor ごとに Bridge を指定する必要はありません。
+
+## オプションを移す
+
+`ksp { arg() }` に書いていたオプションは、`analysisCodeGen { arg() }` に移します。
+
+```kotlin title="bridge-app/build.gradle.kts"
+    // ksp { arg("moshi.generated", "...") } の移行先
+    arg("moshi.generated", "javax.annotation.processing.Generated")
+```
+
+KSP Processor からは、これまでどおり `SymbolProcessorEnvironment.options` で読めます。
+
+## KMP での見え方を選ぶ
+
+KMP では、KSP Processor に見せるファイルの範囲を `processingMode` で選びます。
+
+```kotlin title="bridge-app/build.gradle.kts"
+    kspBridge {
+        // KMP で KSP Processor に見せるファイルの範囲。既定は Compatible（KSP2 と同じ）
+        processingMode = KspProcessingMode.Compatible
+    }
+```
+
+`Compatible` では Compilation の全ソースが見えます。`SourceSet` にすると実行単位の処理対象だけになり、共通の生成が 1 回で済みます。
+
+## まとめ
+
+| 要素 | 役割 |
+|---|---|
+| `me.tbsten.analysiscodegen.ksp-bridge` | KSP Processor を動かす plugin |
+| `analysisCodeGen(...)` | KSP と Native の Processor を足す |
+| `analysisCodeGen { arg() }` | `ksp { arg() }` の移行先 |
+| `processingMode` | KMP で見せるファイルの範囲 |
+
+## 次のステップ
+
+- [Hybrid Processor](/analysis-code-gen/guides/hybrid/): KSP Processor の中で AA を使う
+- [Gradle DSL](/analysis-code-gen/guides/gradle-dsl/): 実行単位ごとの Processor の付け方

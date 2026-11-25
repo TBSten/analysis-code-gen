@@ -1,0 +1,91 @@
+---
+title: 増分処理と依存の宣言
+description: 生成物がどのファイルに依存するかを宣言し、変わったところだけを作り直す仕組みを説明します。
+fixture: fixtures/docs/guides
+---
+
+:::note[レビューで判断してほしいこと]
+- 迷ったときの既定を `Dependencies.all`（全ファイルに依存する）にした（遅いが正しい側に倒す）
+- 読んだファイルの自動追跡はしない。宣言漏れは利用者の責任で、フレームワークは検出しない
+:::
+
+増分ビルドでは、変わったファイルとそれに関係する生成物だけを作り直します。どの生成物がどのファイルから作られたかは、Processor が生成のたびに宣言します。
+
+## 1 つのファイルから作る
+
+1 つのソースから 1 つの生成物を作るなら `isolating` です。そのファイルが変わったときだけ作り直されます。
+
+```kotlin title="greeting-processor/src/main/kotlin/com/example/greeting/GreetingProcessor.kt"
+                    context.codeGenerator.generateKotlin(
+                        packageName = pkg,
+                        fileName = "${name}Greeting",
+                        dependencies = Dependencies.isolating(file),
+                        content = "package $pkg\n\nfun $name.greet(): String = \"$prefix, $name!\"\n",
+                    )
+```
+
+増分ビルドのラウンド 1 では、`newFiles` に作り直しが必要なファイルだけが入ります。
+
+## 集めて作る
+
+一覧のように多くのファイルを集める生成物は `aggregating` です。ファイルが増えた・消えたときにも作り直されます。
+
+```kotlin title="registry-processor/src/main/kotlin/com/example/registry/RouteRegistryProcessor.kt"
+        // 一覧は @Route の付いたファイルと、ファイルの増減に依存する。読んだヘッダーのファイルも宣言する
+        var dependencies = Dependencies.aggregating(files)
+        if (headerFile != null) dependencies = dependencies.withExternalInputs(headerFile)
+```
+
+集める側は `newFiles` ではなく `allFiles` を見ます。`allFiles` は増分ビルドでも処理対象の全部です。
+
+## ソース以外の入力
+
+設定ファイルなどソース以外を読んだときは、`withExternalInputs` で足します。足したファイルが変わると作り直されます。
+
+```kotlin title="registry-processor/src/main/kotlin/com/example/registry/RouteRegistryProcessor.kt"
+        RouteRegistryProcessor(environment.options["registry.header"]?.let(::File))
+```
+
+ここではオプションで受け取ったパスのファイルを読み、上の `withExternalInputs` で宣言しています。
+
+## 迷ったら all にする
+
+`dependencies` に `Dependencies.all` を渡すと、処理対象のどれかが変わるたびに作り直されます。
+
+```kotlin
+context.codeGenerator.generateKotlin(
+    packageName = pkg,
+    fileName = "Everything",
+    dependencies = Dependencies.all, // 遅いが、宣言漏れが起きない
+    content = content,
+)
+```
+
+読んだのに宣言しなかったファイルの変化は検出できません。迷ったら `all` にしてください。
+
+## 全件処理に戻るとき
+
+次のどれかが変わると、増分をやめて全件処理します。
+
+```text
+- クラスパス・コンパイラオプション
+- Processor の JAR・オプション
+- analysisCodeGen・Kotlin の版
+- 前回のビルドが途中で止まった
+```
+
+全件でも増分でも、最終的な生成物は同じになります。これは毎時のテストで検査しています。
+
+## まとめ
+
+| 宣言 | 作り直すとき |
+|---|---|
+| `isolating(files)` | 列挙したファイルが変わった・消えた |
+| `aggregating(files)` | 上に加え、処理対象のファイルが増えた・消えた |
+| `all` | 処理対象のどれかが変わった |
+| `withExternalInputs(file)` | 足したファイルが変わった |
+
+## 次のステップ
+
+- [生成と出力の管理](/analysis-code-gen/guides/code-generator/): 生成物の確定
+- [KSP Bridge](/analysis-code-gen/guides/ksp-bridge/): KSP の増分処理との対応
