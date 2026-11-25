@@ -292,7 +292,12 @@ class CliUnitTest : UnitSpec({
             r.stderr.isBlank() shouldBe true
             val root = Json.parseToJsonElement(r.stdout).jsonObject
             root.getValue("success").jsonPrimitive.boolean shouldBe true
-            val unit = root.getValue("units").jsonArray.single().jsonObject
+            val unit =
+                root
+                    .getValue("units")
+                    .jsonArray
+                    .single()
+                    .jsonObject
             unit.str("name") shouldBe "main"
             unit.getValue("success").jsonPrimitive.boolean shouldBe true
             unit.getValue("generatedFiles").jsonArray.shouldNotBeEmpty()
@@ -364,7 +369,12 @@ class CliUnitTest : UnitSpec({
                     .map { it.jsonObject }
                     .single { it.str("severity") == "error" }
             diagnostic.str("file") shouldMatch Regex(""".*Broken\.kt$""")
-            (diagnostic.getValue("line").jsonPrimitive.content.toInt() > 0) shouldBe true
+            (
+                diagnostic
+                    .getValue("line")
+                    .jsonPrimitive.content
+                    .toInt() > 0
+            ) shouldBe true
             diagnostic.str("processor").isNotBlank() shouldBe true
         }
     }

@@ -14,7 +14,11 @@ import java.util.jar.JarOutputStream
 // テストの classpath に載っていないクラスにすることで、エンジンが Processor ごとに作る ClassLoader から読まれるようにする
 
 /** Kotlin の標準ライブラリの JAR。[inherit] を切ったコンパイルに渡す。 */
-internal val kotlinStdlib: File get() = File(KotlinVersion::class.java.protectionDomain.codeSource.location.toURI())
+internal val kotlinStdlib: File get() =
+    File(
+        KotlinVersion::class.java.protectionDomain.codeSource.location
+            .toURI(),
+    )
 
 /**
  * [sources]（パス → 中身）をコンパイルし、クラスの出力ディレクトリを返す。Processor は動かさない（KSP2 の経路でコンパイルだけ）。

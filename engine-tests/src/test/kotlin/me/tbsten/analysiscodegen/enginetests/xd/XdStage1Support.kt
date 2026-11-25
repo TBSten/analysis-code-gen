@@ -62,8 +62,13 @@ internal fun CodegenTestResult.publicAbi(): List<String> {
     return classesDir
         .walkTopDown()
         .filter { it.isFile && it.extension == "class" }
-        .map { it.relativeTo(classesDir).invariantSeparatorsPath.removeSuffix(".class").replace('/', '.') }
-        .map(::loadClass)
+        .map {
+            it
+                .relativeTo(classesDir)
+                .invariantSeparatorsPath
+                .removeSuffix(".class")
+                .replace('/', '.')
+        }.map(::loadClass)
         .filter { visible(it.modifiers) && !it.isSynthetic }
         .flatMap { c ->
             val header = "${Modifier.toString(c.modifiers)} ${c.name} : ${c.genericSuperclass} ${c.genericInterfaces.toList()}"

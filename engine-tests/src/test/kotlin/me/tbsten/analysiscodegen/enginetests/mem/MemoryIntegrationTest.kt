@@ -56,7 +56,11 @@ private fun singleFileModel(): ProjectModel {
     val root = Files.createTempDirectory("acg-mem").toFile()
     val src = root.resolve("src/main/kotlin").apply { mkdirs() }
     src.resolve("A.kt").writeText("package a\n\nclass A {\n    fun f(): Int = 1\n}\n")
-    val stdlib = File(KotlinVersion::class.java.protectionDomain.codeSource.location.toURI())
+    val stdlib =
+        File(
+            KotlinVersion::class.java.protectionDomain.codeSource.location
+                .toURI(),
+        )
     return ProjectModel(
         schemaVersion = 1,
         rootDir = root.absolutePath,

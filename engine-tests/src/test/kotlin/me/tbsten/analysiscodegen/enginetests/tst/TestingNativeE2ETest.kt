@@ -74,7 +74,11 @@ class TestingNativeE2ETest : E2ESpec({
                 native(
                     processorProvider { context ->
                         if (context.round == 1) {
-                            val klass = context.allFiles.flatMap { it.declarations }.filterIsInstance<KtClass>().single()
+                            val klass =
+                                context.allFiles
+                                    .flatMap { it.declarations }
+                                    .filterIsInstance<KtClass>()
+                                    .single()
                             context.logger.error("Broken は使えない", klass)
                         }
                     },
