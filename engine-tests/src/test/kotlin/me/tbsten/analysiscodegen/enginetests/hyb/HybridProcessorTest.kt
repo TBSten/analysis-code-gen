@@ -56,7 +56,7 @@ class HybridInspectProvider : SymbolProcessorProvider {
                                     fn.bodyExpression!!.collectDescendantsOfType<KtCallExpression>().mapNotNull { call ->
                                         call.calleeExpression?.text
                                     }
-                                HybridRecord.lines += "fn=${symbol.callableId?.callableName} callees=$callees"
+                                HybridRecord.lines += "fn=${fn.name} callees=$callees"
                                 HybridRecord.leaked = symbol
                             }
                             // HYB-02: KSType → KaType
