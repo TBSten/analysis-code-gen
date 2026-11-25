@@ -1,0 +1,10 @@
+# 対応する Kotlin の唯一の一覧（ADR-008 / ADR-011）
+# 書式: <版> <役割> [pr]
+#   役割: baseline = 最低対応版（2.4.0 固定）/ stable / prerelease（最新の 1 つだけ）
+#   pr:   PR の CI でも回す版（baseline と最新 stable の 2 つ）
+# 更新: 上流リリースの確認（毎朝 09:00）で新しい版を足す。検査と CI matrix は scripts/kotlin-versions.py
+# 注意: 2026-11-26 時点の版は Metro の互換表から推定。上流確認で正しい一覧に直すこと
+2.4.0       baseline   pr
+2.4.10      stable
+2.4.20      stable     pr
+2.5.0-RC    prerelease
