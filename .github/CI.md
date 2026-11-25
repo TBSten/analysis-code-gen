@@ -13,6 +13,8 @@
 | `pbt-hourly.yml` | 毎時 | PBT × E2E（ACG-40 が追加。詳細は ADR-022） | ACG-40 の取り決め |
 | `lic-01.yml` ほか | PR・push | 出所記録・版一覧・Processor 一覧・PoC の検査（ci-ok の外。必要なら必須に足す） | PR のチェック |
 
+CI・Nightly・毎時 PBT の main での実行結果は `progress-data.yml`（ACG-30、ADR-032）が集めて `progress-data` branch に push する。ワークフローの `name:` を変えるときは `progress-data.yml` の `workflows:` も合わせる。
+
 issue は同じラベルで 1 つだけ開き、続けて落ちたらコメントを足す。回復したら自動で閉じる。毎朝 09:00 の振り返りはこの issue を見る。
 
 ## テストに渡す値
@@ -39,6 +41,6 @@ script で済む検査は `ci.yml` の `checks` job に step を足す。Gradle 
 
 Agent の環境からはリポジトリ設定を変えられないため、てべすてん が一度だけ行う。
 
-1. **ブランチ保護**: Settings → Branches（または Rules → Rulesets）で `main` に「Require status checks to pass」を付け、`ci-ok` を必須にする。「Require branches to be up to date」は任意
+1. **ブランチ保護**: Settings → Branches（または Rules → Rulesets）で `main` に「Require status checks to pass」を付け、`ci-ok` を必須にする。「Require branches to be up to date」は任意。bot が push する `progress-data` branch は保護の対象外にする（`main` だけを対象にすれば足りる）
 2. **GitHub Pages**: Settings → Pages → Build and deployment の Source を「GitHub Actions」にする。有効になるまで `docs.yml` はデプロイを飛ばして警告だけ出す
 3. **Actions の権限**: Settings → Actions → General → Workflow permissions は既定（read）のままでよい。issue を書く job は自分で `issues: write` を宣言している

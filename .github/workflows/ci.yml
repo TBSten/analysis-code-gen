@@ -55,7 +55,11 @@ jobs:
           python3 scripts/doclint/doc_lint.py --stats > "$RUNNER_TEMP/stats.md" || true
           { echo "## Doc lint"; echo; cat "$RUNNER_TEMP/stats.md"; } >> "$GITHUB_STEP_SUMMARY"
           python3 scripts/doclint/doc_lint.py --format github
-      # ここに足す: ケース ID と test-cases.csv の整合（ACG-37）
+      # quality/test-cases.csv は test-case-inventory.md から生成する。手で直した・再生成し忘れたら落とす（ADR-030）
+      - name: test-cases.csv が一覧から生成されたものか
+        run: |
+          python3 quality/scripts/gen_csv.py > /dev/null
+          git diff --exit-code -- quality/
 
   build:
     needs: plan
@@ -73,7 +77,10 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
-      # build = compile + test + ktlintCheck（acg.jvm）。テストには -Pacg.kotlin が system property で渡る
+      # ケース ID 整合チェック（:quality:checkCaseIds、ADR-030、build に含む）が origin/main の quality/case-status.csv と比べるため
+      - name: Fetch main for case status comparison
+        run: git fetch --no-tags --depth=1 origin main:refs/remotes/origin/main
+      # build = compile + test + ktlintCheck + checkCaseIds。テストには -Pacg.kotlin が system property で渡る
       - name: Build and test
         run: ./gradlew build -Pacg.kotlin=${{ matrix.kotlin }} --continue --console=plain
       - name: Upload test reports

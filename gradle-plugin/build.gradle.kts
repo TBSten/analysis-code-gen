@@ -1,5 +1,7 @@
 plugins {
     id("acg.gradle-plugin")
+    id("acg.dokka")
+    id("acg.fixture-publish")
 }
 
 dependencies {

@@ -1,0 +1,129 @@
+---
+title: クイックスタート
+description: アノテーションの付いたクラスに関数を生成する、小さな Native Processor を書いて動かします。
+fixture: fixtures/docs/quick-start
+---
+
+:::note[レビューで判断してほしいこと]
+- 最初の例を「Native Processor を書いて、同じプロジェクトで使う」にしてよいか（既存の KSP Processor を動かす例を先にする案もある）
+- 例を短くするため、アノテーションを使う側のモジュールに置いている
+:::
+
+`@Hello` を付けたクラスに `hello()` 関数を生成する Processor を作ります。ここにあるコードは、リポジトリの `fixtures/docs/quick-start` にそのまま置いてあります。
+
+## 作るもの
+
+Processor のモジュールと、それを使うアプリのモジュールの 2 つを作ります。
+
+```text
+quick-start/
+├── settings.gradle.kts
+├── hello-processor/   # Processor
+└── app/               # Processor を使うアプリ
+```
+
+`settings.gradle.kts` には、[インストール](/analysis-code-gen/start/install/)にあるリポジトリを書いておきます。
+
+## Processor を書く
+
+`AnalysisCodegenProcessor` を実装します。ファイルごとに AA の `analyze { }` に入り、`@Hello` の付いたクラスを探します。
+
+```kotlin title="hello-processor/src/main/kotlin/com/example/hello/HelloProcessor.kt"
+class HelloProcessor : AnalysisCodegenProcessor {
+    override fun process(context: AnalysisCodegenRoundContext) {
+        for (file in context.newFiles) {
+            analyze(file) {
+                file.declarations.filterIsInstance<KtClassOrObject>()
+                    .filter { it.classSymbol?.annotations?.contains(HELLO) == true }
+                    .forEach { generateHello(context, file, it.name!!) }
+            }
+        }
+    }
+}
+```
+
+`newFiles` は今回処理すべきファイルです。増分ビルドでは、変わったファイルだけが入ります。
+
+## ファイルを生成する
+
+生成には `codeGenerator` を使います。生成物がどのファイルから作られたかを `dependencies` で伝えます。
+
+```kotlin title="hello-processor/src/main/kotlin/com/example/hello/HelloProcessor.kt"
+private fun generateHello(context: AnalysisCodegenRoundContext, file: KtFile, name: String) {
+    val pkg = file.packageFqName.asString()
+    context.codeGenerator.generateKotlin(
+        packageName = pkg,
+        fileName = "${name}Hello",
+        dependencies = Dependencies.isolating(file),
+        content = "package $pkg\n\nfun $name.hello(): String = \"Hello, $name!\"\n",
+    )
+}
+```
+
+`isolating(file)` は「この生成物は `file` だけから作られる」という宣言です。`file` が変わったときだけ作り直されます。
+
+## Provider を登録する
+
+Processor は Provider から作られます。Provider は ServiceLoader で見つけるので、`META-INF/services` にクラス名を書きます。
+
+```kotlin title="hello-processor/src/main/kotlin/com/example/hello/HelloProcessorProvider.kt"
+class HelloProcessorProvider : AnalysisCodegenProcessorProvider {
+    override fun create(environment: AnalysisCodegenProcessorEnvironment): AnalysisCodegenProcessor =
+        HelloProcessor()
+}
+```
+
+```text title="hello-processor/src/main/resources/META-INF/services/me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessorProvider"
+com.example.hello.HelloProcessorProvider
+```
+
+Processor のモジュールは `processor-api` に `compileOnly` で依存します。
+
+## アプリに適用する
+
+アプリ側で Gradle plugin を適用し、`analysisCodeGen` の依存に Processor を足します。
+
+```kotlin title="app/build.gradle.kts"
+plugins {
+    kotlin("jvm") version "2.4.21"
+    id("me.tbsten.analysiscodegen") version "0.1.0"
+    application
+}
+
+dependencies {
+    analysisCodeGen(project(":hello-processor"))
+}
+```
+
+`main` の SourceSet で Processor が動き、生成物はそのままコンパイルに入ります。
+
+## 動かす
+
+アプリで `@Hello` を付けたクラスを用意し、生成された `hello()` を呼びます。
+
+```kotlin title="app/src/main/kotlin/com/example/Main.kt"
+annotation class Hello
+
+@Hello
+class Greeter
+
+fun main() {
+    println(Greeter().hello()) // Hello, Greeter!
+}
+```
+
+`./gradlew :app:run` で `Hello, Greeter!` と出ます。生成物は `app/build/generated/analysisCodeGen/main/kotlin/` にあります。
+
+## まとめ
+
+| 要素 | 役割 |
+|---|---|
+| `AnalysisCodegenProcessor` | ラウンドごとに呼ばれ、解析と生成をする |
+| `analyze(file) { }` | AA で解析する入口 |
+| `codeGenerator` / `Dependencies` | 生成と、生成物の依存の宣言 |
+| `AnalysisCodegenProcessorProvider` | Processor を作る入口。ServiceLoader で見つける |
+| `analysisCodeGen(...)` | Processor をプロジェクトに足す |
+
+## 次のステップ
+
+- [インストール](/analysis-code-gen/start/install/): KMP や既存の KSP Processor で使う

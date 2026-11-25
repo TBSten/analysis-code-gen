@@ -225,6 +225,48 @@ class CheckProvenanceTest(unittest.TestCase):
                       + f"{UP_PATH.replace('FileCache', 'Nope')},1,Google LLC,analysis-engine,as-is,P2,ported,{TARGET},\n")
         self.assertRule(self.run_check(with_upstream=True), "R5", "無い")
 
+    # --- MPL-2.0 の上流（kotlin-compile-testing、ADR-021） ---
+    def _add_mpl_upstream(self) -> str:
+        self.fx.write("porting/kct/UPSTREAM.properties", textwrap.dedent(f"""\
+            id=kct
+            repository=https://github.com/ZacSweers/kotlin-compile-testing
+            license=MPL-2.0
+            tag=0.14.0
+            commit={self.sha}
+            previous_commits=
+            notice_marker=kotlin-compile-testing
+            """))
+        self.fx.write("NOTICE", f"Kotlin Symbol Processing (KSP) 2.3.14 kotlin-compile-testing 0.14.0 {self.sha} Apache License\n")
+        target = "testing-kct/src/main/kotlin/example/SourceFile.kt"
+        up_path = "core/src/main/kotlin/com/tschuchort/compiletesting/SourceFile.kt"
+        header = ",".join(cp.PORT_MAP_COLUMNS)
+        self.fx.write("porting/kct/port-map.csv", f"{header}\n{up_path},1,,testing-kct,as-is,P1,ported,{target},\n")
+        return target
+
+    def _mpl_file(self, target: str, license_lines: str) -> None:
+        self.fx.write(target, license_lines + textwrap.dedent(f"""\
+            // Copyright kotlin-compile-testing contributors
+            // Ported-From: ZacSweers/kotlin-compile-testing@{self.sha}:core/src/main/kotlin/com/tschuchort/compiletesting/SourceFile.kt
+            // Modified-By: analysis-code-gen contributors
+            // Modifications: パッケージを移動
+            package example
+            """))
+
+    def test_mpl_upstream_accepts_mpl_header(self) -> None:
+        target = self._add_mpl_upstream()
+        self._mpl_file(target, "// This Source Code Form is subject to the terms of the Mozilla Public\n"
+                               "// License, v. 2.0. If a copy of the MPL was not distributed with this\n")
+        self.assertEqual(self.run_check(), [])
+
+    def test_mpl_upstream_rejects_apache_only_header(self) -> None:
+        target = self._add_mpl_upstream()
+        self._mpl_file(target, "// Licensed under the Apache License, Version 2.0\n")
+        self.assertRule(self.run_check(), "R2", "MPL-2.0")
+
+    def test_unrecorded_kct_copy(self) -> None:
+        self.fx.write("testing/src/main/kotlin/Copied.kt", "package com.tschuchort.compiletesting\n\nclass X\n")
+        self.assertRule(self.run_check(), "R4", "Ported-From 行が無い")
+
     # --- 実リポジトリ ---
     def test_real_repository_passes(self) -> None:
         repo_root = Path(__file__).resolve().parents[2]

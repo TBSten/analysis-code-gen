@@ -1,0 +1,20 @@
+# docs のコード例が fixtures/docs のファイルと一致しているかを検査する（ADR-031）
+name: Docs snippets
+
+on:
+  pull_request:
+    paths: ["docs/**", "fixtures/docs/**", "scripts/docsnippets/**", ".github/workflows/docs-snippets.yml"]
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 -m unittest discover -s scripts/docsnippets
+      - run: python3 scripts/docsnippets/check_snippets.py
