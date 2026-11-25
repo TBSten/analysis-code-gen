@@ -1,0 +1,17 @@
+name: kotlin-versions
+on:
+  pull_request:
+    paths: ["gradle/kotlin-versions.txt", "scripts/kotlin-versions.py", ".github/workflows/kotlin-versions.yml"]
+  push:
+    branches: [main]
+    paths: ["gradle/kotlin-versions.txt", "scripts/kotlin-versions.py", ".github/workflows/kotlin-versions.yml"]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 対応 Kotlin 一覧の検査（ADR-011）
+        run: |
+          python3 scripts/kotlin-versions.py check
+          echo "PR matrix:   $(python3 scripts/kotlin-versions.py matrix pr)"
+          echo "full matrix: $(python3 scripts/kotlin-versions.py matrix full)"
