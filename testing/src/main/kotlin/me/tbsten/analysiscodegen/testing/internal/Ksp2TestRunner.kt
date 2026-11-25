@@ -34,9 +34,14 @@ internal object Ksp2TestRunner {
                 useKsp2()
                 configureKsp {
                     symbolProcessorProviders +=
-                        spec.processors.map {
+                        spec.processors.flatMap {
                             when (it) {
-                                is TestProcessor.Ksp -> it.provider
+                                is TestProcessor.Ksp -> listOf(it.provider)
+                                is TestProcessor.Jar -> kspProvidersIn(it.file)
+                                is TestProcessor.Native ->
+                                    throw IllegalArgumentException(
+                                        "Native Processor は TestEngine.Ksp2 では動かせない（TestEngine.AnalysisCodegen を使う）",
+                                    )
                             }
                         }
                     processorOptions.putAll(spec.options)
@@ -73,4 +78,19 @@ internal object Ksp2TestRunner {
             DiagnosticSeverity.INFO -> CodegenDiagnostic.Severity.Info
             DiagnosticSeverity.LOGGING -> CodegenDiagnostic.Severity.Logging
         }
+
+    /** JAR の META-INF/services にある KSP の Provider。Native の Provider があれば KSP 側は使わない（ADR-017 と同じ規則）。 */
+    private fun kspProvidersIn(jar: File): List<com.google.devtools.ksp.processing.SymbolProcessorProvider> {
+        val loader = java.net.URLClassLoader(arrayOf(jar.toURI().toURL()), Ksp2TestRunner::class.java.classLoader)
+        val zip = java.util.zip.ZipFile(jar)
+        val hasNative =
+            zip.use {
+                it.getEntry("META-INF/services/me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessorProvider") !=
+                    null
+            }
+        if (hasNative) return emptyList()
+        return java.util.ServiceLoader
+            .load(com.google.devtools.ksp.processing.SymbolProcessorProvider::class.java, loader)
+            .toList()
+    }
 }
