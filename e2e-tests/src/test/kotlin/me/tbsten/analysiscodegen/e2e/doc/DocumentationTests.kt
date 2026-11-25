@@ -172,14 +172,29 @@ class DocumentationE2ETest : E2ESpec({
     }
 
     case("DOC-05", "移行ガイドの手順どおりに選定 Processor を移行すると、RW の E2E が通る", pending = PendingCase(Milestone.M3)) {
-        // 移行ガイドの例の出所: fixtures/docs/migrate-ksp/<processor>/{before,after}。before は KSP2、after はガイドの手順を当てたもの（Bridge）。
-        // after で、RW の B1 と同じく生成コードを使う実行時テストが before と同じ件数だけ通る
         snippetsShouldMatch()
-        val root = repoRoot.resolve("fixtures/docs/migrate-ksp")
+
+        // 1. ガイド本文の例（fixtures/docs/migration/README.md の期待どおり）: 移行前（KSP）と Bridge で同じ出力・同じ生成物
+        val (migration, runs) = buildDocsFixture("migration", ":ksp-app:run", ":app:run", ":hello-ksp-processor:test")
+        Regex("Hello, Greeter!").findAll(runs.output).count() shouldBe 2
+        val kspGenerated = migration.resolve("ksp-app/build/generated/ksp/main/kotlin")
+        val bridgeGenerated = migration.resolve("app/build/generated/analysisCodeGen/main/kotlin")
+        kspGenerated
+            .walkTopDown()
+            .filter { it.isFile }
+            .toList()
+            .shouldNotBeEmpty()
+        kspGenerated.walkTopDown().filter { it.isFile }.forEach { f ->
+            bridgeGenerated.resolve(f.relativeTo(kspGenerated).path).readText() shouldBe f.readText()
+        }
+
+        // 2. 選定 Processor: ガイドの手順を当てた出所 fixtures/docs/migration/real-world/<processor>/{before,after}。
+        //    before は KSP2、after は手順どおりに Bridge へ移したもの。after で RW の B1 と同じ実行時テストが before と同じ件数だけ通る
+        val root = repoRoot.resolve("fixtures/docs/migration/real-world")
         for (processor in listOf("cream", "moshi", "koin", "kotlin-inject", "dagger")) {
             val reports =
                 listOf("before", "after").associateWith { side ->
-                    val (dir, result) = buildDocsFixture("migrate-ksp/$processor/$side", "test")
+                    val (dir, result) = buildDocsFixture("migration/real-world/$processor/$side", "test")
                     withClue("$processor/$side") { result.output shouldContain "BUILD SUCCESSFUL" }
                     TestReport.read(dir)
                 }
