@@ -19,6 +19,7 @@ Kotlin Analysis API を直接使うコード生成基盤（KSP2 の代替を目�
 | `ksp-bridge` | 内部 | KSP API の AA 実装（KSP2 から移植） |
 | `cli` | 内部 | Gradle に依存しない実行 |
 | `benchmarks` / `e2e-tests` / `ksp-compatibility-tests` | テスト | 性能・E2E・KSP 互換 |
+| `test-processors:core` / `:ksp` / `:native` | テスト | テスト用 Processor TP-*（`test-processors/README.md`） |
 
 境界は ADR-012〜017 で確定する（設計文書 16 章の案が元）。
 
@@ -29,5 +30,5 @@ JDK 21 で `./gradlew build`。生成物は JVM 17 向け。共通設定は `bui
 ## 開発の進め方
 
 - 変更は branch → PR → CI が緑ならマージ（AI Agent が自分でマージしてよい）
-- テストを弱める変更は禁止。ルールは `CLAUDE.md` と `.claude/rules/`（ACG-27 で追加）
+- テストを弱める変更は禁止。Agent 向けのルールは `CLAUDE.md` と `.claude/rules/`、繰り返す手順は `.claude/skills/`
 - ライセンス: Apache License 2.0

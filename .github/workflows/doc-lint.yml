@@ -1,0 +1,27 @@
+# ドキュメントの構成・分量チェック（ADR-028）。基準は docs/doc-lint.toml
+name: Doc lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  doc-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Self-test of the checker
+        run: python3 scripts/doclint/test_doc_lint.py
+      - name: Doc lint
+        run: |
+          python3 scripts/doclint/doc_lint.py --stats > "$RUNNER_TEMP/stats.md" || true
+          { echo "## Doc lint"; echo; cat "$RUNNER_TEMP/stats.md"; } >> "$GITHUB_STEP_SUMMARY"
+          python3 scripts/doclint/doc_lint.py --format github

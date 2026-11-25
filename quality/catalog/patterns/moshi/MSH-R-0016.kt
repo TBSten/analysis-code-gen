@@ -1,0 +1,58 @@
+// PATTERN: MSH-R-0016
+// TITLE: cashapp/cash-app-pay-android-sdk / core / AnalyticsInitializationPayload
+// PROCESSORS: moshi
+// EXPECT: ok
+// ORIGIN: real:cashapp/cash-app-pay-android-sdk@a4979b3d3094/core/src/main/java/app/cash/paykit/core/models/analytics/payloads/AnalyticsInitializationPayload.kt
+// LICENSE: Apache-2.0
+// STATUS: candidate
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// FILE: core/main/app/cash/paykit/core/models/analytics/payloads/AnalyticsInitializationPayload.kt
+/*
+ * Copyright (C) 2023 Cash App
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package app.cash.paykit.core.models.analytics.payloads
+
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
+/**
+ * This payload corresponds to the (mobile_cap_pk_initialization)[https://es-manager.stage.sqprod.co/schema-manager/catalogs/1339] Catalog.
+ */
+@JsonClass(generateAdapter = true)
+internal class AnalyticsInitializationPayload(
+  /*
+   * Common fields.
+   */
+  @Json(name = "mobile_cap_pk_initialization_sdk_version")
+  sdkVersion: String,
+
+  @Json(name = "mobile_cap_pk_initialization_client_ua")
+  clientUserAgent: String,
+
+  @Json(name = "mobile_cap_pk_initialization_platform")
+  requestPlatform: String,
+
+  @Json(name = "mobile_cap_pk_initialization_client_id")
+  clientId: String,
+
+  @Json(name = "mobile_cap_pk_initialization_environment")
+  override val environment: String,
+
+) : AnalyticsBasePayload(sdkVersion, clientUserAgent, requestPlatform, clientId, environment) {
+
+  companion object {
+    const val CATALOG = "mobile_cap_pk_initialization"
+  }
+}
