@@ -3,7 +3,9 @@
 package me.tbsten.analysiscodegen.engine
 
 import me.tbsten.analysiscodegen.analysis.AnalysisEnvironmentFactory
-import me.tbsten.analysiscodegen.analysis.StandaloneAnalysisEnvironmentFactory
+import me.tbsten.analysiscodegen.engine.spi.EngineProcessor
+import me.tbsten.analysiscodegen.engine.spi.EngineProcessorEnvironment
+import me.tbsten.analysiscodegen.engine.spi.ProcessorComponent
 import me.tbsten.analysiscodegen.engine.spi.ProcessorFrontend
 import me.tbsten.analysiscodegen.incremental.DirtyFileCalculator
 import me.tbsten.analysiscodegen.model.ProjectModel
@@ -62,14 +64,14 @@ public class EngineComponents(
     }
 }
 
-/** Native Processor を [me.tbsten.analysiscodegen.engine.spi.EngineProcessor] として回す（ADR-017）。 */
+/** Native Processor を [EngineProcessor] として回す（ADR-017）。 */
 internal class NativeProcessorFrontend : ProcessorFrontend {
     override val id: String = "native"
 
-    override fun canHandle(component: me.tbsten.analysiscodegen.engine.spi.ProcessorComponent): Boolean = TODO()
+    override fun canHandle(component: ProcessorComponent): Boolean = TODO()
 
     override fun create(
-        component: me.tbsten.analysiscodegen.engine.spi.ProcessorComponent,
-        environment: me.tbsten.analysiscodegen.engine.spi.EngineProcessorEnvironment,
-    ): List<me.tbsten.analysiscodegen.engine.spi.EngineProcessor> = TODO()
+        component: ProcessorComponent,
+        environment: EngineProcessorEnvironment,
+    ): List<EngineProcessor> = TODO()
 }
