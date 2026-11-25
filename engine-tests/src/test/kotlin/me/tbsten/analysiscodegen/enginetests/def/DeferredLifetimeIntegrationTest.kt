@@ -240,7 +240,7 @@ class DeferredLifetimeIntegrationTest : IntegrationSpec({
                             .collectDescendantsOfType<org.jetbrains.kotlin.psi.KtProperty>()
                             .single()
                     val escaped: KaType = analyze(prop) { prop.returnType }
-                    caught = runCatching { escaped.isMarkedNullable }.exceptionOrNull()
+                    caught = runCatching { escaped.annotations.size }.exceptionOrNull()
                 },
             )
         }

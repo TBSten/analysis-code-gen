@@ -127,7 +127,7 @@ class KmpIntegrationTest : IntegrationSpec({
                         val fn = findTopLevelCallables(FqName("c"), Name.identifier("platform")).filter { it.isActual }.toList()
                         val cls = findClass(ClassId(FqName("c"), Name.identifier("Clock")))!!
                         actualFiles = (fn + cls).map { it.psi!!.containingFile.name }
-                        expectFiles = (fn + cls).flatMap { it.expectsForActual }.map { it.psi!!.containingFile.name }
+                        expectFiles = (fn + cls).flatMap { it.getExpectsForActual() }.map { it.psi!!.containingFile.name }
                     }
                 },
             )
