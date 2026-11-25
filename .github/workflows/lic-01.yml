@@ -20,17 +20,26 @@ jobs:
           python-version: "3.12"
       - name: Self-test of the checker
         run: python3 scripts/lic01/test_check_provenance.py
-      - name: Fetch pinned upstream when ported files exist
+      - name: Fetch pinned upstreams when ported files exist
         id: upstream
         run: |
-          if grep -rIl --include='*.kt' --include='*.kts' --include='*.java' 'Ported-From:' . \
-               --exclude-dir=.git --exclude-dir=porting --exclude-dir=lic01 --exclude-dir=build | grep -q .; then
-            commit=$(grep '^commit=' porting/ksp/UPSTREAM.properties | cut -d= -f2)
-            prev=$(grep '^previous_commits=' porting/ksp/UPSTREAM.properties | cut -d= -f2 | tr ',' ' ')
-            git init -q "$RUNNER_TEMP/ksp"
-            git -C "$RUNNER_TEMP/ksp" remote add origin https://github.com/google/ksp.git
-            for c in $commit $prev; do git -C "$RUNNER_TEMP/ksp" fetch -q --depth 1 --filter=blob:none origin "$c"; done
-            echo "args=--upstream-dir ksp=$RUNNER_TEMP/ksp" >> "$GITHUB_OUTPUT"
-          fi
+          # porting/<id>/UPSTREAM.properties ごとに、移植済みファイルがあればその上流の固定コミットを取る（R5）
+          args=""
+          for props in porting/*/UPSTREAM.properties; do
+            id=$(grep '^id=' "$props" | cut -d= -f2)
+            repo=$(grep '^repository=' "$props" | cut -d= -f2)
+            owner_repo=$(echo "$repo" | sed -E 's#https://github.com/##; s#/$##')
+            if grep -rIl --include='*.kt' --include='*.kts' --include='*.java' "Ported-From: ${owner_repo}@" . \
+                 --exclude-dir=.git --exclude-dir=porting --exclude-dir=lic01 --exclude-dir=build | grep -q .; then
+              commit=$(grep '^commit=' "$props" | cut -d= -f2)
+              prev=$(grep '^previous_commits=' "$props" | cut -d= -f2 | tr ',' ' ')
+              dir="$RUNNER_TEMP/upstream-$id"
+              git init -q "$dir"
+              git -C "$dir" remote add origin "$repo.git"
+              for c in $commit $prev; do git -C "$dir" fetch -q --depth 1 --filter=blob:none origin "$c"; done
+              args="$args --upstream-dir $id=$dir"
+            fi
+          done
+          echo "args=$args" >> "$GITHUB_OUTPUT"
       - name: LIC-01
         run: python3 scripts/lic01/check_provenance.py ${{ steps.upstream.outputs.args }}

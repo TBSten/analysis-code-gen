@@ -28,6 +28,7 @@ include(
     ":gradle-plugin",
     ":cli",
     ":testing",
+    ":testing-kct",
     ":benchmarks",
     ":ksp-bridge",
     ":ksp-bridge-api",

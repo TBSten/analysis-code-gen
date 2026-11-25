@@ -3,7 +3,7 @@
 
 検査すること
   R1 NOTICE がリポジトリ直下にあり、各上流の notice_marker・タグ・コミットを含む
-  R2 Ported-From 行を持つファイルが、著作権表示・ライセンス表示・Modified-By・
+  R2 Ported-From 行を持つファイルが、著作権表示・上流のライセンスの表示・Modified-By・
      Modifications を持ち、Ported-From のコミットが固定済みのものである
   R3 port-map.csv の値が正しく、status=ported の行と実ファイルの記録が一致する
   R4 KSP 由来に見えるのに Ported-From 行が無いファイル（記録漏れ）が無い
@@ -59,15 +59,22 @@ PORTED_FROM_LOOSE_RE = re.compile(r"Ported-From:")
 MODIFIED_BY_RE = re.compile(r"^\s*(?://|\*|#)\s*Modified-By:\s*\S.*$")
 MODIFICATIONS_RE = re.compile(r"^\s*(?://|\*|#)\s*Modifications:\s*(?P<body>.*)$")
 COPYRIGHT_RE = re.compile(r"Copyright\b", re.IGNORECASE)
-LICENSE_RES = (
-    re.compile(r"Licensed under the Apache License,\s*Version 2\.0"),
-    re.compile(r"governed by the Apache 2\.0 license"),
-)
+# 上流の license（UPSTREAM.properties）ごとに、移植先のヘッダに要るライセンス表示
+LICENSE_RES_BY_LICENSE = {
+    "Apache-2.0": (
+        re.compile(r"Licensed under the Apache License,\s*Version 2\.0"),
+        re.compile(r"governed by the Apache 2\.0 license"),
+    ),
+    # kotlin-compile-testing（ADR-021）。MPL-2.0 Exhibit A の定型文
+    "MPL-2.0": (re.compile(r"Mozilla Public\s*(?://\s*)?License,\s*v\.\s*2\.0"),),
+}
+LICENSE_RES = LICENSE_RES_BY_LICENSE["Apache-2.0"]
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
-# 記録漏れの手がかり: KSP の著作権表示、または KSP のパッケージ宣言
+# 記録漏れの手がかり: KSP の著作権表示、KSP・kotlin-compile-testing のパッケージ宣言
 SUSPECT_RES = (
     re.compile(r"Copyright\s+(?:\d{4}(?:-\d{4})?\s+)?Google LLC"),
     re.compile(r"^\s*package\s+com\.google\.devtools\.ksp\b", re.MULTILINE),
+    re.compile(r"^\s*package\s+com\.tschuchort\.compiletesting\b", re.MULTILINE),
 )
 
 
@@ -257,14 +264,18 @@ def check_file(root: Path, path: Path, ups: dict[str, Upstream], report: Report)
     if not refs:
         text = "\n".join(lines)
         if any(r.search(text) for r in SUSPECT_RES):
-            report.error("R4", rel, "KSP 由来に見えるが Ported-From 行が無い（出所記録の漏れ）")
+            report.error("R4", rel, "上流（KSP・kotlin-compile-testing）由来に見えるが Ported-From 行が無い（出所記録の漏れ）")
         return []
 
     header = "\n".join(lines[: first_ref_line - 1])
     if not COPYRIGHT_RE.search(header):
         report.error("R2", rel, "Ported-From より前に著作権表示（Copyright 行）が無い")
-    if not any(r.search(header) for r in LICENSE_RES):
-        report.error("R2", rel, "Ported-From より前にライセンス表示（Apache License 2.0）が無い")
+    # 上流の license に合うライセンス表示が要る（上流が分からないときは Apache-2.0 として扱う）
+    first_up = next((u for u in ups.values() if u.owner == refs[0].owner and u.repo_name == refs[0].repo), None)
+    license_id = first_up.props.get("license", "Apache-2.0") if first_up else "Apache-2.0"
+    license_res = LICENSE_RES_BY_LICENSE.get(license_id, LICENSE_RES)
+    if not any(r.search(header) for r in license_res):
+        report.error("R2", rel, f"Ported-From より前にライセンス表示（{license_id}）が無い")
     if not any(MODIFIED_BY_RE.match(l) for l in lines):
         report.error("R2", rel, "Modified-By 行が無い")
     mods = [MODIFICATIONS_RE.match(l) for l in lines]
