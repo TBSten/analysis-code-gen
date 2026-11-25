@@ -41,6 +41,7 @@ CASE_NAME = re.compile(r"\[([A-Z]+(?:-[A-Z]+)*-[A-Z0-9]+[a-z]?)\]")
 PASS_WINDOW = 3
 # 定期 PBT が「24 時間続けて成功」とみなす最低回数（1 時間ごと。取りこぼしを 4 回まで許す）
 PBT_MIN_RUNS_24H = 20
+ENABLED = ("passing", "unconfirmed", "flaky", "failing")
 # 進捗履歴に残す点の数（2 時間ごと × 約 3 日）
 HISTORY_KEEP = 36
 
@@ -165,10 +166,11 @@ def parse_time(s: str) -> dt.datetime:
 
 
 def case_states(cases: list[Case], ci_runs: list[dict]) -> dict[str, str]:
-    """ケース → passing / flaky / failing / pending / missing。
+    """ケース → passing / unconfirmed / flaky / failing / pending / missing。
 
     passing は「有効」かつ直近 PASS_WINDOW 回の main の CI すべてで pass。
-    一部だけ pass は flaky（通過に数えない）。実行記録が 1 つも無い有効ケースは failing。
+    pass と fail が混ざれば flaky。pass だけだが回数が足りない（有効にした直後で、前の実行に
+    そのケースが無い・skip）なら unconfirmed。どちらも通過に数えない。それ以外の有効ケースは failing。
     """
     recent = sorted(ci_runs, key=lambda r: r["finishedAt"])[-PASS_WINDOW:]
     out = {}
@@ -179,8 +181,10 @@ def case_states(cases: list[Case], ci_runs: list[dict]) -> dict[str, str]:
         res = [r["cases"].get(c.id) for r in recent]
         if res and all(x == "pass" for x in res):
             out[c.id] = "passing"
-        elif any(x == "pass" for x in res):
+        elif any(x == "pass" for x in res) and any(x == "fail" for x in res):
             out[c.id] = "flaky"
+        elif any(x == "pass" for x in res):
+            out[c.id] = "unconfirmed"
         else:
             out[c.id] = "failing"
     return out
@@ -203,7 +207,7 @@ def correctness(cs: list[Case], state: dict[str, str], pbt_green: bool) -> float
     ベンチマーク（種別 B）は性能の側で見るので、正しさには数えない。
     """
     cs = [c for c in cs if c.kind != "B" and c.milestone != "任意"]
-    if not any(state[c.id] in ("passing", "flaky", "failing") for c in cs):
+    if not any(state[c.id] in ENABLED for c in cs):
         return 0.0
 
     def rate(ms: str) -> float:
@@ -279,12 +283,13 @@ def build_report(
         return sorted(c.id for c in counted if state[c.id] == s)
 
     prev_cases = prev.get("cases", {})
-    prev_enabled = set(prev_cases.get("passing", []) + prev_cases.get("flaky", []) + prev_cases.get("failing", []))
+    prev_enabled = {i for k in ENABLED for i in prev_cases.get(k, [])}
     prev_passing = set(prev_cases.get("passing", []))
-    enabled_now = {c.id for c in counted if state[c.id] in ("passing", "flaky", "failing")}
+    enabled_now = {c.id for c in counted if state[c.id] in ENABLED}
     case_block = {
         "total": len(counted),
         "passing": ids("passing"),
+        "unconfirmed": ids("unconfirmed"),
         "flaky": ids("flaky"),
         "failing": ids("failing"),
         "pending": len(ids("pending")),
@@ -357,7 +362,7 @@ def cmd_report(a: argparse.Namespace) -> int:
     Path(a.out).write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     c = out["cases"]
     print(
-        f"{a.out}: 通過 {len(c['passing'])}/{c['total']}（flaky {len(c['flaky'])}・失敗 {len(c['failing'])}・"
+        f"{a.out}: 通過 {len(c['passing'])}/{c['total']}（確認中 {len(c['unconfirmed'])}・flaky {len(c['flaky'])}・失敗 {len(c['failing'])}・"
         f"保留 {c['pending']}・未作成 {c['missing']}）、CI {len(c['ciRuns'])} 回分、PBT 24h {out['pbt']['runs24h']} 回、"
         f"ベンチ {len(ratios)} 件"
     )

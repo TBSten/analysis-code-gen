@@ -61,15 +61,15 @@ class CollectTest(unittest.TestCase):
 
 class StateTest(unittest.TestCase):
     def test_pass_only_when_last_three_runs_pass(self) -> None:
-        cases = [case("A-01"), case("A-02"), case("A-03"), case("A-04", status="pending"), case("A-05", status="missing"), case("A-06")]
+        cases = [case("A-01"), case("A-02"), case("A-03"), case("A-04", status="pending"), case("A-05", status="missing"), case("A-06"), case("A-07")]
         runs = [
             run("1", {"A-01": "fail", "A-02": "pass"}, hours_ago=4),  # 4 回前は窓の外
             run("2", {"A-01": "pass", "A-02": "pass", "A-03": "fail"}, hours_ago=3),
             run("3", {"A-01": "pass", "A-02": "fail", "A-03": "fail"}, hours_ago=2),
-            run("4", {"A-01": "pass", "A-02": "pass", "A-03": "fail", "A-04": "pass"}, hours_ago=1),
+            run("4", {"A-01": "pass", "A-02": "pass", "A-03": "fail", "A-04": "pass", "A-07": "pass"}, hours_ago=1),  # A-07 は有効にした直後
         ]
         got = pr.case_states(cases, runs)
-        self.assertEqual(got, {"A-01": "passing", "A-02": "flaky", "A-03": "failing", "A-04": "pending", "A-05": "missing", "A-06": "failing"})
+        self.assertEqual(got, {"A-01": "passing", "A-02": "flaky", "A-03": "failing", "A-04": "pending", "A-05": "missing", "A-06": "failing", "A-07": "unconfirmed"})
 
     def test_no_runs_means_nothing_passes(self) -> None:
         self.assertEqual(pr.case_states([case("A-01")], []), {"A-01": "failing"})
