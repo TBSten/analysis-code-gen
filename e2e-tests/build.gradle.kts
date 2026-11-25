@@ -8,9 +8,14 @@ val acgCliRuntime: Configuration by configurations.creating
 dependencies {
     testImplementation(project(":analysis-code-gen-testing"))
     testImplementation(gradleTestKit())
-    testImplementation(project(":test-processors:ksp")) // ACG-46: TST の Processor（ADR-027）
+    testImplementation(project(":test-processors:ksp")) // ACG-46: TST の Processor（ADR-027）。ACG-45: BRG・BIN
     testImplementation(project(":pbt")) // ACG-46: PBT-03〜05（ADR-022）
     testImplementation(project(":differential")) // ACG-46: XD（ADR-023）
+    testImplementation(libs.kotlinpoet.ksp) // ACG-45: BRG-11
+    // GCC-04（U）: ProjectBuilder で plugin を適用してタスクの入力を調べる。analysis-code-gen-gradle-plugin は AA に依存しない（ADR-012）
+    testImplementation(project(":analysis-code-gen-gradle-plugin"))
+    testImplementation(gradleApi())
+    testImplementation(libs.kotlin.gradle.plugin)
     testImplementation(libs.kotlinx.serialization.json) // ACG-46: CLI のモデル JSON を書き換える
     acgCliRuntime(project(":analysis-code-gen-cli"))
 }
