@@ -33,6 +33,8 @@ ID_MAP = ROOT / "id-map.tsv"
 SHARDS = 24
 
 PROC_PREFIX = {"common": "CMN", "cream": "CRM", "moshi": "MSH", "koin": "KOI"}
+# PROCESSORS に書ける名前（"*" は背景コード）。XD-01（ACG-40）も同じ一覧で検査する
+KNOWN_PROCESSORS = {"*", "cream", "moshi", "koin", "kotlin-inject", "dagger", "room"}
 SRC_LETTER = {"test": "T", "real": "R", "own": "O"}
 KNOWN_HEADERS = {
     "PATTERN", "TITLE", "PROCESSORS", "EXPECT", "EXPECT_MESSAGE", "OPTIONS", "TAGS",
@@ -700,8 +702,7 @@ MARKERS = {
 }
 OTHER_PROCS = {
     "room": re.compile(r"^import androidx\.room\.(Entity|Dao|Database)\b", re.M),
-    "hilt": re.compile(r"^import dagger\.hilt\.", re.M),
-    "dagger": re.compile(r"^import dagger\.(Module|Component|Provides)\b", re.M),
+    "dagger": re.compile(r"^import dagger\.(hilt\.|Module\b|Component\b|Provides\b)", re.M),  # Hilt も dagger として数える
     "moshi": re.compile(r"@JsonClass\b"),
     "koin": re.compile(r"^import org\.koin\.core\.annotation\.", re.M),
 }
@@ -802,6 +803,9 @@ def build(write: bool = True):
             errors.append(f"{p.path}: ファイル名と PATTERN が違います")
         if not re.match(r"^(CMN|CRM|MSH|KOI)-[TRO]-\d{4}$", p.id):
             errors.append(f"{p.path}: ID の形が違います: {p.id}")
+        for pr in p.processors:
+            if pr not in KNOWN_PROCESSORS:
+                errors.append(f"{p.id}: 未知の Processor 名です: {pr}（{', '.join(sorted(KNOWN_PROCESSORS))}）")
         if p.expect not in ("ok", "error", "warning", "compile-error"):
             errors.append(f"{p.id}: EXPECT が不正です: {p.expect}")
         if p.status not in ("candidate", "verified", "rejected"):
