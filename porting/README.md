@@ -11,7 +11,7 @@ KSP2 などの上流から写したコードの出所・著作権表示・改変
 | `NOTICE`（リポジトリ直下） | 第三者コードの著作権表示 |
 | `scripts/lic01/check_provenance.py` | LIC-01 の検査 |
 
-いまの上流は `ksp`（google/ksp、タグ 2.3.14）だけ。KSP 公式テストや他 Processor のテスト入力を取り込むときも、同じ形で `porting/<id>/` を足す。
+いまの上流は `ksp`（google/ksp、タグ 2.3.14）と `kct`。KSP 公式テスト（testData とテスト用 Processor）は `porting/ksp/import_kspt.py` が写し、同じ `porting/ksp/port-map.csv` に行を足す（ADR-024。testData は行番号を変えないよう出所の行を末尾に足し、Processor はパッケージを上流のままにする）。
 
 ## ファイルの先頭に書くこと
 

@@ -1,19 +1,78 @@
-# 最小の CI（足場 ACG-26）。マトリクス・定期実行・docs などは ACG-28 で広げる
+# PR ごとの CI（ADR-026）。Kotlin は baseline（2.4.0）と最新 stable の 2 つ（gradle/kotlin-versions.txt の pr 印）
+# ブランチ保護の必須チェックには `CI / ci-ok` 1 つだけを指定する（.github/CI.md）
 name: CI
 
 on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 5
+    outputs:
+      kotlin: ${{ steps.matrix.outputs.kotlin }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: matrix
+        name: Kotlin の PR matrix（ADR-011）
+        run: |
+          python3 scripts/kotlin-versions.py check
+          echo "kotlin=$(python3 scripts/kotlin-versions.py matrix pr)" >> "$GITHUB_OUTPUT"
+
+  # 軽い検査（Gradle を使わない script）。チケットごとの検査はこの job に step を足す
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: CI script の自己テスト
+        run: python3 scripts/ci/test_test_guard.py
+      # 有効 → 保留の逆戻り・ケースの消失は :quality:checkCaseIds（ACG-37、build に含む）が見る
+      - name: PendingCase 以外の無効化の検出
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python3 scripts/ci/test_guard.py --base "$BASE_SHA"
+      - name: doc-lint の自己テスト（ADR-028）
+        run: python3 scripts/doclint/test_doc_lint.py
+      - name: ドキュメントの構成・分量チェック（ADR-028、基準は docs/doc-lint.toml）
+        run: |
+          python3 scripts/doclint/doc_lint.py --stats > "$RUNNER_TEMP/stats.md" || true
+          { echo "## Doc lint"; echo; cat "$RUNNER_TEMP/stats.md"; } >> "$GITHUB_STEP_SUMMARY"
+          python3 scripts/doclint/doc_lint.py --format github
+      # quality/test-cases.csv は test-case-inventory.md から生成する。手で直した・再生成し忘れたら落とす（ADR-030）
+      - name: test-cases.csv が一覧から生成されたものか
+        run: |
+          python3 quality/scripts/gen_csv.py > /dev/null
+          git diff --exit-code -- quality/
+      # 進捗レポートのコマンド（ACG-30、ADR-032）
+      - name: progress_report の自己テスト
+        run: python3 scripts/progress/test_progress_report.py
+
+  build:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        kotlin: ${{ fromJSON(needs.plan.outputs.kotlin) }}
+    name: build (Kotlin ${{ matrix.kotlin }})
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -21,20 +80,31 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
-      # ケース ID 整合チェック（:quality:checkCaseIds、ADR-030）が origin/main の quality/case-status.csv と比べるため
+      # ケース ID 整合チェック（:quality:checkCaseIds、ADR-030、build に含む）が origin/main の quality/case-status.csv と比べるため
       - name: Fetch main for case status comparison
         run: git fetch --no-tags --depth=1 origin main:refs/remotes/origin/main
-      # quality/test-cases.csv は test-case-inventory.md から生成する。手で直した・再生成し忘れたら落とす
-      - name: Check test-cases.csv is generated from the inventory
-        run: |
-          python3 quality/scripts/gen_csv.py > /dev/null
-          git diff --exit-code -- quality/
+      # build = compile + test + ktlintCheck + checkCaseIds。テストには -Pacg.kotlin が system property で渡る
       - name: Build and test
-        run: ./gradlew build --console=plain
+        run: ./gradlew build -Pacg.kotlin=${{ matrix.kotlin }} --continue --console=plain
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
+          name: test-results-pr-kotlin-${{ matrix.kotlin }}
           path: "**/build/test-results/**/*.xml"
           if-no-files-found: ignore
+          retention-days: 14
+
+  # 必須チェックはこれ 1 つ。job を足しても保護設定を変えなくてよい
+  ci-ok:
+    if: always()
+    needs: [plan, checks, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: すべての job が成功したか
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "$RESULTS"
+          echo "$RESULTS" | python3 -c 'import json,sys; r=json.load(sys.stdin); sys.exit(0 if r and all(x=="success" for x in r) else 1)'

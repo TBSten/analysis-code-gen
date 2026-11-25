@@ -55,6 +55,33 @@ export default defineConfig({
 						{ label: '対応バージョン', slug: 'guides/versions' },
 					],
 				},
+				{
+					label: 'テスト',
+					items: [
+						{ label: 'Processor をテストする', slug: 'testing' },
+						{ label: 'いろいろな状況をテストする', slug: 'testing/advanced' },
+					],
+				},
+				{
+					label: '既存の KSP Processor を移行する',
+					items: [
+						{ label: '移行の流れ', slug: 'migration' },
+						{ label: '1. KSP Bridge に載せ替える', slug: 'migration/bridge' },
+						{ label: '2. Hybrid で AA を使う', slug: 'migration/hybrid' },
+						{ label: '3. Native Processor に書き換える', slug: 'migration/native' },
+					],
+				},
+				{
+					label: '内部の仕組み',
+					collapsed: true,
+					items: [
+						{ label: 'アーキテクチャ', slug: 'internal' },
+						{ label: 'モジュールと依存の向き', slug: 'internal/modules' },
+						{ label: '解析環境と Module Graph', slug: 'internal/analysis-environment' },
+						{ label: 'ラウンドと増分処理', slug: 'internal/rounds' },
+						{ label: 'KSP Bridge の仕組み', slug: 'internal/ksp-bridge' },
+					],
+				},
 				// Dokka の HTML。docs ワークフローが ./gradlew dokkaGenerate の出力を /api/ に置く。base は Starlight が付ける
 				{ label: 'API リファレンス', link: '/api/' },
 			],
