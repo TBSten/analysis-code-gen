@@ -29,8 +29,24 @@ dependencies {
     "testImplementation"(libs.findLibrary("kotest-property").get())
 }
 
+// CI から渡す値（ADR-026）。-P で受けて、テスト JVM の system property に同じ名前で渡す
+//   acg.kotlin      テスト対象の Kotlin 版。未指定なら gradle/kotlin-versions.txt の最新 stable（ADR-011）
+//   acg.runPending  true で保留中（@PendingCase）のケースも実行し、予想外の通過を記録する（夜間）
+val kotlinVersionsFile = rootProject.layout.projectDirectory.file("gradle/kotlin-versions.txt")
+val latestStableKotlin: Provider<String> =
+    providers.fileContents(kotlinVersionsFile).asText.map { text ->
+        text.lineSequence()
+            .map { it.substringBefore('#').trim().split(Regex("\\s+")) }
+            .filter { it.size >= 2 && (it[1] == "baseline" || it[1] == "stable") }
+            .last()[0]
+    }
+val acgKotlin: Provider<String> = providers.gradleProperty("acg.kotlin").orElse(latestStableKotlin)
+val acgRunPending: Provider<String> = providers.gradleProperty("acg.runPending").orElse("false")
+
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    systemProperty("acg.kotlin", acgKotlin.get())
+    systemProperty("acg.runPending", acgRunPending.get())
     testLogging {
         events("failed")
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL

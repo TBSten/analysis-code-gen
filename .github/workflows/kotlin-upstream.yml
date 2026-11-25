@@ -1,0 +1,27 @@
+# 上流の Kotlin リリースの検知（ADR-026、VER-04）。毎日 08:00 JST、09:00 の振り返りの前に回す
+# 一覧（gradle/kotlin-versions.txt）に無い stable / 最新プレリリースがあれば issue（ラベル kotlin-upstream）で知らせる
+name: Kotlin upstream
+
+on:
+  schedule:
+    - cron: "0 23 * * *" # 08:00 JST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: diff
+        run: python3 scripts/ci/kotlin_upstream.py | tee report.md
+      - if: steps.diff.outputs.missing == 'true'
+        run: scripts/ci/report_issue.sh open kotlin-upstream "新しい Kotlin の版を対応一覧に足す" report.md
+      - if: steps.diff.outputs.missing == 'false'
+        run: scripts/ci/report_issue.sh close kotlin-upstream "一覧が最新になった"

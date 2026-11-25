@@ -1,0 +1,156 @@
+# 夜間の定期実行（ADR-026）。毎日 04:00 JST に回し、09:00 の振り返りまでに結果をそろえる
+#   - 対応する全 Kotlin（gradle/kotlin-versions.txt の全行）で build + test
+#   - macOS ランナーで最新 stable（KMP の Apple ターゲットなど）
+#   - 保留中のケースも実行し、予想外に通ったものを知らせる（-Pacg.runPending=true）
+# 失敗・検知は issue（ラベル nightly-failure / unexpected-pass）で知らせ、回復したら自動で閉じる
+name: Nightly
+
+on:
+  schedule:
+    - cron: "0 19 * * *" # 04:00 JST
+  workflow_dispatch:
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      kotlin: ${{ steps.matrix.outputs.kotlin }}
+      latest: ${{ steps.matrix.outputs.latest }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: matrix
+        run: |
+          python3 scripts/kotlin-versions.py check
+          echo "kotlin=$(python3 scripts/kotlin-versions.py matrix full)" >> "$GITHUB_OUTPUT"
+          echo "latest=$(python3 scripts/kotlin-versions.py latest-stable)" >> "$GITHUB_OUTPUT"
+
+  matrix:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        kotlin: ${{ fromJSON(needs.plan.outputs.kotlin) }}
+    name: linux (Kotlin ${{ matrix.kotlin }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build and test
+        run: ./gradlew build -Pacg.kotlin=${{ matrix.kotlin }} --continue --console=plain
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-nightly-kotlin-${{ matrix.kotlin }}
+          path: "**/build/test-results/**/*.xml"
+          if-no-files-found: ignore
+          retention-days: 30
+
+  macos:
+    needs: plan
+    runs-on: macos-latest
+    timeout-minutes: 60
+    name: macos (Kotlin ${{ needs.plan.outputs.latest }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build and test
+        run: ./gradlew build -Pacg.kotlin=${{ needs.plan.outputs.latest }} --continue --console=plain
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-nightly-macos
+          path: "**/build/test-results/**/*.xml"
+          if-no-files-found: ignore
+          retention-days: 30
+
+  # 保留中（@PendingCase）のケースも実行する。保留中のケースの失敗はビルドを落とさない（ACG-37 の拡張が扱う）。
+  # 予想外に通ったケースは各モジュールの build/acg/unexpected-pass/*.txt に「ID<TAB>テスト名」で 1 行ずつ書かれる
+  pending:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      found: ${{ steps.collect.outputs.found }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: 保留中のケースも実行
+        run: ./gradlew test -Pacg.runPending=true -Pacg.kotlin=${{ needs.plan.outputs.latest }} --continue --console=plain
+      - id: collect
+        name: 予想外の通過を集める
+        if: always()
+        run: |
+          files=$(find . -path '*/build/acg/unexpected-pass/*.txt' -not -path './.git/*' | sort)
+          if [[ -z "$files" ]]; then echo "found=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          {
+            echo "## 保留中なのに通ったケース"
+            echo
+            echo "skip を外せる可能性がある。担当スレッドで確認し、外す PR を出す（外す PR でアサーションは変えない）。"
+            echo
+            echo '| ID | テスト |'
+            echo '|---|---|'
+            cat $files | sort -u | awk -F'\t' '{ printf "| %s | %s |\n", $1, $2 }'
+          } > unexpected-pass.md
+          cat unexpected-pass.md >> "$GITHUB_STEP_SUMMARY"
+          echo "found=true" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unexpected-pass
+          path: unexpected-pass.md
+          if-no-files-found: ignore
+
+  report:
+    if: always()
+    needs: [plan, matrix, macos, pending]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: unexpected-pass
+        continue-on-error: true
+      - name: 失敗を知らせる / 回復したら閉じる
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          failed=$(echo "$RESULTS" | python3 -c 'import json,sys; print(" ".join(k for k,v in json.load(sys.stdin).items() if v["result"]!="success"))')
+          if [[ -n "$failed" ]]; then
+            printf '夜間の定期実行が失敗した（%s）。\n\n- 失敗した job: %s\n- 実行: %s\n\n最初に落ちた版・テストを担当スレッドへ回す。\n' "$(date -u +%F)" "$failed" "$RUN_URL" > body.md
+            scripts/ci/report_issue.sh open nightly-failure "夜間 CI の失敗" body.md
+          else
+            scripts/ci/report_issue.sh close nightly-failure "回復した: $RUN_URL"
+          fi
+      - name: 予想外の通過を知らせる
+        if: needs.pending.outputs.found == 'true'
+        run: |
+          printf '\n\n実行: %s\n' "$RUN_URL" >> unexpected-pass.md
+          scripts/ci/report_issue.sh open unexpected-pass "保留中なのに通ったケースがある" unexpected-pass.md
