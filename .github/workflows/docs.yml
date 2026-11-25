@@ -48,6 +48,12 @@ jobs:
         run: |
           if [[ -f package-lock.json ]]; then npm ci; else npm install; fi
           npm run build
+      - name: dev 専用のフィードバックモードが本番に混ざっていないか（ADR-043）
+        if: steps.detect.outputs.site != ''
+        working-directory: ${{ steps.detect.outputs.site }}
+        run: |
+          npm run test:feedback
+          npm run check:dist
       - if: steps.detect.outputs.dokka == 'true'
         uses: actions/setup-java@v4
         with:

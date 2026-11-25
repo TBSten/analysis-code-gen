@@ -14,3 +14,6 @@ __pycache__/
 
 # F-LARGE の生成物（fixtures/scripts/gen_large.py）
 fixtures/projects/large-*/
+
+# ローカル専用の置き場（docs サイトのフィードバックの記録など。ADR-043）
+.local/

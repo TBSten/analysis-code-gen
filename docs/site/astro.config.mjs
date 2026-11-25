@@ -5,6 +5,8 @@ import starlight from '@astrojs/starlight';
 import mermaid from 'astro-mermaid';
 import starlightLlmsTxt from 'starlight-llms-txt';
 import starlightLinksValidator from 'starlight-links-validator';
+// `astro dev` のときだけ Dev Toolbar に Feedback を出す（ADR-043）。build には何も足さない
+import feedbackMode from './src/integrations/feedback/feedback-integration.ts';
 
 const repo = 'analysis-code-gen';
 
@@ -12,6 +14,10 @@ export default defineConfig({
 	site: 'https://tbsten.github.io',
 	base: `/${repo}`,
 	integrations: [
+		feedbackMode({
+			appName: 'analysisCodeGen docs',
+			pointer: '案内: analysisCodeGen の docs サイトへのフィードバック。ページは docs/site/src/content/docs/、コード例は fixtures/docs/、決まりは docs/site/README.md と ADR-028 / ADR-031',
+		}),
 		// starlight より前に置く（```mermaid を Starlight の処理より先に置き換えるため）
 		mermaid({ theme: 'neutral', autoTheme: true }),
 		starlight({
