@@ -26,6 +26,10 @@ Kotlin Analysis API を直接使うコード生成基盤（KSP2 の代替を目�
 
 JDK 21 で `./gradlew build`。生成物は JVM 17 向け。共通設定は `build-logic/` の convention plugin（`acg.jvm` / `acg.library` / `acg.gradle-plugin`）、バージョンは `gradle/libs.versions.toml`。
 
+## CI
+
+PR ごとの CI、夜間の全 Kotlin 版マトリクス、上流 Kotlin の検知、docs のデプロイがある。中身と、ブランチ保護・Pages などの GitHub 側の設定手順は [.github/CI.md](.github/CI.md)。
+
 ## 開発の進め方
 
 - 変更は branch → PR → CI が緑ならマージ（AI Agent が自分でマージしてよい）

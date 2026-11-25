@@ -1,19 +1,66 @@
-# 最小の CI（足場 ACG-26）。マトリクス・定期実行・docs などは ACG-28 で広げる
+# PR ごとの CI（ADR-026）。Kotlin は baseline（2.4.0）と最新 stable の 2 つ（gradle/kotlin-versions.txt の pr 印）
+# ブランチ保護の必須チェックには `CI / ci-ok` 1 つだけを指定する（.github/CI.md）
 name: CI
 
 on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 5
+    outputs:
+      kotlin: ${{ steps.matrix.outputs.kotlin }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: matrix
+        name: Kotlin の PR matrix（ADR-011）
+        run: |
+          python3 scripts/kotlin-versions.py check
+          echo "kotlin=$(python3 scripts/kotlin-versions.py matrix pr)" >> "$GITHUB_OUTPUT"
+
+  # 軽い検査（Gradle を使わない script）。チケットごとの検査はこの job に step を足す
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: CI script の自己テスト
+        run: python3 scripts/ci/test_test_guard.py
+      - name: テストを弱める変更の検出（保留に戻す・無効化・ケース削除）
+        if: github.event_name == 'pull_request'
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
+          python3 scripts/ci/test_guard.py --base "$BASE_SHA" --pr-body-file "$RUNNER_TEMP/pr-body.md"
+      # ここに足す: ドキュメント分量チェック（ACG-29）、ケース ID と test-cases.csv の整合（ACG-37）
+
+  build:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        kotlin: ${{ fromJSON(needs.plan.outputs.kotlin) }}
+    name: build (Kotlin ${{ matrix.kotlin }})
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -21,12 +68,28 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
+      # build = compile + test + ktlintCheck（acg.jvm）。テストには -Pacg.kotlin が system property で渡る
       - name: Build and test
-        run: ./gradlew build --console=plain
+        run: ./gradlew build -Pacg.kotlin=${{ matrix.kotlin }} --continue --console=plain
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
+          name: test-results-pr-kotlin-${{ matrix.kotlin }}
           path: "**/build/test-results/**/*.xml"
           if-no-files-found: ignore
+          retention-days: 14
+
+  # 必須チェックはこれ 1 つ。job を足しても保護設定を変えなくてよい
+  ci-ok:
+    if: always()
+    needs: [plan, checks, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: すべての job が成功したか
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "$RESULTS"
+          echo "$RESULTS" | python3 -c 'import json,sys; r=json.load(sys.stdin); sys.exit(0 if r and all(x=="success" for x in r) else 1)'
