@@ -25,8 +25,9 @@ python3 scripts/progress/progress_report.py report \
 | 状態 | 条件 |
 |---|---|
 | passing | `case-status.csv` で enabled、かつ main の直近 3 回の CI すべてで pass |
-| flaky | 直近 3 回のうち一部だけ pass。通過に数えない |
-| failing | enabled だが上のどちらでもない（記録が無いときも） |
+| unconfirmed | fail は無いが 3 回の pass がそろっていない（有効にした直後・まだ走っていない）。通過に数えない |
+| flaky | pass と fail が混ざる。通過に数えない |
+| failing | 直近 3 回に fail があり pass が無い |
 | pending / missing | `case-status.csv` のまま |
 
 - 任意（M 列が `任意`）のケースは合格ラインの外なので数えない。ベンチマーク（種別 B）は正しさに数えない

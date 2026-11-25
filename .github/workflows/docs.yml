@@ -1,0 +1,107 @@
+# ドキュメントサイトのビルド・リンクチェック・GitHub Pages へのデプロイ（ADR-026）
+#   - サイト: docs/ 配下で "astro" に依存する package.json のあるディレクトリ（ACG-47）。無ければ飛ばす
+#   - API: build-logic などに Dokka が入っていれば ./gradlew dokkaGenerate の出力を <サイト>/api/ に置く
+#   - リンク: 生成物の内部リンクを lychee で検査（外部リンクは見ない。結果がぶれないように）
+#   - デプロイ: main への push だけ。リポジトリで Pages（Source: GitHub Actions）が有効なときだけ（.github/CI.md）
+# サイトの base は GitHub Pages のプロジェクトサイトに合わせて /<リポジトリ名>/ にすること
+name: Docs
+
+on:
+  pull_request:
+    paths: ["docs/**", "**/*.kt", "**/*.gradle.kts", "gradle/**", ".github/workflows/docs.yml"]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# main ではマージが続くと前のデプロイが取り消され続けるので、取り消すのは PR だけにする（main は順に流す）
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      site: ${{ steps.detect.outputs.site }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: detect
+        name: サイトと Dokka の有無
+        run: |
+          site=$(grep -l '"astro"' docs/package.json docs/*/package.json 2>/dev/null | head -1 | xargs -r dirname)
+          echo "site=$site" >> "$GITHUB_OUTPUT"
+          if grep -rqs --include='*.gradle.kts' --include='*.toml' -i 'dokka' build-logic gradle *.gradle.kts */build.gradle.kts; then
+            echo "dokka=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "site=${site:-なし} / dokka=$(grep -rqs --include='*.gradle.kts' --include='*.toml' -i dokka build-logic gradle && echo あり || echo なし)" >> "$GITHUB_STEP_SUMMARY"
+      - if: steps.detect.outputs.site != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: サイトをビルド
+        if: steps.detect.outputs.site != ''
+        working-directory: ${{ steps.detect.outputs.site }}
+        run: |
+          if [[ -f package-lock.json ]]; then npm ci; else npm install; fi
+          npm run build
+      - if: steps.detect.outputs.dokka == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - if: steps.detect.outputs.dokka == 'true'
+        uses: gradle/actions/setup-gradle@v4
+      - name: Dokka（API リファレンス）
+        if: steps.detect.outputs.dokka == 'true'
+        run: ./gradlew dokkaGenerate --console=plain
+      - name: 公開物をまとめる
+        if: steps.detect.outputs.site != ''
+        env:
+          SITE: ${{ steps.detect.outputs.site }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          mkdir -p _site
+          cp -R "$SITE/dist/." _site/
+          if [[ -d build/dokka/html ]]; then mkdir -p _site/api && cp -R build/dokka/html/. _site/api/; fi
+          # リンク検査用に /<リポジトリ名>/ の下へ置いた写しを作る（base が /<リポジトリ名>/ のため）
+          mkdir -p "_linkcheck/$REPO" && cp -R _site/. "_linkcheck/$REPO/"
+      - name: 内部リンクの検査
+        if: steps.detect.outputs.site != ''
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress --root-dir ${{ github.workspace }}/_linkcheck '_linkcheck/**/*.html'
+          fail: true
+      - if: steps.detect.outputs.site != ''
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build.outputs.site != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: enabled
+        name: Pages が有効か
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${{ github.repository }}/pages" --jq .build_type 2>/dev/null | grep -q workflow; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::GitHub Pages（Source: GitHub Actions）が有効でないためデプロイを飛ばした。手順は .github/CI.md"
+          fi
+      - id: deploy
+        if: steps.enabled.outputs.ok == 'true'
+        uses: actions/deploy-pages@v4
