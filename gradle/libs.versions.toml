@@ -34,7 +34,6 @@ okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
 
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 # Analysis API と IntelliJ Platform（非推移で使う。acg.analysis-api convention plugin が追加する）
 aa-api = { module = "org.jetbrains.kotlin:analysis-api-for-ide", version.ref = "analysis-api" }
