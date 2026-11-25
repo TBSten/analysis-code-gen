@@ -222,9 +222,9 @@ TST-05,E,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.tst.TestingFr
 TST-06,E,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.tst.TestingFrameworkE2ETest
 TST-07,E,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.tst.TestingFrameworkE2ETest
 TST-08,E,M3,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.tst.TestingFrameworkE2ETest
-CLI-01,D,M2,missing,,0,
-CLI-02,I,M2,missing,,0,
-CLI-03,U,M2,missing,,0,
+CLI-01,D,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.cli.CliDiffTest
+CLI-02,I,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.cli.CliIntegrationTest
+CLI-03,U,M2,pending,NotImplemented,3,me.tbsten.analysiscodegen.e2e.cli.CliUnitTest
 VER-01,E,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.ver.VersionCompatibilityE2ETest
 VER-02,I,M2,missing,,0,
 VER-03,E,M2,pending,NotImplemented,1,me.tbsten.analysiscodegen.e2e.ver.VersionCompatibilityE2ETest
