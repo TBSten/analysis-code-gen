@@ -37,4 +37,4 @@ class IncrementalAddFileTest : E2ESpec({
 | 整合だけ見る | `./gradlew :quality:checkCaseIds`（`./gradlew build` にも含まれる） |
 | 保留中のケースも実行する（夜間） | `./gradlew test -Pacg.runPending=true` → `build/acg/unexpected-pass/` に予想外に通ったもの |
 
-`checkCaseIds` が落とすもの: 一覧に無い ID・種別違い・マイルストーン違い・有効→保留や消失・`case-status.csv` の更新忘れ・生成できない spec。テストの無いケースは今はお知らせだけで、全ケースの保留テストがそろったら `acg.caseCheck.requireAllCases=true`（`gradle.properties`）にして落とす。
+`checkCaseIds` が落とすもの: 一覧に無い ID・種別違い・マイルストーン違い・有効→保留や消失・`case-status.csv` の更新忘れ・生成できない spec。テストの無いケースも落とす（`acg.caseCheck.requireAllCases=true`、`gradle.properties`。2026-11-26 から）。一覧にケースを足すときは、同じ PR で保留テストも足す。
