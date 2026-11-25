@@ -3,7 +3,8 @@
 
 frontmatter に `fixture: <リポジトリ直下からのディレクトリ>` を書いたページでは、
 `title="<フィクスチャ内の相対パス>"` を付けたコードブロックの中身が、そのファイルの一部と
-一字一句同じ（行末の空白は無視）でなければならない。title の無いコードブロック（コマンドや出力）は検査しない。
+一字一句同じ（行末の空白は無視）でなければならない。クラスの中などから切り出した例は、
+共通の字下げを取り除いて比べる（ページでは字下げを浅くして載せてよい）。title の無いコードブロック（コマンドや出力）は検査しない。
 
 フィクスチャは E2E（DOC-02・03）がビルド・実行するので、ページの例が「動くコード」から離れないようにする。
 
@@ -16,6 +17,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+import textwrap
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -70,6 +72,17 @@ def normalize(text: str) -> str:
     return "\n".join(line.rstrip() for line in text.strip("\n").splitlines())
 
 
+def contains(body: str, file_text: str) -> bool:
+    """body が file_text の連続した行と一致するか。共通の字下げの違いは無視する。"""
+    block, text = normalize(body), normalize(file_text)
+    if block in text:
+        return True
+    want = textwrap.dedent(block).splitlines()
+    lines = text.splitlines()
+    n = len(want)
+    return any(textwrap.dedent("\n".join(lines[i : i + n])).splitlines() == want for i in range(len(lines) - n + 1))
+
+
 def check(page: Path, root: Path) -> list[str]:
     text = page.read_text(encoding="utf-8")
     fixture = frontmatter(text).get("fixture")
@@ -86,7 +99,7 @@ def check(page: Path, root: Path) -> list[str]:
         target = base / block.title
         if not target.is_file():
             errors.append(f"{rel}:{block.line}: {fixture}/{block.title} がありません")
-        elif normalize(block.body) not in normalize(target.read_text(encoding="utf-8")):
+        elif not contains(block.body, target.read_text(encoding="utf-8")):
             errors.append(f"{rel}:{block.line}: コード例が {fixture}/{block.title} の中身と一致しません")
     return errors
 

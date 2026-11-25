@@ -29,6 +29,9 @@ jobs:
         run: |
           python3 quality/scripts/gen_csv.py > /dev/null
           git diff --exit-code -- quality/
+      # 進捗レポートのコマンド（ACG-30、ADR-032）
+      - name: progress_report の自己テスト
+        run: python3 scripts/progress/test_progress_report.py
       - name: Build and test
         run: ./gradlew build --console=plain
       - name: Upload test reports
