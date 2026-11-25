@@ -19,6 +19,7 @@ Agent はいつ止まってもよい前提で動く。続きは次の 4 段で�
 - **決めたら ADR**: 仕様・設計の決め打ちは 1 決定 1 ファイルの ADR に残す（[adr](.claude/rules/adr.md)）
 - **移植したら出所を書く**: KSP2 などから写したコードは、上流ヘッダ + `Ported-From` などの 3 行 + `porting/<id>/port-map.csv`（[porting](.claude/rules/porting.md)）
 - **main へは PR で**: branch → PR → CI が緑なら自分で squash マージしてよい。CI を通すためにテストを skip・削除しない（[git-and-pr](.claude/rules/git-and-pr.md)）
+- **置き場所は定義どおりに**: 新しい種類のファイル・モジュールを足す PR は、同じ PR で `architecture-test/` の katachi の定義も直す。違反を消すために定義を緩めない（[architecture](.claude/rules/architecture.md)）
 - **スコープの変更と重大な問題だけ人間に聞く**。それ以外は決め打ちして ADR
 
 ## ビルド
@@ -46,6 +47,7 @@ python3 scripts/lic01/check_provenance.py  # 移植コードの出所検査（AD
 | `porting/` | 移植元の固定と出所記録（ADR-018） |
 | `fixtures/processors/` | 移植・検証する既存 Processor の一覧（ADR-019） |
 | `fixtures/projects/`・`test-processors/` | 共通フィクスチャ F-* とテスト用 Processor TP-*（ADR-027。`fixtures/README.md`） |
+| `architecture-test/` | ファイルの置き場所の唯一の一覧（katachi の定義。ADR-041） |
 | `gradle/kotlin-versions.txt` | 対応 Kotlin の唯一の一覧（ADR-011） |
 | `quality/` | テストケース一覧・候補置き場（ACG-37 で共有フォルダから移す） |
 | 共有フォルダ `pm/` | PM 資料・ADR・P1 計画（クラウドでは `/mnt/project-files/pm/`） |

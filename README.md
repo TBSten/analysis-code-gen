@@ -23,6 +23,7 @@ Kotlin Analysis API を直接使うコード生成基盤（KSP2 の代替を目�
 | `pbt` | テスト | PBT 基盤（Arb・縮小・seed・試行数の自動調整、ADR-022） |
 | `differential` | テスト | 三者差分ハーネス（K / B / N・正規化・K 結果キャッシュ、ADR-023） |
 | `test-processors:core` / `:ksp` / `:native` | テスト | テスト用 Processor TP-*（`test-processors/README.md`） |
+| `architecture-test` | テスト | katachi によるファイルの置き場所の定義と検査（ADR-041） |
 
 境界は ADR-012〜017 で確定する（設計文書 16 章の案が元）。
 
