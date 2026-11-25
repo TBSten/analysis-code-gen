@@ -5,6 +5,7 @@ plugins {
 dependencies {
     testImplementation(project(":testing"))
     testImplementation(gradleTestKit())
+    testImplementation(project(":test-processors:ksp")) // ACG-46: TST の Processor（ADR-027）
 }
 
 tasks.withType<Test>().configureEach {
