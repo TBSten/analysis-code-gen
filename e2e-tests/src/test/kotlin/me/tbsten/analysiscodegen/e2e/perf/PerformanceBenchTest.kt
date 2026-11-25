@@ -7,7 +7,7 @@ import io.kotest.matchers.string.shouldContain
 import me.tbsten.analysiscodegen.e2e.support.SampleEngine
 import me.tbsten.analysiscodegen.e2e.support.Timing
 import me.tbsten.analysiscodegen.e2e.support.benchRunner
-import me.tbsten.analysiscodegen.e2e.support.copyFixture
+import me.tbsten.analysiscodegen.e2e.support.copyFixtureDir
 import me.tbsten.analysiscodegen.e2e.support.generateLarge
 import me.tbsten.analysiscodegen.e2e.support.measure
 import me.tbsten.analysiscodegen.e2e.support.measureFullCodegen
@@ -61,7 +61,7 @@ private fun File.someSource(): File =
 
 class PerformanceBenchTest : BenchSpec({
     case("PERF-01", "Cold start（プロセス・ClassLoader・AA 環境の初期化）が KSP2 以下", pending = PendingCase(Milestone.M2)) {
-        val dir = copyFixture("jvm")
+        val dir = copyFixtureDir("jvm")
         bridgeShouldNotBeSlowerThanKsp2("PERF-01") { engine ->
             // 毎回 daemon を止めてから流す。依存のキャッシュは残るので、差はプロセスと初期化の時間になる
             measure("F-JVM cold/$engine") {
@@ -72,7 +72,7 @@ class PerformanceBenchTest : BenchSpec({
     }
 
     case("PERF-02", "Warm start（Worker 再利用時）が KSP2 以下", pending = PendingCase(Milestone.M2)) {
-        val dir = copyFixture("jvm")
+        val dir = copyFixtureDir("jvm")
         bridgeShouldNotBeSlowerThanKsp2("PERF-02") { engine -> measureFullCodegen(dir, engine, "F-JVM warm/$engine") }
     }
 
@@ -83,7 +83,7 @@ class PerformanceBenchTest : BenchSpec({
 
     case("PERF-04", "5 ラウンドの連鎖が KSP2 以下", pending = PendingCase(Milestone.M2)) {
         // F-JVM に TP-Chain の起点（depth = 5）を 20 個足す。1 つの起点からラウンドごとに 1 段ずつ、5 ラウンド続く
-        val dir = copyFixture("jvm")
+        val dir = copyFixtureDir("jvm")
         val chains =
             (1..20).joinToString("\n") { "@me.tbsten.analysiscodegen.tp.Chain(depth = 5) class PerfChainRoot$it" }
         dir.resolve("src/main/kotlin/fixture/PerfChains.kt").apply { parentFile.mkdirs() }.writeText("package fixture\n\n$chains\n")
@@ -137,7 +137,7 @@ class PerformanceBenchTest : BenchSpec({
             measureIncremental(large, engine, "delete", apply = { target.delete() }, revert = { target.writeText(original) })
         }
         // 依存先変更: F-JVM-MULTI の :lib を変え、:app の生成を計測する
-        val multi = copyFixture("jvm-multi")
+        val multi = copyFixtureDir("jvm-multi")
         val libFile = multi.resolve("lib/src/main/kotlin").walkTopDown().first { it.isFile && it.extension == "kt" }
         val libOriginal = libFile.readText()
         bridgeShouldNotBeSlowerThanKsp2("PERF-05") { engine ->
@@ -159,7 +159,7 @@ class PerformanceBenchTest : BenchSpec({
 
     case("PERF-07", "KMP（共通 + 3 プラットフォーム）の合計時間が KSP2 以下", pending = PendingCase(Milestone.M2)) {
         // F-KMP の commonMain・jvm・js・linuxX64 の生成タスクだけを集約して計測する（Apple は mac ランナーが要るので入れない）
-        val dir = copyFixture("kmp")
+        val dir = copyFixtureDir("kmp")
         val filter =
             mapOf(
                 SampleEngine.Ksp2 to "ksp(CommonMainKotlinMetadata|KotlinJvm|KotlinJs|KotlinLinuxX64)",
@@ -175,7 +175,7 @@ class PerformanceBenchTest : BenchSpec({
     }
 
     case("PERF-08", "no-op ビルドのオーバーヘッドが KSP2 以下", pending = PendingCase(Milestone.M2)) {
-        val dir = copyFixture("jvm")
+        val dir = copyFixtureDir("jvm")
         bridgeShouldNotBeSlowerThanKsp2("PERF-08") { engine ->
             benchRunner(dir, engine, "clean", "acgCodegen").build()
             measure("F-JVM no-op/$engine") {

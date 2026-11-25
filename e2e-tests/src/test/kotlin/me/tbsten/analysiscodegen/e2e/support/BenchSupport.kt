@@ -154,7 +154,7 @@ internal fun BuildResult.heap(): Pair<Long, Long> {
 }
 
 /** F-* フィクスチャ（fixtures/projects/<name>）を一時ディレクトリに写す。 */
-internal fun copyFixture(name: String): File {
+internal fun copyFixtureDir(name: String): File {
     val source = repoRoot.resolve("fixtures/projects/$name")
     check(source.isDirectory) { "フィクスチャ $name が無い" }
     return Files.createTempDirectory("acg-fixture-$name").toFile().also { copyProject(source, it) }

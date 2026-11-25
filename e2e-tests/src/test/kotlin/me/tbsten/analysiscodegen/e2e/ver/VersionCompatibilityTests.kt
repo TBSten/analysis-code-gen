@@ -7,7 +7,7 @@ import io.kotest.matchers.maps.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import me.tbsten.analysiscodegen.e2e.support.SampleEngine
-import me.tbsten.analysiscodegen.e2e.support.copyFixture
+import me.tbsten.analysiscodegen.e2e.support.copyFixtureDir
 import me.tbsten.analysiscodegen.e2e.support.generatedFiles
 import me.tbsten.analysiscodegen.e2e.support.gradleArgs
 import me.tbsten.analysiscodegen.e2e.support.repoRoot
@@ -82,7 +82,7 @@ class VersionCompatibilityE2ETest : E2ESpec({
         "対応表に無い Kotlin / KGP の組み合わせでは、原因と対応バージョンが分かる診断が出る",
         pending = PendingCase(Milestone.M2),
     ) {
-        val dir = copyFixture("jvm")
+        val dir = copyFixtureDir("jvm")
         // 最低対応版（2.4.0）より古い Kotlin
         val old = buildFixtureWithKotlin(dir, "2.3.20").buildAndFail()
         old.shouldExplainUnsupportedKotlin("2.3.20")
@@ -96,7 +96,7 @@ class VersionCompatibilityE2ETest : E2ESpec({
         val agp = readVersionList(repoRoot.resolve("gradle/agp-versions.txt"))
         val versions = listOf("min", "latest").map { role -> agp.single { it.role == role }.version }
         for (version in versions) {
-            val dir = copyFixture("android")
+            val dir = copyFixtureDir("android")
             val result =
                 GradleRunner
                     .create()
@@ -133,7 +133,7 @@ class VersionCompatibilityE2ETest : E2ESpec({
                 .forwardOutput()
                 .build()
         publish.output shouldContain "BUILD SUCCESSFUL"
-        val dir = copyFixture("jvm")
+        val dir = copyFixtureDir("jvm")
         buildFixtureWithKotlin(dir, prerelease).buildAndFail().shouldExplainUnsupportedKotlin(prerelease)
     }
 })
@@ -183,7 +183,7 @@ class VersionOutputDiffTest : DiffSpec({
         // F-JVM の入力は 2.4.0 の言語機能だけで書いてある（ADR-027）。TP の Native 版で、版ごとの生成物を比べる
         val outputs =
             kotlinVersions.associate { v ->
-                val dir = copyFixture("jvm")
+                val dir = copyFixtureDir("jvm")
                 buildFixtureWithKotlin(dir, v.version).build()
                 v.version to generatedFiles(dir, SampleEngine.Native, "main")
             }

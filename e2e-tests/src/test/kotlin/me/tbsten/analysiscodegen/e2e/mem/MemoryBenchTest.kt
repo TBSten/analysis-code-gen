@@ -4,7 +4,7 @@ import io.kotest.assertions.withClue
 import io.kotest.matchers.longs.shouldBeLessThanOrEqual
 import me.tbsten.analysiscodegen.e2e.support.SampleEngine
 import me.tbsten.analysiscodegen.e2e.support.benchRunner
-import me.tbsten.analysiscodegen.e2e.support.copyFixture
+import me.tbsten.analysiscodegen.e2e.support.copyFixtureDir
 import me.tbsten.analysiscodegen.e2e.support.generateLarge
 import me.tbsten.analysiscodegen.e2e.support.heap
 import me.tbsten.analysiscodegen.e2e.support.stopDaemons
@@ -17,7 +17,7 @@ import me.tbsten.analysiscodegen.testfoundation.PendingCase
 
 class MemoryBenchTest : BenchSpec({
     case("MEM-02", "同じ Gradle daemon で 20 回続けてビルドしても、ヒープが増え続けない", pending = PendingCase(Milestone.M2)) {
-        val dir = copyFixture("jvm")
+        val dir = copyFixtureDir("jvm")
         stopDaemons(dir)
         // 毎回 clean して全件処理し、GC 後の使用量を記録する
         val used =
