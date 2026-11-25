@@ -23,9 +23,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: TEMP probe AA repositories (ACG-34, remove before merge)
         run: |
-          for base in https://redirector.kotlinlang.org/maven/kotlin-ide-plugin-dependencies https://packages.jetbrains.team/maven/p/kt/kotlin-ide-plugin-dependencies https://redirector.kotlinlang.org/maven/intellij-dependencies https://packages.jetbrains.team/maven/p/ij/intellij-dependencies https://cache-redirector.jetbrains.com/intellij-dependencies https://redirector.kotlinlang.org/maven/bootstrap; do
+          for base in https://redirector.kotlinlang.org/maven/kotlin-ide-plugin-dependencies https://packages.jetbrains.team/maven/p/kt/kotlin-ide-plugin-dependencies https://packages.jetbrains.team/maven/p/ij/intellij-dependencies https://redirector.kotlinlang.org/maven/bootstrap; do
             echo "=== $base"
-            curl -sL "$base/org/jetbrains/kotlin/analysis-api-for-ide/maven-metadata.xml" | grep -o "<version>[^<]*</version>" | grep -v dev | tail -25 || true
+            curl -sL "$base/org/jetbrains/kotlin/analysis-api-for-ide/maven-metadata.xml" | grep -o "<version>2\.[34][^<]*</version>" | grep -v "dev-" | sort -V | tr '\n' ' ' || true; echo
           done
       - name: Build and test
         run: ./gradlew build --console=plain
