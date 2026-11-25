@@ -258,7 +258,7 @@ PBT-05,P,M2,missing,,0,
 PBT-06,U,M1,missing,,0,
 XD-01,U,M1,missing,,0,
 XD-02,E,M1,missing,,0,
-XD-03,E,M1,missing,,0,
+XD-03,E,M1,enabled,,1,me.tbsten.analysiscodegen.differential.DifferentialRunnerTest
 XD-04,D,M2,missing,,0,
 XD-05,D,M2,missing,,0,
 XD-06,D,M2,missing,,0,
@@ -271,6 +271,6 @@ XD-12,D,M3,missing,,0,
 XD-13,D,M3,missing,,0,
 XD-14,D,M3,missing,,0,
 XD-15,D,M3,missing,,0,
-XD-16,U,M1,missing,,0,
-XD-17,U,M2,missing,,0,
+XD-16,U,M1,enabled,,1,me.tbsten.analysiscodegen.differential.NormalizationTest
+XD-17,U,M2,enabled,,1,me.tbsten.analysiscodegen.differential.KResultCacheTest
 XD-18,D,M3,missing,,0,
