@@ -1,5 +1,5 @@
 plugins {
-    id("acg.jvm")
+    id("acg.tests")
 }
 
 dependencies {
