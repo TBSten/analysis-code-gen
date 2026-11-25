@@ -1,0 +1,84 @@
+---
+title: 対応バージョン
+description: analysisCodeGen が対応する Kotlin の版と、Analysis API の版がどう決まるかを説明します。
+fixture: fixtures/docs/guides
+---
+
+:::note[レビューで判断してほしいこと]
+- analysisCodeGen の版を Kotlin の版から切り離し（`0.x.y`）、対応表で示す形でよいか
+- 試した最新より新しい Kotlin では、止めずに警告を出して動かす（ベストエフォート）
+:::
+
+analysisCodeGen は Kotlin 2.4.0 以降の stable と、最新のプレリリース 1 つに対応します。1 つの成果物で、対応するすべての版を扱います。
+
+## 利用者の Kotlin と同じ AA で動く
+
+Processor が使う Analysis API（AA）は、プロジェクトの Kotlin Gradle Plugin と同じ版です。
+
+```kotlin title="versions-app/build.gradle.kts"
+plugins {
+    // 利用者の Kotlin。analysisCodeGen は同じ版の Analysis API を読み込む
+    kotlin("jvm") version "2.4.21"
+    id("me.tbsten.analysiscodegen") version "0.1.0"
+}
+```
+
+Kotlin を上げると AA も上がるので、新しい文法もその版の AA がそのまま読みます。
+
+## 対応範囲の外のとき
+
+Kotlin の版が対応範囲の外だと、次のように扱います。
+
+```text
+e: analysisCodeGen 0.1.0 は Kotlin 2.4.0 以降に対応しています（使用中: 2.3.20）
+w: Kotlin 2.6.0 は未検証です。最も近い版向けの実装で動かします
+```
+
+| Kotlin | 扱い |
+|---|---|
+| 2.4.0 より前 | ビルドを止める |
+| 対応範囲の中 | そのまま動く |
+| 試した最新より新しい | 警告を 1 回出して動かす |
+| 同じ版の AA が無い | `analysisApiVersion` の指定を促して止める |
+
+## AA の版を指定する
+
+dev 版の Kotlin など、同じ版の AA が手に入らないときだけ、版を指定します。
+
+```kotlin title="versions-app/build.gradle.kts"
+analysisCodeGen {
+    // 同じ版の Analysis API が手に入らないとき（dev 版の Kotlin など）だけ指定する
+    analysisApiVersion = "2.4.20"
+}
+```
+
+普段は指定しません。Kotlin と違う版の AA では、解析結果が Kotlin のコンパイラとずれることがあります。
+
+## Processor を作るとき
+
+Processor は `processor-api` を通して、2.4.0 の AA でコンパイルされます。実行時の版は `environment.kotlinVersion` で分かります。
+
+```kotlin title="greeting-processor/src/main/kotlin/com/example/greeting/KotlinVersionCheck.kt"
+fun supportsNewSyntax(environment: AnalysisCodegenProcessorEnvironment): Boolean {
+    val (major, minor) = environment.kotlinVersion.split(".").map { it.takeWhile(Char::isDigit).toInt() }
+    val supported = major > 2 || (major == 2 && minor >= 5)
+```
+
+2.4.0 の AA でコンパイルした Processor が対応範囲のすべての版で動くことは、互換テストで確かめます。
+
+`processor-api` と合わない Processor は、Processor 名付きのエラーで止まります。
+
+## まとめ
+
+| 要素 | 決まり |
+|---|---|
+| 対応する Kotlin | 2.4.0 以降の stable と、最新のプレリリース 1 つ |
+| 実行する AA | 利用者の Kotlin と同じ版 |
+| analysisCodeGen の版 | Kotlin とは別の `0.x.y` |
+| `analysisApiVersion` | AA の版を指定する（普段は使わない） |
+| `kotlinVersion` | Processor から実行中の版を知る |
+
+## 次のステップ
+
+- [インストール](/analysis-code-gen/start/install/): plugin とリポジトリの設定
+- [Gradle DSL](/analysis-code-gen/guides/gradle-dsl/): ほかの設定
