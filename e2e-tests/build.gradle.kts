@@ -5,6 +5,8 @@ plugins {
 dependencies {
     testImplementation(project(":testing"))
     testImplementation(gradleTestKit())
+    testImplementation(project(":test-processors:ksp"))
+    testImplementation(libs.kotlinpoet.ksp)
 }
 
 tasks.withType<Test>().configureEach {
