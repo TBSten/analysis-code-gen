@@ -34,4 +34,5 @@ include(
     ":ksp-bridge-gradle-plugin",
     ":ksp-compatibility-tests",
     ":e2e-tests",
+    ":pbt",
 )
