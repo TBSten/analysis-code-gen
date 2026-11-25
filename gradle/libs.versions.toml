@@ -4,6 +4,8 @@ kotlin = "2.4.21"
 ksp = "2.3.14"
 kotest = "6.2.7"
 ktlint-gradle = "14.2.0"
+okio = "3.18.2"
+classgraph = "4.8.200"
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -12,6 +14,14 @@ kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref 
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+# kct fork（testing-kct、ADR-021）が使うもの。Kotlin コンパイラの版は -Pacg.kotlin で差し替える（testing-kct/build.gradle.kts）
+ksp-impl = { module = "com.google.devtools.ksp:symbol-processing", version.ref = "ksp" }
+ksp-aa-embeddable = { module = "com.google.devtools.ksp:symbol-processing-aa-embeddable", version.ref = "ksp" }
+ksp-common-deps = { module = "com.google.devtools.ksp:symbol-processing-common-deps", version.ref = "ksp" }
+kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
+kotlin-annotation-processing-embeddable = { module = "org.jetbrains.kotlin:kotlin-annotation-processing-embeddable", version.ref = "kotlin" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
