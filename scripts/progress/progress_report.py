@@ -169,8 +169,8 @@ def case_states(cases: list[Case], ci_runs: list[dict]) -> dict[str, str]:
     """ケース → passing / unconfirmed / flaky / failing / pending / missing。
 
     passing は「有効」かつ直近 PASS_WINDOW 回の main の CI すべてで pass。
-    pass と fail が混ざれば flaky。pass だけだが回数が足りない（有効にした直後で、前の実行に
-    そのケースが無い・skip）なら unconfirmed。どちらも通過に数えない。それ以外の有効ケースは failing。
+    pass と fail が混ざれば flaky、fail だけなら failing。fail が無いのに 3 回そろわない（有効にした
+    直後で、まだ CI で走っていない・前の実行にそのケースが無い）なら unconfirmed。passing 以外は通過に数えない。
     """
     recent = sorted(ci_runs, key=lambda r: r["finishedAt"])[-PASS_WINDOW:]
     out = {}
@@ -181,12 +181,10 @@ def case_states(cases: list[Case], ci_runs: list[dict]) -> dict[str, str]:
         res = [r["cases"].get(c.id) for r in recent]
         if res and all(x == "pass" for x in res):
             out[c.id] = "passing"
-        elif any(x == "pass" for x in res) and any(x == "fail" for x in res):
-            out[c.id] = "flaky"
-        elif any(x == "pass" for x in res):
-            out[c.id] = "unconfirmed"
+        elif any(x == "fail" for x in res):
+            out[c.id] = "flaky" if any(x == "pass" for x in res) else "failing"
         else:
-            out[c.id] = "failing"
+            out[c.id] = "unconfirmed"
     return out
 
 

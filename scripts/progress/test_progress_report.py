@@ -69,10 +69,10 @@ class StateTest(unittest.TestCase):
             run("4", {"A-01": "pass", "A-02": "pass", "A-03": "fail", "A-04": "pass", "A-07": "pass"}, hours_ago=1),  # A-07 は有効にした直後
         ]
         got = pr.case_states(cases, runs)
-        self.assertEqual(got, {"A-01": "passing", "A-02": "flaky", "A-03": "failing", "A-04": "pending", "A-05": "missing", "A-06": "failing", "A-07": "unconfirmed"})
+        self.assertEqual(got, {"A-01": "passing", "A-02": "flaky", "A-03": "failing", "A-04": "pending", "A-05": "missing", "A-06": "unconfirmed", "A-07": "unconfirmed"})
 
     def test_no_runs_means_nothing_passes(self) -> None:
-        self.assertEqual(pr.case_states([case("A-01")], []), {"A-01": "failing"})
+        self.assertEqual(pr.case_states([case("A-01")], []), {"A-01": "unconfirmed"})
 
 
 class CorrectnessTest(unittest.TestCase):
