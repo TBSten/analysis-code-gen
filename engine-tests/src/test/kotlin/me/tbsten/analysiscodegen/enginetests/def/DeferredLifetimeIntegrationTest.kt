@@ -268,7 +268,7 @@ class DeferredLifetimeIntegrationTest : IntegrationSpec({
 })
 
 /** LIF-03: 1 回目のビルドの KtFile を static に持ち、2 回目のビルドで解析しようとする。 */
-class StaleFileProvider : AnalysisCodegenProcessorProvider by processorProvider({ ctx ->
+class StaleFileProvider : AnalysisCodegenProcessorProvider by processorProvider(process = { ctx ->
     if (ctx.round != 1) return@processorProvider
     val old = held
     if (old == null) {

@@ -300,7 +300,7 @@ class NativeApiUnitTest : UnitSpec({
     }
 })
 
-private class ThrowingProvider : AnalysisCodegenProcessorProvider by processorProvider({ error("from process") })
+private class ThrowingProvider : AnalysisCodegenProcessorProvider by processorProvider(process = { error("from process") })
 
 private class AnalysisCodegenProviderThatThrows : AnalysisCodegenProcessorProvider {
     override fun create(environment: me.tbsten.analysiscodegen.processor.AnalysisCodegenProcessorEnvironment) = error("from create")

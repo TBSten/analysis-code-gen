@@ -19,12 +19,12 @@ import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 private val M1 = PendingCase(Milestone.M1)
 
 /** 毎ラウンド新しいファイルを作り続ける（TRM-01）。 */
-class InfiniteProvider : AnalysisCodegenProcessorProvider by processorProvider({ ctx ->
+class InfiniteProvider : AnalysisCodegenProcessorProvider by processorProvider(process = { ctx ->
     ctx.codeGenerator.generateKotlin("inf", "Gen${ctx.round}", Dependencies.all, "package inf\nclass Gen${ctx.round}")
 })
 
 /** 毎ラウンド同じクラスを defer し続け、毎ラウンド新しいファイルも作る（TRM-02）。 */
-class StuckDeferProvider : AnalysisCodegenProcessorProvider by processorProvider({ ctx ->
+class StuckDeferProvider : AnalysisCodegenProcessorProvider by processorProvider(process = { ctx ->
     val target = ctx.allFiles.flatMap { it.collectDescendantsOfType<KtClass>() }.first { it.name == "Target" }
     analyze(target) {
         @Suppress("UNCHECKED_CAST")
