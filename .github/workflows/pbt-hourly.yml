@@ -5,8 +5,9 @@
 name: PBT hourly
 
 on:
+  # schedule は default branch（main）のファイルだけが効く。動かないときは .github/CI.md「schedule が動かないとき」
   schedule:
-    - cron: "17 * * * *"
+    - cron: "17 * * * *" # 毎時 17 分（:00 の混雑を避ける）
   workflow_dispatch:
     inputs:
       budget:

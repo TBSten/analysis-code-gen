@@ -44,3 +44,10 @@ Agent の環境からはリポジトリ設定を変えられないため、て�
 1. **ブランチ保護**: Settings → Branches（または Rules → Rulesets）で `main` に「Require status checks to pass」を付け、`ci-ok` を必須にする。「Require branches to be up to date」は任意。bot が push する `progress-data` branch は保護の対象外にする（`main` だけを対象にすれば足りる）
 2. **GitHub Pages**: Settings → Pages → Build and deployment の Source を「GitHub Actions」にする。有効になるまで `docs.yml` はデプロイを飛ばして警告だけ出す
 3. **Actions の権限**: Settings → Actions → General → Workflow permissions は既定（read）のままでよい。issue を書く job は自分で `issues: write` を宣言している
+
+## schedule が動かないとき（ACG-53）
+
+1. `gh api 'repos/tbsten/analysis-code-gen/actions/runs?event=schedule' --jq .total_count` で schedule の run を数える
+2. 0 件なら、まず `workflow_dispatch` で手動起動して中身が動くか確かめる
+3. 中身が動くのに schedule だけ起きないときは、GitHub 側の schedule 登録の問題。Actions 画面で対象のワークフローを Disable → Enable するか、cron のあるファイルを触る PR を main に入れて登録し直す
+4. それでも起きないときは てべすてん に Settings → Actions → General の確認を頼む

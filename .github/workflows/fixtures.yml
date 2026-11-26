@@ -16,6 +16,7 @@ on:
     branches: [main]
     paths: *paths
   schedule:
+    # schedule は default branch（main）のファイルだけが効く。動かないときは .github/CI.md「schedule が動かないとき」
     # 毎週月曜 04:00 JST（日曜 19:00 UTC）に F-LARGE の大きい版も回す
     - cron: "0 19 * * 0"
   workflow_dispatch:
