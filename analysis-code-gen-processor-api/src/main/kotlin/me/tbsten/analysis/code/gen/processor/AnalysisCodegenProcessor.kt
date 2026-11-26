@@ -8,6 +8,31 @@ package me.tbsten.analysis.code.gen.processor
  */
 public fun interface AnalysisCodegenProcessorProvider {
     public fun create(environment: AnalysisCodegenProcessorEnvironment): AnalysisCodegenProcessor
+
+    /**
+     * オプション [key] の値が前回から変わったとき、どこまで作り直すかを宣言する（ADR-051）。
+     *
+     * 宣言しないキーは [OptionImpact.Full]（全件処理）。変わったキーのうち 1 つでも `Full` なら全件、
+     * `Incremental` だけなら増分のまま、`None` だけなら変化を無視する。キーごとに判定する。
+     */
+    public fun optionImpact(key: String): OptionImpact = OptionImpact.Full
+}
+
+/**
+ * オプションが変わったときの影響の大きさ（ADR-051）。[AnalysisCodegenProcessorProvider.optionImpact] が返す。
+ */
+public enum class OptionImpact {
+    /** 全件処理に戻す（既定）。 */
+    Full,
+
+    /**
+     * 増分のまま。全ファイルを dirty にしない。そのオプションを読む生成物の作り直しは、
+     * Processor が [Dependencies] で表す。
+     */
+    Incremental,
+
+    /** 影響なし。変わっても無視する。 */
+    None,
 }
 
 /**

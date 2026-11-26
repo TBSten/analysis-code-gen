@@ -212,7 +212,7 @@ class IncrementalE2ETest : E2ESpec({
         lastRound1Files(probe) shouldContainExactlyInAnyOrder setOf("A.kt", "B.kt")
     }
 
-    case("INC-09", "Processor の JAR・バージョン・オプションが変わると全件処理になる", pending = PendingCase(Milestone.M2)) {
+    case("INC-09", "Processor の JAR・バージョン、または `Full` と宣言された（宣言の無い）オプションが変わると全件処理になる", pending = PendingCase(Milestone.M2)) {
         val probe = probeFile()
         val fixture =
             acg45Project(processors = "Mapper,Probe", probeOut = probe, dsl = "arg(\"inc09.flag\", \"1\")") {

@@ -12,7 +12,7 @@ import java.io.File
 public data class InputSnapshot(
     /** ソースの相対パス → 内容のハッシュ。 */
     val sources: Map<String, String>,
-    /** これが変わったら全件処理: クラスパス、コンパイラオプション、Processor の JAR とオプション、各バージョン。 */
+    /** これが変わったら全件処理: クラスパス、コンパイラオプション、Processor の JAR、`Full` 宣言のオプション（ADR-051、[OptionChangeJudge]）、各バージョン。 */
     val globalFingerprint: String,
     val externalInputs: Map<String, String>,
 )

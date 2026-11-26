@@ -6,6 +6,7 @@ import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorEnvironment
 import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorProvider
 import me.tbsten.analysis.code.gen.processor.AnalysisCodegenRoundContext
 import me.tbsten.analysis.code.gen.processor.Dependencies
+import me.tbsten.analysis.code.gen.processor.OptionImpact
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -17,6 +18,10 @@ private val ROUTE = ClassId.topLevel(FqName("com.example.Route"))
 class RouteRegistryProcessorProvider : AnalysisCodegenProcessorProvider {
     override fun create(environment: AnalysisCodegenProcessorEnvironment): AnalysisCodegenProcessor =
         RouteRegistryProcessor(environment.options["registry.header"]?.let(::File))
+
+    // 出力に関わらないオプションは None。宣言しないオプションが変わると全件処理になる
+    override fun optionImpact(key: String): OptionImpact =
+        if (key == "registry.logLevel") OptionImpact.None else OptionImpact.Full
 }
 
 /** `@Route` の付いたクラスを集めて、1 つの一覧を生成する。 */
