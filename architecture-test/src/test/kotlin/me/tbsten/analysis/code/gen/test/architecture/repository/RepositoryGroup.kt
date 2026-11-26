@@ -21,27 +21,36 @@ fun DeclarationContainerScope.repositoryGroup() = "Repository".group {
             summary = "場面ごとの詳しいルール（.claude/rules/<kebab>.md）"
             layout { ".claude/rules" / "*.md".file() }
         }
-        "AgentSkill".role {
-            summary = "繰り返す手順（.claude/skills/<kebab>/SKILL.md）"
-            layout { ".claude/skills/*" / "SKILL.md".file() }
-        }
-        "VendoredAgentSkill".role {
-            summary = "gh skill install で入れた外部の skill の手順書と雛形（katachi）。手で直さず gh skill update で上げる"
-            layout {
-                ".claude/skills/katachi" {
-                    "references" / "**" / "*.md".file()
-                    "assets/*" / "check-list.html".file()
-                }
+        "Skill".group {
+            summary = "繰り返す手順（skill）。自前のものと、gh skill install で入れた外部のもの"
+
+            "AgentSkill".role {
+                summary = "繰り返す手順（.claude/skills/<kebab>/SKILL.md）"
+                layout { ".claude/skills/*" / "SKILL.md".file() }
+            }
+            "VendoredSkillReference".role {
+                summary = "gh skill install で入れた外部の skill（katachi）の手順書。手で直さず gh skill update で上げる"
+                layout { ".claude/skills/katachi/references" / "**" / "*.md".file() }
+            }
+            "VendoredSkillAsset".role {
+                summary = "外部の skill（katachi）が導入のときに写す、チェックリストの雛形"
+                layout { ".claude/skills/katachi/assets/*" / "check-list.html".file() }
             }
         }
-        "AgentSetting".role {
-            summary = "Claude Code の設定と SessionStart hook（Maven Central のミラー設定など）"
-            layout {
-                ".claude" / "settings.json".file()
-                ".claude/hooks" {
-                    "*.sh".file()
-                    "*.init.gradle".file()
-                }
+        "Setting".group {
+            summary = "Claude Code の設定と hook"
+
+            "AgentSetting".role {
+                summary = "Claude Code の設定（hook・許可するコマンド）"
+                layout { ".claude" / "settings.json".file() }
+            }
+            "SessionStartHook".role {
+                summary = "クラウド環境の SessionStart hook（Maven Central のミラー設定と依存の取得）"
+                layout { ".claude/hooks" / "session-start.sh".file() }
+            }
+            "GradleInitScript".role {
+                summary = "SessionStart hook が Gradle に渡す init script"
+                layout { ".claude/hooks" / "*.init.gradle".file() }
             }
         }
     }
@@ -53,34 +62,47 @@ fun DeclarationContainerScope.repositoryGroup() = "Repository".group {
             summary = "GitHub Actions のワークフロー（PR・夜間・定期実行・docs のデプロイ）"
             layout { ".github/workflows" / "*.yml".file() }
         }
-        "GitHubTemplate".role {
-            summary = "Issue と PR のテンプレート"
-            layout {
-                ".github/ISSUE_TEMPLATE" / "*.yml".file()
-                ".github" / "PULL_REQUEST_TEMPLATE.md".file()
-            }
+        "IssueTemplate".role {
+            summary = "Issue のフォームと、Issue を作るときの案内"
+            layout { ".github/ISSUE_TEMPLATE" / "*.yml".file() }
         }
-        "GitHubConfig".role {
-            summary = "CI の説明・コードオーナー・Renovate の設定"
-            layout {
-                ".github" {
-                    "CI.md".file()
-                    "CODEOWNERS".file()
-                    "renovate.json5".file()
-                }
-            }
+        "PullRequestTemplate".role {
+            summary = "PR の本文の見出し"
+            layout { ".github" / "PULL_REQUEST_TEMPLATE.md".file() }
+        }
+        "CiGuide".role {
+            summary = "CI の中身と、ブランチ保護・Pages など GitHub 側の設定手順"
+            layout { ".github" / "CI.md".file() }
+        }
+        "CodeOwners".role {
+            summary = "レビューを求める人の割り当て"
+            layout { ".github" / "CODEOWNERS".file() }
+        }
+        "RenovateConfig".role {
+            summary = "依存の自動更新（Renovate）の設定"
+            layout { ".github" / "renovate.json5".file() }
         }
     }
 
-    "RepositoryScript".role {
-        summary = "CI と開発で使う Python スクリプト（scripts/<topic>/）と、その単体テスト（test_*.py）"
-        layout {
-            "scripts" {
-                "*.py".file()
-                "*" / "*.py".file()
-                "*" / "*.sh".file()
-                "*" / "README.md".file()
+    "Scripts".group {
+        summary = "CI と開発で使うスクリプト（scripts/<topic>/）"
+
+        "RepositoryScript".role {
+            summary = "CI と開発で使う Python スクリプトと、その単体テスト（test_<script>.py）"
+            layout {
+                "scripts" {
+                    "*.py".file()
+                    "*" / "*.py".file()
+                }
             }
+        }
+        "ShellScript".role {
+            summary = "CI から呼ぶシェルスクリプト"
+            layout { "scripts/*" / "*.sh".file() }
+        }
+        "ScriptReadme".role {
+            summary = "スクリプトの使い方"
+            layout { "scripts/*" / "README.md".file() }
         }
     }
 

@@ -59,10 +59,11 @@ private fun DeclarationContainerScope.foundationGroup() = "Foundation".group {
     }
     "PbtFoundation".role {
         summary = "PBT の生成器・縮小・seed・試行数の自動調整（ADR-022）。領域ごとのサブパッケージに置く"
-        layout {
-            mainKotlin("pbt", "pbt") / "{catalog,change,compile,kmp,processor,run,source}" / "*".ktFile()
-            "pbt/src/main/resources/pbt" / "options.tsv".file()
-        }
+        layout { mainKotlin("pbt", "pbt") / "{catalog,change,compile,kmp,processor,run,source}" / "*".ktFile() }
+    }
+    "PbtProcessorOptions".role {
+        summary = "PBT が組み合わせる Processor のオプションの一覧"
+        layout { "pbt/src/main/resources/pbt" / "options.tsv".file() }
     }
     "DifferentialHarness".role {
         summary = "K / B / N の三者の出力を比べる差分ハーネス（ADR-023）"
@@ -93,18 +94,25 @@ private fun DeclarationContainerScope.foundationGroup() = "Foundation".group {
             testKotlin("test-foundation", "testfoundation") / "Samples".ktFile()
         }
     }
-    "PbtTestResource".role {
-        summary = "PBT の単体テストが読むデータ（カタログの縮小版・回帰の置き場の説明）"
+    "PbtTestCatalog".group {
+        summary = "PBT の単体テストが読む、入力パターンカタログの縮小版"
         documented = false
-        layout {
-            "pbt/src/test/resources" {
-                "catalog-fixture" {
-                    "index.json".file()
-                    "patterns" / "*" / "[A-Z][A-Z][A-Z]-O-[0-9][0-9][0-9][0-9]".ktFile()
-                }
-                "pbt/regressions" / "README.txt".file()
+
+        "PbtTestCatalogIndex".role {
+            summary = "縮小版カタログの索引"
+            layout { "pbt/src/test/resources/catalog-fixture" / "index.json".file() }
+        }
+        "PbtTestCatalogPattern".role {
+            summary = "縮小版カタログの入力パターン"
+            layout {
+                "pbt/src/test/resources/catalog-fixture/patterns/*" / "[A-Z][A-Z][A-Z]-O-[0-9][0-9][0-9][0-9]".ktFile()
             }
         }
+    }
+    "PbtRegressionNote".role {
+        summary = "PBT の回帰の置き場の説明（見つかった反例はここに溜まる）"
+        documented = false
+        layout { "pbt/src/test/resources/pbt/regressions" / "README.txt".file() }
     }
 }
 
@@ -124,16 +132,17 @@ private fun DeclarationContainerScope.testProcessorGroup() = "TestProcessor".gro
     }
     "TestProcessorKsp".role {
         summary = "TP-* を KSP の SymbolProcessor として包んだもの"
-        layout {
-            mainKotlin("test-processors/ksp", "testprocessors/ksp") / "{TpKsp*,KspSupport}".ktFile()
-            "test-processors/ksp/src/main/resources/META-INF/services" /
-                "com.google.devtools.ksp.processing.SymbolProcessorProvider".file()
-        }
+        layout { mainKotlin("test-processors/ksp", "testprocessors/ksp") / "{TpKsp*,KspSupport}".ktFile() }
     }
     "TestProcessorNative".role {
         summary = "TP-* を Native Processor として包んだもの"
+        layout { mainKotlin("test-processors/native", "testprocessors/native") / "{TpNative*,NativeSupport}".ktFile() }
+    }
+    "TestProcessorServiceRegistration".role {
+        summary = "ksp 版・native 版の Processor を ServiceLoader に登録するファイル"
+        documented = false
         layout {
-            mainKotlin("test-processors/native", "testprocessors/native") / "{TpNative*,NativeSupport}".ktFile()
+            "test-processors/ksp/src/main/resources/META-INF/services" / "com.google.devtools.ksp.processing.SymbolProcessorProvider".file()
             "test-processors/native/src/main/resources/META-INF/services" /
                 "me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorProvider".file()
         }
@@ -225,14 +234,14 @@ private fun DeclarationContainerScope.kspCompatibilityGroup() = "KspCompatibilit
         portedFromHeader()
     }
     "KsptCaseList".role {
-        summary = "取り込んだ KSPT-* の一覧と、Bridge で有効にしたケースの一覧（import_kspt.py が書く）"
+        summary = "取り込んだ KSPT-* の一覧（import_kspt.py が書く）"
         documented = false
-        layout {
-            "ksp-compatibility-tests/src/test/resources/kspt" {
-                "cases.csv".file()
-                "bridge-enabled.txt".file()
-            }
-        }
+        layout { "ksp-compatibility-tests/src/test/resources/kspt" / "cases.csv".file() }
+    }
+    "KsptBridgeEnabledList".role {
+        summary = "Bridge で有効にした KSPT-* の一覧（Bridge の実装が進むと増える）"
+        documented = false
+        layout { "ksp-compatibility-tests/src/test/resources/kspt" / "bridge-enabled.txt".file() }
     }
 }
 

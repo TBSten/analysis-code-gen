@@ -62,14 +62,22 @@ fun DeclarationContainerScope.qualityGroup() = "Quality".group {
             layout { "quality/catalog" / "dimensions.toml".file() }
         }
         "CatalogIndex".role {
-            summary = "catalog.py が生成する索引・網羅表・ID の対応表・第三者の一覧と、カタログの説明"
+            summary = "catalog.py が生成する索引（PBT が読む）"
+            documented = false
+            layout { "quality/catalog" / "index.json".file() }
+        }
+        "CatalogIdMap".role {
+            summary = "catalog.py が生成する、取り込み元とパターン ID の対応表"
+            documented = false
+            layout { "quality/catalog" / "id-map.tsv".file() }
+        }
+        "CatalogReport".role {
+            summary = "カタログの説明と、catalog.py が生成する網羅表・第三者の一覧"
             documented = false
             layout {
                 "quality/catalog" {
                     "README.md".file()
-                    "index.json".file()
                     "coverage.md".file()
-                    "id-map.tsv".file()
                     "THIRD_PARTY.md".file()
                 }
             }

@@ -16,21 +16,25 @@ const val KOTLIN_COMPILER = "org.jetbrains.kotlin.**"
 const val INTELLIJ = "com.intellij.**"
 
 /**
- * 上流から写したファイルは、上流のヘッダの直後に `// Ported-From:` を持つ（ADR-018、`.claude/rules/porting.md`）。
+ * 上流から写したファイルは、上流のヘッダの直後に出所の 3 行（先頭は [PORTED_FROM_MARKER]）を持つ（ADR-018、`.claude/rules/porting.md`）。
  * 中身の正しさ（SHA・port-map.csv との一致）は scripts/lic01/check_provenance.py が見る。ここでは Role に置いた時点で出所があることを守る。
  * 上流の testData はヘッダの後ろに複数ファイルの区切りが続くので、行の位置は決めずにファイル全体から探す
  */
-fun FileConstraintScope.portedFromHeader() = fileConstraint("上流から写したファイルは // Ported-From: で出所を書く") { subject ->
+fun FileConstraintScope.portedFromHeader() = fileConstraint("上流から写したファイルは出所の 3 行を書く") { subject ->
     subject.files.mapNotNull { file ->
-        val hasHeader = File(subject.projectRoot, file).useLines { lines -> lines.any { it.startsWith("// Ported-From: ") } }
+        val hasHeader = File(subject.projectRoot, file).useLines { lines -> lines.any { it.startsWith(PORTED_FROM_MARKER) } }
         if (hasHeader) return@mapNotNull null
         FileConstraintFailure(
             file = file,
-            reasons = listOf(FileConstraintReason("Missing", "// Ported-From: <owner>/<repo>@<40 桁 SHA>:<上流パス>")),
+            reasons = listOf(FileConstraintReason("Missing", "$PORTED_FROM_MARKER<owner>/<repo>@<40 桁 SHA>:<上流パス>")),
             howToFix = listOf(FileConstraintFix("skill port-from-ksp2 の手順で、上流のヘッダの直後に出所の 3 行を足す")),
         )
     }
 }
+
+// 出所の行の先頭。check_provenance.py（LIC-01）はこの文字列をそのまま含む行を出所の行として書式を検査するため、
+// このファイル自身が誤検知されないよう分けて組み立てる
+private val PORTED_FROM_MARKER = listOf("// Ported", "From: ").joinToString("-")
 
 /**
  * 各モジュールの build.gradle.kts は convention plugin（`id("acg.*")`）を使い、共通設定を個別に書かない（`.claude/rules/kotlin-code.md`）。

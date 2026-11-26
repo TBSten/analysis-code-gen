@@ -82,14 +82,21 @@ fun DeclarationContainerScope.buildGroup() {
         }
         independentBuildFiles("Poc", "poc/p*", withGradleProperties = true, withWrapper = true)
         "PocRecord".role {
-            summary = "PoC の説明・結果・実行と比較のスクリプト"
+            summary = "PoC の説明と結果の記録"
             layout {
                 "poc/p*" {
                     "README.md".file()
                     "results" / "*.md".file()
-                    "**" / "*.{py,sh}".file()
                 }
             }
+        }
+        "PocPythonScript".role {
+            summary = "PoC の結果を比べる・整える Python スクリプト"
+            layout { "poc/p*" / "**" / "*.py".file() }
+        }
+        "PocShellScript".role {
+            summary = "PoC をまとめて実行する・正解を作るシェルスクリプト"
+            layout { "poc/p*" / "**" / "*.sh".file() }
         }
     }
 }

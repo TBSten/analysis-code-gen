@@ -40,16 +40,26 @@ fun DeclarationContainerScope.independentBuildFiles(
         }
     }
     if (withWrapper) {
-        "${prefix}GradleWrapper".role {
-            summary = "独立したビルドの Gradle wrapper"
+        // katachi の gradle() と同じく、起動スクリプト・本体・設定の 3 つに分ける
+        "${prefix}GradleWrapperLauncher".role {
+            summary = "独立したビルドの wrapper を起動するスクリプト（Unix と Windows）"
             documented = false
             layout {
                 roots / "**" {
                     "gradlew".file()
                     "gradlew.bat".file()
-                    "gradle/wrapper" / "gradle-wrapper.{jar,properties}".file()
                 }
             }
+        }
+        "${prefix}GradleWrapperJar".role {
+            summary = "独立したビルドの wrapper の本体"
+            documented = false
+            layout { roots / "**/gradle/wrapper" / "gradle-wrapper.jar".file() }
+        }
+        "${prefix}GradleWrapperProperties".role {
+            summary = "独立したビルドの wrapper が動かす Gradle の版"
+            documented = false
+            layout { roots / "**/gradle/wrapper" / "gradle-wrapper.properties".file() }
         }
     }
 }

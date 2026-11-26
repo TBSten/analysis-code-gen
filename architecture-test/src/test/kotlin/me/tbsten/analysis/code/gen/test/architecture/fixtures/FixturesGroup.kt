@@ -18,13 +18,12 @@ fun DeclarationContainerScope.fixturesGroup() = "Fixtures".group {
         summary = "共通フィクスチャ F-*。E2E・差分テストが Gradle TestKit で動かす独立したビルド"
 
         "CommonFixtureSource".role {
-            summary = "フィクスチャのソース（Kotlin・Java。TP のアノテーションの写しを含む）"
-            layout {
-                COMMON_FIXTURES / "**/src/*" {
-                    "kotlin" / "**" / "*".ktFile()
-                    "java" / "**" / "*.java".file()
-                }
-            }
+            summary = "フィクスチャの Kotlin のソース（TP のアノテーションの写しを含む）"
+            layout { COMMON_FIXTURES / "**/src/*/kotlin" / "**" / "*".ktFile() }
+        }
+        "CommonFixtureJavaSource".role {
+            summary = "Java と混在するプロジェクトを再現するための Java のソース"
+            layout { COMMON_FIXTURES / "**/src/*/java" / "**" / "*.java".file() }
         }
         "AndroidManifest".role {
             summary = "Android フィクスチャのマニフェスト"
@@ -70,23 +69,22 @@ fun DeclarationContainerScope.fixturesGroup() = "Fixtures".group {
         independentBuildFiles("DocFixture", DOC_FIXTURES)
     }
 
-    "FixtureCatalog".role {
-        summary = "フィクスチャと検証対象 Processor の一覧（ADR-019）"
-        layout {
-            "fixtures" {
-                "README.md".file()
-                "processors" / "processors.toml".file()
-            }
-        }
+    "FixturesReadme".role {
+        summary = "フィクスチャの一覧と使い方"
+        layout { "fixtures" / "README.md".file() }
+    }
+    "TargetProcessorList".role {
+        summary = "移植・検証する既存 Processor の一覧（ADR-019）"
+        layout { "fixtures/processors" / "processors.toml".file() }
     }
     "LargeFixtureGenerator".role {
-        summary = "F-LARGE を生成するスクリプトとその入力（生成物は .gitignore で除外）"
+        summary = "F-LARGE を生成するスクリプト（生成物は .gitignore で除外）"
         documented = false
-        layout {
-            "fixtures" {
-                "scripts" / "gen_large.py".file()
-                "large" / "deps-*.txt".file()
-            }
-        }
+        layout { "fixtures/scripts" / "gen_large.py".file() }
+    }
+    "LargeFixtureInput".role {
+        summary = "F-LARGE の生成が読む依存の一覧"
+        documented = false
+        layout { "fixtures/large" / "deps-*.txt".file() }
     }
 }
