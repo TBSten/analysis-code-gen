@@ -14,6 +14,8 @@ import kotlin.time.Duration.Companion.nanoseconds
  *   （次の実行からは全員の記録がそろい、合計がほぼ予算になる）
  * - 1 試行の時間はバッチごとに計測して更新し、残りの持ち分 ÷ 1 試行の時間 で次のバッチを決める（倍々で増やす）
  * - 上限（既定 40 分）を過ぎたら、持ち分が残っていても新しいバッチを始めない
+ * - 持ち分は kotest の 1 テストの時間切れ（[PbtSettings.testTimeout]）から [TIMEOUT_MARGIN] を引いた長さを超えない。
+ *   超えると、反例が無くても kotest が時間切れで落とす（ADR-046、issue #43）
  */
 public class IterationPlanner(
     private val settings: PbtSettings,
@@ -31,8 +33,12 @@ public class IterationPlanner(
         val pool = (settings.budget - fixed).coerceAtLeast(settings.budget / 4)
         val s = pool * (weight / totalWeight)
         val known = timings.read(name) != null
-        return if (known) s else minOf(s, FIRST_RUN_CAP)
+        val capped = minOf(s, maxShare())
+        return if (known) capped else minOf(capped, FIRST_RUN_CAP)
     }
+
+    /** 1 つの性質に渡せる持ち分の上限（テストの時間切れ − 余裕）。 */
+    public fun maxShare(): Duration = (settings.testTimeout - TIMEOUT_MARGIN).coerceAtLeast(settings.testTimeout / 2)
 
     /**
      * 次のバッチの試行数。0 なら打ち切る。
@@ -66,5 +72,8 @@ public class IterationPlanner(
 
         /** 記録の無い性質の持ち分の上限 */
         public val FIRST_RUN_CAP: Duration = 2.minutes
+
+        /** テストの時間切れまでに残す余裕（最後のバッチのはみ出しと、縮小にかかる時間の分） */
+        public val TIMEOUT_MARGIN: Duration = 2.minutes
     }
 }

@@ -66,6 +66,12 @@ tasks.withType<Test>().configureEach {
     systemProperty("acg.pbt.stateDir", pbtStateDir.get())
     systemProperty("acg.pbt.reportDir", pbtReportDir.get())
     systemProperty("acg.repoRoot", repoRoot)
-    // 定期実行（scheduled）は毎回違う seed で回すので、Gradle のテスト結果キャッシュを使わない
-    if (pbtProps.getValue("mode").orNull == "scheduled") outputs.upToDateWhen { false }
+    if (pbtProps.getValue("mode").orNull == "scheduled") {
+        // 定期実行（scheduled）は毎回違う seed で回すので、Gradle のテスト結果キャッシュを使わない
+        outputs.upToDateWhen { false }
+        // 1 つの性質が予算（既定 30 分）をまるごと使えるよう、kotest の 1 テストの時間切れ（既定 10 分）を
+        // 上限（hardLimitMinutes、既定 40 分）+ 5 分に延ばす（ADR-046、issue #43）
+        val hardLimit = pbtProps.getValue("hardLimitMinutes").orNull?.toDoubleOrNull() ?: 40.0
+        systemProperty("kotest.framework.timeout", ((hardLimit + 5) * 60_000).toLong().toString())
+    }
 }

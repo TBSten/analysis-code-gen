@@ -79,13 +79,29 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           body=$(mktemp)
+          found=$(find . -path '*/build/pbt/failures/new-regressions.tsv' -exec cat {} +)
+          # 落ちたテストの名前と 1 行目のメッセージ（反例以外の失敗、たとえば時間切れを見分けるため。issue #43）
+          failed=$(find . -path '*/build/test-results/*' -name '*.xml' -print0 | xargs -0 -r python3 -c '
+          import sys, xml.etree.ElementTree as ET
+          for f in sys.argv[1:]:
+              for c in ET.parse(f).getroot().iter("testcase"):
+                  for e in list(c.findall("failure")) + list(c.findall("error")):
+                      msg = (e.get("message") or "").splitlines()
+                      print("- " + c.get("classname", "") + " > " + c.get("name", "") + ": " + (msg[0][:200] if msg else ""))
+          ')
           {
-            echo "毎時の PBT で反例が見つかった（Kotlin ${{ steps.plan.outputs.kotlin }}）。実行: $RUN_URL"
+            if [ -n "$found" ]; then
+              echo "毎時の PBT で反例が見つかった（Kotlin ${{ steps.plan.outputs.kotlin }}）。実行: $RUN_URL"
+            else
+              echo "毎時の PBT が反例以外の理由で落ちた（Kotlin ${{ steps.plan.outputs.kotlin }}）。実行: $RUN_URL"
+            fi
+            echo
+            echo "落ちたテスト:"
+            echo "${failed:-（テスト結果なし。ビルドの失敗の可能性）}"
             echo
             echo "回帰ケースにする行（各モジュールの src/test/resources/pbt/regressions/<性質>.tsv に足す）:"
             echo '```'
-            found=$(find . -path '*/build/pbt/failures/new-regressions.tsv' -exec cat {} +)
-            echo "${found:-（記録なし。テスト以外の失敗の可能性）}"
+            echo "${found:-（記録なし。反例ではない）}"
             echo '```'
           } > "$body"
           gh label create pbt-counterexample --color B60205 --description "毎時 PBT の反例（ADR-022）" 2>/dev/null || true
