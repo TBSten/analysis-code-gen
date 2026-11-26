@@ -29,6 +29,6 @@ private fun generateHello(context: AnalysisCodegenRoundContext, file: KtFile, na
         packageName = pkg,
         fileName = "${name}Hello",
         dependencies = Dependencies.isolating(file),
-        content = "package $pkg\n\nfun $name.hello(): String = \"Hello, $name!\"\n",
+        content = "// Auto generated\npackage $pkg\n\nfun $name.hello(): String = \"Hello, $name!\"\n",
     )
 }
