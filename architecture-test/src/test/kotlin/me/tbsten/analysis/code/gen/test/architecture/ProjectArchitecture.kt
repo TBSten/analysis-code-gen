@@ -2,7 +2,7 @@
 
 package me.tbsten.analysis.code.gen.test.architecture
 
-import me.tbsten.analysis.code.gen.test.architecture.build.buildGroup
+import me.tbsten.analysis.code.gen.test.architecture.buildsystem.buildGroup
 import me.tbsten.analysis.code.gen.test.architecture.docs.docsGroup
 import me.tbsten.analysis.code.gen.test.architecture.fixtures.fixturesGroup
 import me.tbsten.analysis.code.gen.test.architecture.product.productGroup
