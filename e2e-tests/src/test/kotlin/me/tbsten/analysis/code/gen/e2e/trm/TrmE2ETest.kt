@@ -17,9 +17,9 @@ class TrmE2ETest : E2ESpec({
                 // TP-Mapper が作る fixture.jvm.UserMapper を手で書いておく
                 write("src/main/kotlin/fixture/jvm/HandWritten.kt", "package fixture.jvm\nobject UserMapper")
             }
-        val result = p.buildAndFail("analysisCodeGenMain")
+        val result = p.buildAndFail("analysisCodeGenMainSourceSet")
         // ADR-014: Validate でエラー。生成物は解析対象・出力に入らない
-        result.task(":analysisCodeGenMain")?.outcome shouldBe TaskOutcome.FAILED
+        result.task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.FAILED
         val line = result.output.lines().first { it.contains("fixture.jvm.UserMapper") && it.startsWith("e: ") }
         line shouldContain "TP-Mapper"
         line shouldContain "HandWritten.kt"

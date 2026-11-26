@@ -28,8 +28,8 @@ class ApiE2ETest : E2ESpec({
                         "}\n"
                 }
             }
-        val result = p.buildAndFail("analysisCodeGenMain", "--info")
-        result.task(":analysisCodeGenMain")?.outcome shouldBe TaskOutcome.FAILED
+        val result = p.buildAndFail("analysisCodeGenMainSourceSet", "--info")
+        result.task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.FAILED
         // TP-Probe は allFiles の先頭（辞書順で Main.kt）を指してログを出す。KtFile 全体を指すので行は 1
         val errorLine = result.output.lines().first { it.contains("ERROR-MARK") }
         errorLine shouldContain "e: "

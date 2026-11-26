@@ -12,9 +12,9 @@ import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 class DetE2ETest : E2ESpec({
     case("DET-01", "同じ入力で 2 回クリーンビルドすると、生成物がバイト単位で一致する", PendingCase(Milestone.M1)) {
         val p = fixtureProject(Fixture.JVM)
-        p.build("clean", "analysisCodeGenMain", "--no-build-cache")
+        p.build("clean", "analysisCodeGenMainSourceSet", "--no-build-cache")
         val first = p.file("build/generated/analysisCodeGen").bytesByPath()
-        p.build("clean", "analysisCodeGenMain", "--no-build-cache", "--rerun-tasks")
+        p.build("clean", "analysisCodeGenMainSourceSet", "--no-build-cache", "--rerun-tasks")
         val second = p.file("build/generated/analysisCodeGen").bytesByPath()
         first.shouldNotBeEmpty()
         second.keys shouldBe first.keys

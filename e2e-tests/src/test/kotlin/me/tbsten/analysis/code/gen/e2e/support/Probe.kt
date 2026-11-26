@@ -7,7 +7,7 @@ import java.io.File
  *
  * ```
  * val out = p.dir.resolve("probe.jsonl")
- * p.build("analysisCodeGenMain", "-Ptp.probe.out=$out")
+ * p.build("analysisCodeGenMainSourceSet", "-Ptp.probe.out=$out")
  * val events = readProbe(out)
  * events.filter { it.event == "process" }.map { it.round } shouldBe listOf(1, 2)
  * ```

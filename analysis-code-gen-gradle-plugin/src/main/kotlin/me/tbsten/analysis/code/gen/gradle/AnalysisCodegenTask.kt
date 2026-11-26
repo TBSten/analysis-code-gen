@@ -66,7 +66,7 @@ public abstract class AnalysisCodegenTask : DefaultTask() {
 
 /** タスク名・出力ディレクトリの命名規則（ADR-016、KMP-23）。 */
 public object AnalysisCodegenNaming {
-    /** `commonMain` → `analysisCodeGenCommonMain`。 */
+    /** `commonMain` → `analysisCodeGenCommonMainSourceSet`。 */
     public fun sourceSetTaskName(sourceSetName: String): String = TODO()
 
     /** (`jvm`, `main`) → `analysisCodeGenJvmMainCompilation`。kotlin("jvm") の target 名は空文字。 */
@@ -81,7 +81,7 @@ public object AnalysisCodegenNaming {
         compilationName: String,
     ): String = TODO()
 
-    /** `commonMain` → `analysisCodeGenCommonMain`（Configuration 名。タスク名と同じ形）。 */
+    /** `commonMain` → `analysisCodeGenCommonMainSourceSet`（Configuration 名。タスク名と同じ形）。 */
     public fun sourceSetConfigurationName(sourceSetName: String): String = TODO()
 
     /** (`jvm`, `main`) → `analysisCodeGenJvmMainCompilation`。 */

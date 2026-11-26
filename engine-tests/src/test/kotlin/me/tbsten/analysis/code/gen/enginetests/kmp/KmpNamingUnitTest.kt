@@ -48,16 +48,16 @@ private val COMPILATIONS =
 
 // 5.2 のうち KMP-23（ADR-016 の命名規則）
 class KmpNamingUnitTest : UnitSpec({
-    case("KMP-23", "SourceSet / Compilation 名からタスク名を作る規則が一意（analysisCodeGenIosArm64Main など、衝突しない）", PendingCase(Milestone.M1)) {
-        AnalysisCodegenNaming.sourceSetTaskName("commonMain") shouldBe "analysisCodeGenCommonMain"
-        AnalysisCodegenNaming.sourceSetTaskName("iosArm64Main") shouldBe "analysisCodeGenIosArm64Main"
-        AnalysisCodegenNaming.sourceSetTaskName("main") shouldBe "analysisCodeGenMain"
+    case("KMP-23", "SourceSet / Compilation 名からタスク名を作る規則が一意（analysisCodeGenIosArm64MainSourceSet など、衝突しない）", PendingCase(Milestone.M1)) {
+        AnalysisCodegenNaming.sourceSetTaskName("commonMain") shouldBe "analysisCodeGenCommonMainSourceSet"
+        AnalysisCodegenNaming.sourceSetTaskName("iosArm64Main") shouldBe "analysisCodeGenIosArm64MainSourceSet"
+        AnalysisCodegenNaming.sourceSetTaskName("main") shouldBe "analysisCodeGenMainSourceSet"
         AnalysisCodegenNaming.compilationTaskName("jvm", "main") shouldBe "analysisCodeGenJvmMainCompilation"
         AnalysisCodegenNaming.compilationTaskName("", "main") shouldBe "analysisCodeGenMainCompilation"
         AnalysisCodegenNaming.compilationTaskName("", "freeDebug") shouldBe "analysisCodeGenFreeDebugCompilation"
         AnalysisCodegenNaming.compilationUnitName("jvm", "main") shouldBe "jvmMain"
         AnalysisCodegenNaming.compilationUnitName("iosArm64", "test") shouldBe "iosArm64Test"
-        AnalysisCodegenNaming.sourceSetConfigurationName("jvmMain") shouldBe "analysisCodeGenJvmMain"
+        AnalysisCodegenNaming.sourceSetConfigurationName("jvmMain") shouldBe "analysisCodeGenJvmMainSourceSet"
         AnalysisCodegenNaming.compilationConfigurationName("jvm", "main") shouldBe "analysisCodeGenJvmMainCompilation"
 
         // SourceSet 単位と Compilation 単位を合わせても、タスク名・Configuration 名・出力ディレクトリが衝突しない

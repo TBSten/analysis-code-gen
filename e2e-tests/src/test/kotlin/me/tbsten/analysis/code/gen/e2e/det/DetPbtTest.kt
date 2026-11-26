@@ -17,13 +17,13 @@ private const val SHUFFLE_SEED = "analysisCodeGen.internal.shuffleSeed"
 // 5.8 決定性（DET）の PBT。1 試行ごとに Gradle ビルドを流すので試行数は少なくし、毎時の PBT（ADR-022）で数を稼ぐ
 class DetPbtTest : PbtSpec({
     case("DET-02", "Processor の登録順・ファイルの列挙順・ラウンド内の実行順をランダムに入れ替えても生成物が一致する", PendingCase(Milestone.M2)) {
-        val baseline = fixtureProject(Fixture.JVM).also { it.build("analysisCodeGenMain") }.generated("main").files()
+        val baseline = fixtureProject(Fixture.JVM).also { it.build("analysisCodeGenMainSourceSet") }.generated("main").files()
         checkAll(PropTestConfig(iterations = 5), Arb.long()) { seed ->
             val shuffled =
                 fixtureProject(Fixture.JVM) {
                     edit("build.gradle.kts") { it + "\nanalysisCodeGen { arg(\"$SHUFFLE_SEED\", \"$seed\") }\n" }
                 }
-            shuffled.build("analysisCodeGenMain")
+            shuffled.build("analysisCodeGenMainSourceSet")
             shuffled.generated("main").files() shouldBe baseline
         }
     }

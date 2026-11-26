@@ -270,11 +270,11 @@ class IncrementalE2ETest : E2ESpec({
                 kotlin("src/commonMain/kotlin/com/example/A.kt", mappedClass("A"))
                 kotlin("src/jvmMain/kotlin/com/example/J.kt", mappedClass("J"))
             }
-        fixture.build(":analysisCodeGenJvmMain")
+        fixture.build(":analysisCodeGenJvmMainSourceSet")
         fixture.kotlin("src/commonMain/kotlin/com/example/A.kt", mappedClass("A", props = "val id: Int, val extra: Long"))
-        val result = fixture.build(":analysisCodeGenJvmMain")
-        result.task(":analysisCodeGenCommonMain")?.outcome shouldBe TaskOutcome.SUCCESS
-        result.task(":analysisCodeGenJvmMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        val result = fixture.build(":analysisCodeGenJvmMainSourceSet")
+        result.task(":analysisCodeGenCommonMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenJvmMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
     }
 
     case("INC-12", "Processor が宣言した外部入力（リソースファイル）が変わると再処理される", pending = PendingCase(Milestone.M2)) {
@@ -348,10 +348,10 @@ class IncrementalE2ETest : E2ESpec({
                 )
                 kotlin("app/src/main/kotlin/com/app/Independent.kt", mappedClass("Independent", pkg = "com.app"))
             }
-        fixture.build(":app:analysisCodeGenMain")
+        fixture.build(":app:analysisCodeGenMainSourceSet")
         // :lib の ABI を変える
         fixture.kotlin("lib/src/main/kotlin/com/lib/Base.kt", "package com.lib\n\nopen class Base(val id: Long)")
-        fixture.build(":app:analysisCodeGenMain").task(":app:analysisCodeGenMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        fixture.build(":app:analysisCodeGenMainSourceSet").task(":app:analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         // :lib の型を参照する UsesLib は再処理、参照しない Independent は再処理しない
         lastRound1Files(probe) shouldBe setOf("UsesLib.kt")
     }

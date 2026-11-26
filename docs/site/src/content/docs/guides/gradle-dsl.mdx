@@ -24,8 +24,8 @@ dependencies {
 他の SourceSet や Compilation には、名前付きの依存か `sourceSets { }` の `processor()` を使います。
 
 ```kotlin title="kmp-lib/build.gradle.kts"
-    // dependencies { } でも足せる。名前は analysisCodeGen<SourceSet> と analysisCodeGen<Compilation>Compilation
-    "analysisCodeGenJvmMain"(project(":deferred-processor"))
+    // dependencies { } でも足せる。名前は analysisCodeGen<SourceSet>SourceSet と analysisCodeGen<Compilation>Compilation
+    "analysisCodeGenJvmMainSourceSet"(project(":deferred-processor"))
     "analysisCodeGenIosArm64MainCompilation"(project(":deferred-processor"))
 ```
 
@@ -50,13 +50,13 @@ dependencies {
 Processor の付いた実行単位ごとに、タスクが 1 つできます。
 
 ```bash
-./gradlew :kmp-lib:analysisCodeGenCommonMain             # SourceSet ごと
+./gradlew :kmp-lib:analysisCodeGenCommonMainSourceSet             # SourceSet ごと
 ./gradlew :kmp-lib:analysisCodeGenIosArm64MainCompilation # Compilation ごと
 ```
 
 | 実行単位 | タスク | 出力先 |
 |---|---|---|
-| SourceSet | `analysisCodeGen<SourceSet>` | `build/generated/analysisCodeGen/<SourceSet>/` |
+| SourceSet | `analysisCodeGen<SourceSet>SourceSet` | `build/generated/analysisCodeGen/<SourceSet>/` |
 | Compilation | `analysisCodeGen<Name>Compilation` | `build/generated/analysisCodeGen/compilations/<Name>/` |
 
 コンパイルのタスクが依存するので、普段は直接呼びません。Processor の無い実行単位にはタスクを作りません。
