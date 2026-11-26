@@ -404,7 +404,7 @@ KSP では難しく、analysisCodeGen の存在理由にあたる部分。
 | BRG-11 | KotlinPoet の KSP 拡張（toTypeName、toClassName、writeTo）が Bridge 上で動く | E | M1 | |
 | BRG-12 | KSP 互換モードで、生成ファイルの相対パスとファイル名が KSP2 と一致する | D | M2 | |
 | BRG-13 | `analysisCodeGen { arg(...) }` で渡した引数が KSP Processor の options に届く | E | M1 | |
-| BRG-14 | Bridge を適用しないプロジェクトの依存に KSP API が含まれない | E | M1 | |
+| BRG-14 | KSP の Processor が無いプロジェクト（Bridge が有効にならない）の依存に KSP API が含まれない | E | M1 | |
 | BRG-15 | KSP の主要な Gradle 設定（増分の有効・無効など）に対応する設定があり、同じ効果がある | E | M3 | |
 
 ### 5.15 Bridge の増分互換（BINC）

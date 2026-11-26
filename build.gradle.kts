@@ -9,7 +9,6 @@ dependencies {
     dokka(project(":analysis-code-gen-gradle-plugin"))
     dokka(project(":analysis-code-gen-testing"))
     dokka(project(":analysis-code-gen-ksp-bridge-api"))
-    dokka(project(":analysis-code-gen-ksp-bridge-gradle-plugin"))
 }
 
 // 例外: フィクスチャ（fixtures/projects/*）が読むローカルリポジトリ build/fixture-repo へ、必要なモジュールを publish する（ADR-027）。

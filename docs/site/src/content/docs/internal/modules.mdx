@@ -17,10 +17,9 @@ group とパッケージの根は `me.tbsten.analysis.code.gen` です（ADR-042
 | モジュール | 公開範囲 | 中身 |
 |---|---|---|
 | `analysis-code-gen-processor-api` | 公開 | Native Processor の API |
-| `analysis-code-gen-gradle-plugin` | 公開（DSL） | DSL・タスク・KGP / AGP との連携 |
+| `analysis-code-gen-gradle-plugin` | 公開（DSL） | DSL（`kspBridge {}` を含む）・タスク・KGP / AGP との連携。plugin は 1 つで、KSP の Processor があれば Bridge を自動で有効にする（ADR-050） |
 | `analysis-code-gen-testing` / `analysis-code-gen-testing-kct` | 公開 | Processor のテスト補助と、取り込んだ kotlin-compile-testing |
 | `analysis-code-gen-ksp-bridge-api` | 公開（実験的） | Hybrid API |
-| `analysis-code-gen-ksp-bridge-gradle-plugin` | 公開 | `kspBridge {}` の DSL |
 | `analysis-code-gen-cli` | 公開（コマンド） | プロジェクトモデルの JSON を受けて生成する |
 | `analysis-code-gen-project-model` | 内部 | Gradle にも AA にも依存しないプロジェクトモデル |
 | `analysis-code-gen-engine-spi` | 内部 | エンジンに参加するための SPI |
@@ -50,7 +49,6 @@ flowchart TD
     BR["analysis-code-gen-ksp-bridge"] --> SPI
     BR --> BAPI["analysis-code-gen-ksp-bridge-api"]
     BR --> KSP["公式 symbol-processing-api"]
-    BGP["analysis-code-gen-ksp-bridge-gradle-plugin"] --> GP
 ```
 
 ## 守っていること

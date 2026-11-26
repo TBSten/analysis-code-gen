@@ -31,7 +31,7 @@ dependencies {
 ```kotlin title="app/build.gradle.kts"
 plugins {
     kotlin("jvm") version "2.4.21"
-    id("me.tbsten.analysis.code.gen.ksp-bridge") version "0.1.0"
+    id("me.tbsten.analysis.code.gen") version "0.1.0"
     application
 }
 
@@ -96,7 +96,7 @@ analysisCodeGen {
 
 | やること | 書き換える場所 |
 |---|---|
-| plugin を替える | `com.google.devtools.ksp` → `me.tbsten.analysis.code.gen.ksp-bridge` |
+| plugin を替える | `com.google.devtools.ksp` → `me.tbsten.analysis.code.gen`（Bridge は自動で有効） |
 | 依存を替える | `ksp(...)` → `analysisCodeGen(...)` |
 | オプションを移す | `ksp { arg }` → `analysisCodeGen { arg }` |
 | 結果を比べる | `TestEngine.Ksp2` と `TestEngine.AnalysisCodegen` |

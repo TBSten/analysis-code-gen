@@ -242,6 +242,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
     }
 
     case("API-14", "Native と KSP の Provider を両方含む JAR で、ADR で決めた規則どおりに片方だけ実行される（二重実行しない）", M2) {
+        // ADR-050: KSP の Provider しか無い component は Bridge を自動で有効にして KSP として動かす（plugin は 1 つ）。
         // ADR-017: 同じ component に Native の Provider があれば Native だけを使い、KSP の Provider は使わず info を出す
         val jar =
             serviceJar(

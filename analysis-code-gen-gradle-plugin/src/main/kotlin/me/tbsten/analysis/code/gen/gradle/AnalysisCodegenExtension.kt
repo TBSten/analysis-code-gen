@@ -44,6 +44,16 @@ public abstract class AnalysisCodegenExtension
         @get:Nested
         public abstract val worker: WorkerSpec
 
+        /**
+         * KSP Bridge の設定（ADR-050）。KSP の Processor が依存にあるときだけ使われ、無ければ何も起きない。
+         * Bridge の JAR は、KSP の Processor があるときだけ Worker のクラスパスに足す（座標の文字列で扱い、
+         * この module は Bridge のクラスを import しない。ADR-012）。
+         */
+        @get:Nested
+        public abstract val kspBridge: KspBridgeSpec
+
+        public fun kspBridge(action: Action<in KspBridgeSpec>): Unit = TODO()
+
         public fun worker(action: Action<in WorkerSpec>): Unit = TODO()
 
         /** Kotlin の SourceSet を遅延で写したもの。Android（AGP 単体）の SourceSet は含まない。 */
@@ -72,4 +82,21 @@ public abstract class WorkerSpec {
 
     /** [WorkerIsolation.Process] のときだけ有効。 */
     public abstract val jvmArgs: org.gradle.api.provider.ListProperty<String>
+}
+
+/** `analysisCodeGen { kspBridge { } }`（ADR-050）。 */
+public abstract class KspBridgeSpec {
+    /** 既定 [KspProcessingMode.Compatible]。 */
+    public abstract val processingMode: Property<KspProcessingMode>
+
+    /** Processor がビルドされた KSP API のバージョンを検査する。既定 true。 */
+    public abstract val kspVersionCheck: Property<Boolean>
+}
+
+public enum class KspProcessingMode {
+    /** KSP2 と同じく、KSP Processor に Compilation の全ソースを見せる（既定）。 */
+    Compatible,
+
+    /** 実行単位の Processing Scope だけを見せる。共通の生成が 1 回で済む。 */
+    SourceSet,
 }

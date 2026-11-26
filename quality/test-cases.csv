@@ -156,7 +156,7 @@ BRG-10,KSP Bridge の API 互換（BRG）,JVM 固有 API（getJvmName、mapToJvm
 BRG-11,KSP Bridge の API 互換（BRG）,KotlinPoet の KSP 拡張（toTypeName、toClassName、writeTo）が Bridge 上で動く,E,M1,
 BRG-12,KSP Bridge の API 互換（BRG）,KSP 互換モードで、生成ファイルの相対パスとファイル名が KSP2 と一致する,D,M2,
 BRG-13,KSP Bridge の API 互換（BRG）,`analysisCodeGen { arg(...) }` で渡した引数が KSP Processor の options に届く,E,M1,
-BRG-14,KSP Bridge の API 互換（BRG）,Bridge を適用しないプロジェクトの依存に KSP API が含まれない,E,M1,
+BRG-14,KSP Bridge の API 互換（BRG）,KSP の Processor が無いプロジェクト（Bridge が有効にならない）の依存に KSP API が含まれない,E,M1,
 BRG-15,KSP Bridge の API 互換（BRG）,KSP の主要な Gradle 設定（増分の有効・無効など）に対応する設定があり、同じ効果がある,E,M3,
 BINC-01,Bridge の増分互換（BINC）,KSP の `Dependencies(isolating)` の契約どおりに再処理される,E,M2,
 BINC-02,Bridge の増分互換（BINC）,型解決を通じた暗黙の依存（設計文書 11.7 の superTypes の例）で、B.kt を変えると再生成される,E,M3,

@@ -101,7 +101,6 @@ class ThreeRoundAlternationE2ETest : E2ESpec({
                     plugins {
                         alias(libs.plugins.kotlin.jvm)
                         id("me.tbsten.analysis.code.gen")
-                        id("me.tbsten.analysis.code.gen.ksp-bridge")
                     }
 
                     analysisCodeGen {

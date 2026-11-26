@@ -33,7 +33,7 @@ private fun moshiProject(codegenVersion: String): GradleFixture =
             """
             plugins {
                 kotlin("jvm") version "{{kotlinVersion}}"
-                id("me.tbsten.analysis.code.gen.ksp-bridge") version "${Acg45Repo.acgVersion}"
+                id("me.tbsten.analysis.code.gen") version "${Acg45Repo.acgVersion}"
             }
 
             analysisCodeGen {

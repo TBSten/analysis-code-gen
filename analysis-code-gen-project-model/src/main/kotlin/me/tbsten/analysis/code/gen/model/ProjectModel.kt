@@ -106,7 +106,7 @@ public data class AnalysisConfig(
     val analysisApiVersion: String,
     val maxRounds: Int,
     val unresolvedDeferred: DeferredSeverityModel,
-    /** Bridge の設定。Bridge を適用していなければ null。 */
+    /** Bridge の設定。KSP の Processor が無く Bridge が有効でなければ null（ADR-050）。 */
     val kspBridge: KspBridgeConfig?,
 )
 
