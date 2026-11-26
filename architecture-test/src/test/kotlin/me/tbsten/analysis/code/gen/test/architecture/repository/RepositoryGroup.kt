@@ -25,6 +25,15 @@ fun DeclarationContainerScope.repositoryGroup() = "Repository".group {
             summary = "繰り返す手順（.claude/skills/<kebab>/SKILL.md）"
             layout { ".claude/skills/*" / "SKILL.md".file() }
         }
+        "VendoredAgentSkill".role {
+            summary = "gh skill install で入れた外部の skill の手順書と雛形（katachi）。手で直さず gh skill update で上げる"
+            layout {
+                ".claude/skills/katachi" {
+                    "references" / "**" / "*.md".file()
+                    "assets/*" / "check-list.html".file()
+                }
+            }
+        }
         "AgentSetting".role {
             summary = "Claude Code の設定と SessionStart hook（Maven Central のミラー設定など）"
             layout {

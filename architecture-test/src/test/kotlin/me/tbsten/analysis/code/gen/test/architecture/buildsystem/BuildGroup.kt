@@ -2,6 +2,7 @@
 
 package me.tbsten.analysis.code.gen.test.architecture.buildsystem
 
+import me.tbsten.analysis.code.gen.test.architecture.conventionPluginRequired
 import me.tbsten.analysis.code.gen.test.architecture.independentBuildFiles
 import me.tbsten.katachi.ExperimentalKatachiApi
 import me.tbsten.katachi.dsl.DeclarationContainerScope
@@ -12,7 +13,9 @@ import me.tbsten.katachi.dsl.kotlin.ktsFile
 // ビルドと、上流から写したコードの出所（ADR-011、ADR-018、ADR-025）
 fun DeclarationContainerScope.buildGroup() {
     // wrapper・settings・各モジュールの build.gradle.kts・gradle.properties・version catalog
-    gradle()
+    gradle {
+        buildScript { conventionPluginRequired() }
+    }
 
     "Build".group {
         summary = "ルートのビルドを支える convention plugin と、対応 Kotlin の一覧"
