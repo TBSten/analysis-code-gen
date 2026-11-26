@@ -197,5 +197,20 @@ class ReportTest(unittest.TestCase):
         self.assertEqual(got["cases"]["total"], got["history"]["series"][0]["goal"])
 
 
+
+class NextRunTest(unittest.TestCase):
+    def test_next_advances_by_interval(self) -> None:
+        now = dt.datetime(2026, 11, 26, 9, 9, tzinfo=pr.JST)
+        self.assertTrue(pr.next_run(now).startswith("11/26 11:09"))
+
+    def test_next_skips_cooldown(self) -> None:
+        now = dt.datetime(2026, 11, 26, 1, 7, tzinfo=pr.JST)
+        self.assertTrue(pr.next_run(now).startswith("11/26 09:07"))
+
+    def test_report_overwrites_stale_next(self) -> None:
+        now = dt.datetime(2026, 11, 26, 13, 0, tzinfo=pr.JST)
+        out = pr.build_report({"next": "11/26 09:07（古い）"}, [], [], now, None, [])
+        self.assertTrue(out["next"].startswith("11/26 15:00"))
+
 if __name__ == "__main__":
     unittest.main()

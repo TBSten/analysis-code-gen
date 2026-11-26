@@ -244,6 +244,18 @@ def fmt_now(t: dt.datetime) -> str:
     return f"{t.month}/{t.day} {t:%H:%M}"
 
 
+INTERVAL = dt.timedelta(hours=2)  # 定期実行の間隔
+COOLDOWN = (3, 9)  # 03:00〜09:00 JST は止まる
+
+
+def next_run(now: dt.datetime, interval: dt.timedelta = INTERVAL) -> str:
+    """次回の定期実行の見込み時刻。クールタイムに入るならその明けの同じ分にずらす。"""
+    t = (now + interval).astimezone(JST)
+    if COOLDOWN[0] <= t.hour < COOLDOWN[1]:
+        t = t.replace(hour=COOLDOWN[1])
+    return f"{fmt_now(t)}（定期実行。{COOLDOWN[0]:02d}:00〜{COOLDOWN[1]:02d}:00 はクールタイム）"
+
+
 def build_report(
     prev: dict,
     cases: list[Case],
@@ -336,6 +348,7 @@ def build_report(
         sample=False,
         previous=prev.get("updated"),
         updated=fmt_now(now),
+        next=next_run(now),
         milestones=milestones,
         deliverables=deliverables,
         history=hist,
