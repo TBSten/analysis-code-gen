@@ -161,10 +161,10 @@ BRG-13,KSP Bridge の API 互換（BRG）,`analysisCodeGen { arg(...) }` で渡�
 BRG-14,KSP Bridge の API 互換（BRG）,KSP の Processor が無いプロジェクト（Bridge が有効にならない）の依存に KSP API が含まれない,E,M1,
 BRG-15,KSP Bridge の API 互換（BRG）,KSP の主要な Gradle 設定（増分の有効・無効など）に対応する設定があり、同じ効果がある,E,M3,
 BINC-01,Bridge の増分互換（BINC）,KSP の `Dependencies(isolating)` の契約どおりに再処理される,E,M2,
-BINC-02,Bridge の増分互換（BINC）,型解決を通じた暗黙の依存（設計文書 11.7 の superTypes の例）で、B.kt を変えると再生成される,E,M3,
+BINC-02,Bridge の増分互換（BINC）,型解決を通じた暗黙の依存（設計文書 11.7 の superTypes の例）で、B.kt を変えると再生成される,E,M2,
 BINC-03,Bridge の増分互換（BINC）,同じ変更に対して KSP2 と同じ dirty なファイル集合を計算する,D,M3,
-BINC-04,Bridge の増分互換（BINC）,Bridge 版でも、ランダムな変更履歴のあとの増分結果がクリーンビルドと一致する,P,M3,
-BINC-05,Bridge の増分互換（BINC）,追跡できない操作があったら、保守的に全件処理する,I,M3,
+BINC-04,Bridge の増分互換（BINC）,Bridge 版でも、ランダムな変更履歴のあとの増分結果がクリーンビルドと一致する,P,M2,
+BINC-05,Bridge の増分互換（BINC）,追跡できない操作があったら、保守的に全件処理する,I,M2,
 MIX-01,Native と Bridge の相互運用（MIX）,ラウンド 1 で KSP Processor が生成したコードを、ラウンド 2 で Native Processor が解析できる,I,M1,
 MIX-02,Native と Bridge の相互運用（MIX）,ラウンド 1 で Native Processor が生成したコードが、ラウンド 2 の KSP の `getNewFiles` に現れて処理される,I,M1,
 MIX-03,Native と Bridge の相互運用（MIX）,設計文書 11.6 の 3 ラウンド交互のシナリオが実際の Gradle ビルドで通る,E,M1,
@@ -214,7 +214,7 @@ RW-DAG-B2,実用 Processor の E2E（RW）,Hilt（Bridge）: Android サンプ�
 RW-DAG-B3,実用 Processor の E2E（RW）,Dagger / Hilt（Bridge）: 生成物が KSP2 と一致する,D,M3,
 RW-DAG-N1,実用 Processor の E2E（RW）,Dagger / Hilt（Native）: 書き直し版が元と同じ DI の実行時テストを通る,E,任意,P3 で余力があれば作る
 RW-DAG-N2,実用 Processor の E2E（RW）,Dagger / Hilt（Native）: 生成物が KSP2 と三者差分テストの基準（XD-05・XD-12）で一致する,D,任意,P3 で余力があれば作る
-RW-ALL-I1,実用 Processor の E2E（RW）,上の各 Processor について、代表的な変更履歴（20 履歴）のあとの増分結果がクリーンビルドと一致する（Native 版は M2、Bridge 版は M3）,P,M2 / M3,集計上は版ごとに分ける
+RW-ALL-I1,実用 Processor の E2E（RW）,上の各 Processor について、代表的な変更履歴（20 履歴）のあとの増分結果がクリーンビルドと一致する（Native 版・Bridge 版とも。Bridge 版は M3 から M2 へ前倒し、ADR-054）,P,M2,
 RW-ALL-P1,実用 Processor の E2E（RW）,各 Processor の Bridge 版で全件処理の時間が KSP2 以下,B,M2,Room / Dagger は M3
 TST-01,テストフレームワーク（kct fork、TST）,ソース文字列を渡して Native Processor を実行し、生成物と診断を取得できる,E,M1,
 TST-02,テストフレームワーク（kct fork、TST）,同じ API で KSP Processor（Bridge）もテストできる,E,M1,

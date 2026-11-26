@@ -161,10 +161,10 @@ BRG-13,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeE
 BRG-14,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeE2ETest
 BRG-15,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeE2ETest
 BINC-01,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.BridgeIncrementalE2ETest
-BINC-02,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.BridgeIncrementalE2ETest
+BINC-02,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.BridgeIncrementalE2ETest
 BINC-03,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.BridgeIncrementalDiffTest
-BINC-04,P,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.pbt.IncrementalPropertyTest
-BINC-05,I,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.binc.BridgeIncrementalEngineTest
+BINC-04,P,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.pbt.IncrementalPropertyTest
+BINC-05,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.binc.BridgeIncrementalEngineTest
 MIX-01,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mix.MixedProcessorsTest
 MIX-02,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mix.MixedProcessorsTest
 MIX-03,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.mix.ThreeRoundAlternationE2ETest
@@ -214,7 +214,7 @@ RW-DAG-B2,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealW
 RW-DAG-B3,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest
 RW-DAG-N1,E,任意,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-DAG-N2,D,任意,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest
-RW-ALL-I1,P,M2 / M3,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldIncrementalPbtTest
+RW-ALL-I1,P,M2,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldIncrementalPbtTest
 RW-ALL-P1,B,M2,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldBenchTest
 TST-01,E,M1,pending,NotImplemented,2,me.tbsten.analysis.code.gen.enginetests.tst.TestingNativeE2ETest
 TST-02,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest

@@ -420,10 +420,12 @@ KSP では難しく、analysisCodeGen の存在理由にあたる部分。
 | ID | ケース | 種別 | M | 備考 |
 |---|---|---|---|---|
 | BINC-01 | KSP の `Dependencies(isolating)` の契約どおりに再処理される | E | M2 | |
-| BINC-02 | 型解決を通じた暗黙の依存（設計文書 11.7 の superTypes の例）で、B.kt を変えると再生成される | E | M3 | |
+| BINC-02 | 型解決を通じた暗黙の依存（設計文書 11.7 の superTypes の例）で、B.kt を変えると再生成される | E | M2 | |
 | BINC-03 | 同じ変更に対して KSP2 と同じ dirty なファイル集合を計算する | D | M3 | |
-| BINC-04 | Bridge 版でも、ランダムな変更履歴のあとの増分結果がクリーンビルドと一致する | P | M3 | |
-| BINC-05 | 追跡できない操作があったら、保守的に全件処理する | I | M3 | |
+| BINC-04 | Bridge 版でも、ランダムな変更履歴のあとの増分結果がクリーンビルドと一致する | P | M2 | |
+| BINC-05 | 追跡できない操作があったら、保守的に全件処理する | I | M2 | |
+
+BINC-02・04・05 は M3 から M2 へ前倒しした（ADR-054、G0 項目 3）。増分の「正しさ」は M2 で求め、「KSP2 と同じ dirty 集合」（BINC-03）だけを M3 に残す。
 
 ### 5.16 Native と Bridge の相互運用（MIX）
 
@@ -502,7 +504,7 @@ KSP では難しく、analysisCodeGen の存在理由にあたる部分。
 | RW-DAG-B3 | Dagger / Hilt（Bridge）: 生成物が KSP2 と一致する | D | M3 | |
 | RW-DAG-N1 | Dagger / Hilt（Native）: 書き直し版が元と同じ DI の実行時テストを通る | E | 任意 | P3 で余力があれば作る |
 | RW-DAG-N2 | Dagger / Hilt（Native）: 生成物が KSP2 と三者差分テストの基準（XD-05・XD-12）で一致する | D | 任意 | P3 で余力があれば作る |
-| RW-ALL-I1 | 上の各 Processor について、代表的な変更履歴（20 履歴）のあとの増分結果がクリーンビルドと一致する（Native 版は M2、Bridge 版は M3） | P | M2 / M3 | 集計上は版ごとに分ける |
+| RW-ALL-I1 | 上の各 Processor について、代表的な変更履歴（20 履歴）のあとの増分結果がクリーンビルドと一致する（Native 版・Bridge 版とも。Bridge 版は M3 から M2 へ前倒し、ADR-054） | P | M2 | |
 | RW-ALL-P1 | 各 Processor の Bridge 版で全件処理の時間が KSP2 以下 | B | M2 | Room / Dagger は M3 |
 
 ### 5.21 テストフレームワーク（kct fork、TST）
@@ -593,7 +595,9 @@ KSP では難しく、analysisCodeGen の存在理由にあたる部分。
 
 ### 5.29 三者差分テスト（PBT × E2E、XD）
 
-KSP2（K）/ Bridge（B）/ Native 移植版（N）の 3 つで同じ入力を動かし、出力を比べる。設計は [pbt-differential-design.md](pbt-differential-design.md)。N が無い Processor（Room）は K と B だけを比べる。Native 版が「任意」の Processor（kotlin-inject・Dagger / Hilt）は、N を作った場合だけ N との比較を回し、合格ラインには含めない。
+KSP2（K）/ Bridge（B）/ Native 移植版（N）の 3 つで同じ入力を動かし、出力を比べる。設計は [pbt-differential-design.md](pbt-differential-design.md)。N が無い Processor（Room）は K と B だけを比べる。
+
+M ごとの対象 Processor（ADR-054）: **M2** は cream.kt・Moshi・Koin（K / B / N）と kotlin-inject（K / B）。**M3** で Room・Dagger / Hilt（K / B）を足す。RW-*-B2（KSP2 と一致）の M と揃えている。Native 版が「任意」の Processor（kotlin-inject・Dagger / Hilt）は、N を作った場合だけ N との比較を回し、合格ラインには含めない。
 
 | ID | ケース | 種別 | M | 備考 |
 |---|---|---|---|---|
@@ -830,8 +834,8 @@ KSP2 の AA 実装のテスト（対象リビジョンで固定）を取り込�
 | マイルストーン | 新たに通すケース | 累計（合格ライン） |
 |---|---|---|
 | M1 | 142 | 142 |
-| M2 | 227 | 369 |
-| M3 | 69 | 438 |
+| M2 | 230 | 372 |
+| M3 | 66 | 438 |
 
 ほかに「任意」（余力があれば作る。合格ラインに含めない）が 4 件。
 
@@ -846,5 +850,5 @@ KSP2 の AA 実装のテスト（対象リビジョンで固定）を取り込�
 
 合計 442 件（うち KSPT 165 件）。E2E 系（E / D / P）は 343 件で全体の 77%。
 
-備考: BRG-07（KSPT）と RW-ALL-I1・RW-ALL-P1 は M が分かれるため、最初の M で数えている。
+備考: BRG-07（KSPT）と RW-ALL-P1 は M が分かれるため、最初の M で数えている。
 <!-- summary:end -->

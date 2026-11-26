@@ -92,7 +92,7 @@ class IncrementalPropertyTest : PbtSpec({
         }
     }
 
-    case("BINC-04", "Bridge 版でも、ランダムな変更履歴のあとの増分結果がクリーンビルドと一致する", pending = PendingCase(Milestone.M3)) {
+    case("BINC-04", "Bridge 版でも、ランダムな変更履歴のあとの増分結果がクリーンビルドと一致する", pending = PendingCase(Milestone.M2)) {
         acgCheckAll("BINC-04 増分 = クリーン（Bridge）", Arb.changeHistory()) { history ->
             val (incremental, clean) = incrementalVsClean(history) { kspProcessor(KspShapeProvider::class.java.name) }
             incremental shouldBe clean

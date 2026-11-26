@@ -23,7 +23,7 @@ private data class State(
 ) : IncrementalState
 
 class BridgeIncrementalEngineTest : IntegrationSpec({
-    case("BINC-05", "追跡できない操作があったら、保守的に全件処理する", pending = PendingCase(Milestone.M3)) {
+    case("BINC-05", "追跡できない操作があったら、保守的に全件処理する", pending = PendingCase(Milestone.M2)) {
         val sources = mapOf("A.kt" to "1", "B.kt" to "1", "C.kt" to "1")
         val previous =
             State(

@@ -27,7 +27,7 @@ for m in ['M1', 'M2', 'M3']:
 lines += ['', f'ほかに「任意」（余力があれば作る。合格ラインに含めない）が {ms["任意"]} 件。']
 lines += ['', '| 種別 | 件数 |', '|---|---|'] + [f'| {k} | {kinds[k]} |' for k in 'UIEDPB' if kinds[k]]
 lines += ['', f'合計 {len(rows)} 件（うち KSPT {sum(1 for r in rows if r["id"].startswith("KSPT-"))} 件）。E2E 系（E / D / P）は {e2e} 件で全体の {e2e*100//len(rows)}%。', '',
-          '備考: BRG-07（KSPT）と RW-ALL-I1・RW-ALL-P1 は M が分かれるため、最初の M で数えている。']
+          '備考: BRG-07（KSPT）と RW-ALL-P1 は M が分かれるため、最初の M で数えている。']
 s = '\n'.join(lines)
 md2 = re.sub(r'<!-- summary:start -->.*<!-- summary:end -->', f'<!-- summary:start -->\n{s}\n<!-- summary:end -->', md, flags=re.S)
 (d / 'test-case-inventory.md').write_text(md2)
