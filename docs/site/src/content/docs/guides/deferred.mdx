@@ -42,7 +42,9 @@ fixture: fixtures/docs/guides
 
 ## シンボルを持ち越さない
 
-`KaSymbol`・`KaType`・`KaSession` は、ラウンドをまたいで使えません。フィールドに入れて次のラウンドで触ると例外になります。
+`KaSymbol`・`KaType`・`KaSession` は、ラウンドをまたいで使えません。これは Analysis API の制限です。
+
+AA の値は、作られた `analyze { }` の中でだけ有効です。ラウンドごとに別の `analyze { }` に入るので、フィールドに入れて次のラウンドで触ると AA が例外を投げます。
 
 ```kotlin
 class BadProcessor : AnalysisCodegenProcessor {
