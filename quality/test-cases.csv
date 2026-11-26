@@ -9,7 +9,7 @@ GRD-07,Gradle / KGP / AGP 統合（GRD）,JDK Toolchain の指定（17 / 21）�
 GRD-08,Gradle / KGP / AGP 統合（GRD）,Kotlin + Java 混在で、Kotlin から参照する Java クラスが解析で解決される,E,M1,F-JAVA
 GRD-09,Gradle / KGP / AGP 統合（GRD）,マルチモジュールで `:app` の Processor が `:lib` の公開宣言を解析できる,E,M1,F-JVM-MULTI
 GRD-10,Gradle / KGP / AGP 統合（GRD）,`:lib` の生成物（コンパイル済み）が `:app` から参照できる,E,M1,F-JVM-MULTI
-GRD-11,Gradle / KGP / AGP 統合（GRD）,Android アプリで 4 Variant それぞれにタスクが登録され、Variant 固有のソース（`src/free/` など）が解析される,E,M1,F-AND
+GRD-11,Gradle / KGP / AGP 統合（GRD）,Android アプリで 4 Variant それぞれにタスクが登録され、Variant 固有のソース（`src/free/` など）が解析される,E,M2,F-AND
 GRD-12,Gradle / KGP / AGP 統合（GRD）,Android の boot classpath（android.jar）が解析に入り、`android.*` の型が解決される,E,M1,F-AND
 GRD-13,Gradle / KGP / AGP 統合（GRD）,Android の unit test / androidTest の Compilation にも生成でき、main の生成物がテストから見える,E,M2,F-AND
 GRD-14,Gradle / KGP / AGP 統合（GRD）,AGP の Variant API（`androidComponents.onVariants`）経由で生成ソースが登録される,E,M2,F-AND
@@ -19,7 +19,7 @@ GRD-17,Gradle / KGP / AGP 統合（GRD）,Processor を `analysisCodeGen(...)` �
 GRD-18,Gradle / KGP / AGP 統合（GRD）,`sourceSets.all` / `compilations.all` の一括登録が効き、個別指定と重なったときの優先順位が ADR どおり,E,M2,
 GRD-19,Gradle / KGP / AGP 統合（GRD）,Processor オプションのグローバル指定と SourceSet スコープ指定が渡り、スコープ側が優先される,E,M1,
 GRD-20,Gradle / KGP / AGP 統合（GRD）,Processor が別バージョンの依存（例: Guava、kotlinx-serialization）を持っても、ビルドや AA と衝突しない（ClassLoader 分離）,E,M2,
-GRD-21,Gradle / KGP / AGP 統合（GRD）,AA / IntelliJ Platform がビルドスクリプトの classpath に載らない（Worker 側だけで読み込まれる）,E,M2,
+GRD-21,Gradle / KGP / AGP 統合（GRD）,AA / IntelliJ Platform がビルドスクリプトの classpath に載らない（Worker 側だけで読み込まれる）,E,M1,
 GRD-22,Gradle / KGP / AGP 統合（GRD）,遅延設定: `help` だけを実行したとき analysisCodeGen タスクが realize されない,E,M2,
 GRD-23,Gradle / KGP / AGP 統合（GRD）,同じモジュールで KSP と併用でき、タスクの循環が起きず、生成物の可視性が ADR で決めた規則どおり,E,M2,
 GRD-24,Gradle / KGP / AGP 統合（GRD）,対応表の最小と最新の Gradle でビルドが通る,E,M2,
@@ -33,15 +33,15 @@ KMP-01,KMP の整合性（KMP）,commonMain の Processor が commonMain に 1 �
 KMP-02,KMP の整合性（KMP）,commonMain の生成物がプラットフォームごとに再生成されない（生成ファイル数と宣言の重複が 0）,E,M1,
 KMP-03,KMP の整合性（KMP）,`expect` から各プラットフォームに `actual` を生成し、全ターゲットでコンパイルが通る,E,M1,TP-Actual
 KMP-04,KMP の整合性（KMP）,同じモジュールで commonMain と jvmMain に別々の Processor を付け、それぞれ自分の own files だけを処理する,E,M1,
-KMP-05,KMP の整合性（KMP）,中間 SourceSet（iosMain / appleMain / nativeMain）に生成し、iosArm64Main・iosSimulatorArm64Main から参照できる,E,M1,mac
-KMP-06,KMP の整合性（KMP）,解析の可視範囲が正しい: commonMain から `java.*` は解決できず、iosMain から `platform.UIKit` は解決でき JVM API は解決できない,E,M1,mac
+KMP-05,KMP の整合性（KMP）,中間 SourceSet（iosMain / appleMain / nativeMain）に生成し、iosArm64Main・iosSimulatorArm64Main から参照できる,E,M2,mac
+KMP-06,KMP の整合性（KMP）,解析の可視範囲が正しい: commonMain から `java.*` は解決できず、iosMain から `platform.UIKit` は解決でき JVM API は解決できない,E,M2,mac
 KMP-07,KMP の整合性（KMP）,commonMain の解析で共通 metadata 依存（kotlinx-coroutines-core の common 部分）が解決される,E,M1,
 KMP-08,KMP の整合性（KMP）,中間 SourceSet で commonize されたプラットフォームライブラリ（`platform.posix` など）が解決される,E,M2,
 KMP-09,KMP の整合性（KMP）,jvmMain の実行で、commonMain の宣言は visibleFiles に入り ownFiles には入らない,I,M1,
 KMP-10,KMP の整合性（KMP）,Processing Scope を明示的に広げると上流（commonMain の expect）を処理できるが、出力先は jvmMain のまま,I,M1,
 KMP-11,KMP の整合性（KMP）,commonMain の生成物を jvmMain の Processor が解析できる,E,M1,
 KMP-12,KMP の整合性（KMP）,1 つの SourceSet が複数の Compilation に属するとき、Compilation 単位の実行ではそれぞれのクラスパス・プラットフォームで解析される,E,M2,
-KMP-13,KMP の整合性（KMP）,`compilations.all` の Processor がプラットフォームごとに別々の集約出力（DI Registry 相当）を作る,E,M1,TP-Registry
+KMP-13,KMP の整合性（KMP）,`compilations.all` の Processor がプラットフォームごとに別々の集約出力（DI Registry 相当）を作る,E,M2,TP-Registry
 KMP-14,KMP の整合性（KMP）,commonTest / jvmTest でも生成でき、main の生成物がテストから見える,E,M2,
 KMP-15,KMP の整合性（KMP）,テストからの friend 依存: commonTest の解析で commonMain の `internal` が解決される,I,M2,
 KMP-16,KMP の整合性（KMP）,jvmMain の解析で `expect` 宣言から対応する `actual` を AA で辿れる,I,M2,
@@ -49,7 +49,7 @@ KMP-17,KMP の整合性（KMP）,デフォルト階層テンプレートと手�
 KMP-18,KMP の整合性（KMP）,"全ターゲット（jvm, android, iosArm64, iosSimulatorArm64, macosArm64, linuxX64, mingwX64, js(IR), wasmJs）で生成とコンパイルが通る",E,M2,mac
 KMP-19,KMP の整合性（KMP）,KMP の androidMain で Build Variant ごとに生成できる,E,M2,
 KMP-20,KMP の整合性（KMP）,KMP モジュール `:shared` を Android の `:app` が使い、`:shared` の commonMain 生成物が見える,E,M2,
-KMP-21,KMP の整合性（KMP）,iosMain だけに Processor を付けたとき、他の Compilation のタスクや出力に影響しない,E,M1,
+KMP-21,KMP の整合性（KMP）,iosMain だけに Processor を付けたとき、他の Compilation のタスクや出力に影響しない,E,M2,
 KMP-22,KMP の整合性（KMP）,Linux 上で Apple 向け SourceSet の解析ができる。できない構成では、原因が分かる診断が出る,E,M2,
 KMP-23,KMP の整合性（KMP）,SourceSet / Compilation 名からタスク名を作る規則が一意（`analysisCodeGenIosArm64MainSourceSet` など、衝突しない）,U,M1,
 KMP-24,KMP の整合性（KMP）,KSP の Issue #965 / #2621 の再現シナリオで、共通の生成物が 1 回だけ作られ下流から見える,E,M1,回帰テスト
@@ -140,7 +140,7 @@ FAIL-02,失敗からの回復（FAIL）,失敗のあとソースを直して再�
 FAIL-03,失敗からの回復（FAIL）,ビルドを強制終了（kill -9）したあとの次のビルドで、出力とキャッシュが整合している,E,M2,
 FAIL-04,失敗からの回復（FAIL）,ラウンド 2 で失敗したとき、永続キャッシュは前回成功時のまま（ラウンドの commit と永続の commit が分かれている）,I,M2,
 FAIL-05,失敗からの回復（FAIL）,生成物が原因でコンパイルエラーになったとき、生成物が残って原因を追える,E,M1,
-GCC-01,Gradle のキャッシュ（GCC）,Configuration Cache を有効にして 2 回目で再利用され、問題の報告が 0 件（`--configuration-cache-problems=fail`）,E,M2,
+GCC-01,Gradle のキャッシュ（GCC）,Configuration Cache を有効にして 2 回目で再利用され、問題の報告が 0 件（`--configuration-cache-problems=fail`）,E,M1,
 GCC-02,Gradle のキャッシュ（GCC）,別ディレクトリのクリーンな checkout で Build Cache から復元される（FROM-CACHE、relocatable）,E,M2,
 GCC-03,Gradle のキャッシュ（GCC）,入力が変わらないビルドで analysisCodeGen タスクが UP-TO-DATE になる（時間は PERF-09）,E,M2,
 GCC-04,Gradle のキャッシュ（GCC）,タスク入力のパスが相対で扱われ、キャッシュキーに絶対パスが入らない,U,M2,
@@ -153,7 +153,7 @@ BRG-05,KSP Bridge の API 互換（BRG）,`CodeGenerator.createNewFile` / `assoc
 BRG-06,KSP Bridge の API 互換（BRG）,KSPLogger の error でビルドが失敗し、KSNode の位置が出る,I,M1,
 BRG-07,KSP Bridge の API 互換（BRG）,KSP 公式テストスイート（KSP2 の AA 実装のテスト一式）を Bridge で実行し、取り込み時に付けた M どおりに通る（下の 6 章）,D,M1〜M3,KSPT-*
 BRG-08,KSP Bridge の API 互換（BRG）,Java ソース上の宣言も KS* として扱える,I,M2,
-BRG-09,KSP Bridge の API 互換（BRG）,ライブラリ（バイナリ）の宣言が KSP2 と同じ Origin・内容で表現される,D,M2,
+BRG-09,KSP Bridge の API 互換（BRG）,ライブラリ（バイナリ）の宣言が KSP2 と同じ Origin・内容で表現される,D,M1,
 BRG-10,KSP Bridge の API 互換（BRG）,JVM 固有 API（getJvmName、mapToJvmSignature、getOwnerJvmClassName など）が KSP2 と同じ結果,D,M2,
 BRG-11,KSP Bridge の API 互換（BRG）,KotlinPoet の KSP 拡張（toTypeName、toClassName、writeTo）が Bridge 上で動く,E,M1,
 BRG-12,KSP Bridge の API 互換（BRG）,KSP 互換モードで、生成ファイルの相対パスとファイル名が KSP2 と一致する,D,M2,
@@ -161,10 +161,10 @@ BRG-13,KSP Bridge の API 互換（BRG）,`analysisCodeGen { arg(...) }` で渡�
 BRG-14,KSP Bridge の API 互換（BRG）,KSP の Processor が無いプロジェクト（Bridge が有効にならない）の依存に KSP API が含まれない,E,M1,
 BRG-15,KSP Bridge の API 互換（BRG）,KSP の主要な Gradle 設定（増分の有効・無効など）に対応する設定があり、同じ効果がある,E,M3,
 BINC-01,Bridge の増分互換（BINC）,KSP の `Dependencies(isolating)` の契約どおりに再処理される,E,M2,
-BINC-02,Bridge の増分互換（BINC）,型解決を通じた暗黙の依存（設計文書 11.7 の superTypes の例）で、B.kt を変えると再生成される,E,M3,
+BINC-02,Bridge の増分互換（BINC）,型解決を通じた暗黙の依存（設計文書 11.7 の superTypes の例）で、B.kt を変えると再生成される,E,M2,
 BINC-03,Bridge の増分互換（BINC）,同じ変更に対して KSP2 と同じ dirty なファイル集合を計算する,D,M3,
-BINC-04,Bridge の増分互換（BINC）,Bridge 版でも、ランダムな変更履歴のあとの増分結果がクリーンビルドと一致する,P,M3,
-BINC-05,Bridge の増分互換（BINC）,追跡できない操作があったら、保守的に全件処理する,I,M3,
+BINC-04,Bridge の増分互換（BINC）,Bridge 版でも、ランダムな変更履歴のあとの増分結果がクリーンビルドと一致する,P,M2,
+BINC-05,Bridge の増分互換（BINC）,追跡できない操作があったら、保守的に全件処理する,I,M2,
 MIX-01,Native と Bridge の相互運用（MIX）,ラウンド 1 で KSP Processor が生成したコードを、ラウンド 2 で Native Processor が解析できる,I,M1,
 MIX-02,Native と Bridge の相互運用（MIX）,ラウンド 1 で Native Processor が生成したコードが、ラウンド 2 の KSP の `getNewFiles` に現れて処理される,I,M1,
 MIX-03,Native と Bridge の相互運用（MIX）,設計文書 11.6 の 3 ラウンド交互のシナリオが実際の Gradle ビルドで通る,E,M1,
@@ -191,7 +191,7 @@ RW-CRM-N2,実用 Processor の E2E（RW）,cream.kt（Native）: KMP の commonM
 RW-MSH-B1,実用 Processor の E2E（RW）,Moshi（Bridge）: サンプルがビルドでき、JSON の往復テストが通る,E,M1,
 RW-MSH-B2,実用 Processor の E2E（RW）,Moshi（Bridge）: 生成物が KSP2 と一致する,D,M2,
 RW-MSH-B3,実用 Processor の E2E（RW）,Moshi（Bridge）: Moshi の KSP 向けテストスイートが Bridge 上で通る,E,M3,
-RW-MSH-N1,実用 Processor の E2E（RW）,Moshi（Native）: 書き直し版が元と同じ JSON 往復テストを通る,E,M1,
+RW-MSH-N1,実用 Processor の E2E（RW）,Moshi（Native）: 書き直し版が元と同じ JSON 往復テストを通る,E,M2,
 RW-KIN-B1,実用 Processor の E2E（RW）,kotlin-inject（Bridge）: JVM のサンプルがビルドでき、DI の実行時テストが通る,E,M1,
 RW-KIN-B2,実用 Processor の E2E（RW）,kotlin-inject（Bridge）: 生成物が KSP2 と一致する,D,M2,
 RW-KIN-B3,実用 Processor の E2E（RW）,kotlin-inject（Bridge）: kotlin-inject 自身のテストスイートが Bridge 上で通る,E,M3,
@@ -201,7 +201,7 @@ RW-KIN-N2,実用 Processor の E2E（RW）,kotlin-inject（Native）: KMP でモ
 RW-KOI-B1,実用 Processor の E2E（RW）,Koin Annotations（Bridge）: サンプルがビルドでき、DI の実行時テストが通る,E,M1,
 RW-KOI-B2,実用 Processor の E2E（RW）,Koin Annotations（Bridge）: 生成物が KSP2 と一致する,D,M2,
 RW-KOI-B3,実用 Processor の E2E（RW）,Koin Annotations（Bridge）: Koin Annotations 自身のテストスイートが Bridge 上で通る,E,M3,
-RW-KOI-N1,実用 Processor の E2E（RW）,Koin Annotations（Native）: 書き直し版が元と同じ DI の実行時テストを通る,E,M1,
+RW-KOI-N1,実用 Processor の E2E（RW）,Koin Annotations（Native）: 書き直し版が元と同じ DI の実行時テストを通る,E,M2,
 RW-KOI-N2,実用 Processor の E2E（RW）,Koin Annotations（Native）: KMP でモジュールをまたぐ定義を生成できる,E,M2,
 RW-CMB-01,実用 Processor の E2E（RW）,複数適用: Koin + cream.kt を同じモジュールに適用し、Bridge 版で両方の生成と実行時テストが通る,E,M1,
 RW-CMB-02,実用 Processor の E2E（RW）,複数適用: Koin + cream.kt の Native 版どうし、および Native と Bridge を混ぜた構成で同じ結果になる,E,M2,
@@ -214,7 +214,7 @@ RW-DAG-B2,実用 Processor の E2E（RW）,Hilt（Bridge）: Android サンプ�
 RW-DAG-B3,実用 Processor の E2E（RW）,Dagger / Hilt（Bridge）: 生成物が KSP2 と一致する,D,M3,
 RW-DAG-N1,実用 Processor の E2E（RW）,Dagger / Hilt（Native）: 書き直し版が元と同じ DI の実行時テストを通る,E,任意,P3 で余力があれば作る
 RW-DAG-N2,実用 Processor の E2E（RW）,Dagger / Hilt（Native）: 生成物が KSP2 と三者差分テストの基準（XD-05・XD-12）で一致する,D,任意,P3 で余力があれば作る
-RW-ALL-I1,実用 Processor の E2E（RW）,上の各 Processor について、代表的な変更履歴（20 履歴）のあとの増分結果がクリーンビルドと一致する（Native 版は M2、Bridge 版は M3）,P,M2 / M3,集計上は版ごとに分ける
+RW-ALL-I1,実用 Processor の E2E（RW）,上の各 Processor について、代表的な変更履歴（20 履歴）のあとの増分結果がクリーンビルドと一致する（Native 版・Bridge 版とも。Bridge 版は M3 から M2 へ前倒し、ADR-054）,P,M2,
 RW-ALL-P1,実用 Processor の E2E（RW）,各 Processor の Bridge 版で全件処理の時間が KSP2 以下,B,M2,Room / Dagger は M3
 TST-01,テストフレームワーク（kct fork、TST）,ソース文字列を渡して Native Processor を実行し、生成物と診断を取得できる,E,M1,
 TST-02,テストフレームワーク（kct fork、TST）,同じ API で KSP Processor（Bridge）もテストできる,E,M1,
@@ -233,7 +233,7 @@ VER-03,バージョン互換と診断（VER）,対応表の最小と最新の AG
 VER-04,バージョン互換と診断（VER）,Kotlin の新しい stable / プレリリースが出たら、対応バージョンの一覧と CI のマトリクスが自動で更新される（更新の PR が作られる）,U,M2,
 VER-05,バージョン互換と診断（VER）,同じ入力に対して、対応するすべての Kotlin バージョンで生成物が一致する（言語機能の差が出ない入力に限る）,D,M2,
 VER-06,バージョン互換と診断（VER）,プレリリースが stable になったら、プレリリース枠が次の最新に移り、古いプレリリースには対応外の診断が出る,E,M3,
-MEM-01,メモリ（MEM）,解析環境を閉じたあと、IntelliJ Project と Disposer の登録が残らない（GC 後に回収されている）,I,M2,
+MEM-01,メモリ（MEM）,解析環境を閉じたあと、IntelliJ Project と Disposer の登録が残らない（GC 後に回収されている）,I,M1,
 MEM-02,メモリ（MEM）,同じ Gradle daemon で 20 回続けてビルドしても、ヒープが増え続けない,B,M2,
 MEM-03,メモリ（MEM）,ピークヒープが KSP2 以下（同じ Processor・同じ入力）,B,M2,
 MEM-04,メモリ（MEM）,ビルド終了後に Processor の ClassLoader が解放される,I,M2,
@@ -268,7 +268,7 @@ XD-07,三者差分テスト（PBT × E2E、XD）,Processor ごとの全オプシ
 XD-08,三者差分テスト（PBT × E2E、XD）,ビルドの成否とコンパイラ診断（誤った入力を含む）が K / B / N で一致する,D,M2,
 XD-09,三者差分テスト（PBT × E2E、XD）,変更の列（状態機械 PBT）の各ステップで、B の増分結果 = B の最終状態のクリーンビルド = K のクリーンビルド,P,M2,
 XD-10,三者差分テスト（PBT × E2E、XD）,変更の列の各ステップで、N の増分結果 = N の最終状態のクリーンビルド、かつ K と段階 1 で一致,P,M2,
-XD-11,三者差分テスト（PBT × E2E、XD）,直近 24 時間の定期実行で、カタログのパターン・オプション値・オプション値の組・Processor のペアの網羅率がすべて 100%,U,M2,
+XD-11,三者差分テスト（PBT × E2E、XD）,Kotlin の版ごとに、その版の一巡（版の数 × 24 時間）の定期実行で、カタログのパターン・オプション値・オプション値の組・Processor のペアの網羅率がすべて 100%（ADR-055）,U,M2,
 XD-12,三者差分テスト（PBT × E2E、XD）,K と N の生成コードが正規化後に一致する（段階 2）。差は ADR の許容リストに載ったものだけ,D,M3,
 XD-13,三者差分テスト（PBT × E2E、XD）,Logger 出力（レベル・位置・文言）が K と B で一致する,D,M3,M2 では計測して表示
 XD-14,三者差分テスト（PBT × E2E、XD）,Logger 出力のレベルと位置が K と N で一致する（文言は努力目標として計測・表示）,D,M3,
@@ -309,7 +309,7 @@ KSPT-ObjCacheB,取り込んだテスト（KSPT）,KSP 公式テスト `testObjCa
 KSPT-ChangingBehavior,取り込んだテスト（KSPT）,KSP 公式テスト `testChangingBehavior`（`changingBehavior.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M3,試験的な API 機能（backing field・context parameter）
 KSPT-RegisterProcessorForNewFeatures,取り込んだテスト（KSPT）,KSP 公式テスト `testRegisterProcessorForNewFeatures`（`registerProcessorForNewFeatures.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M3,試験的な API 機能（backing field・context parameter）
 KSPT-CheckOverride,取り込んだテスト（KSPT）,KSP 公式テスト `testCheckOverride`（`checkOverride.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
-KSPT-ClassKinds,取り込んだテスト（KSPT）,KSP 公式テスト `testClassKinds`（`classKinds.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
+KSPT-ClassKinds,取り込んだテスト（KSPT）,KSP 公式テスト `testClassKinds`（`classKinds.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本（Java の宣言を含む）
 KSPT-Companion,取り込んだテスト（KSPT）,KSP 公式テスト `testCompanion`（`companion.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,ライブラリ（バイナリの宣言）
 KSPT-ConstProperties,取り込んだテスト（KSPT）,KSP 公式テスト `testConstProperties`（`constProperties.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,ライブラリ（バイナリの宣言）
 KSPT-ConstructorDeclarations,取り込んだテスト（KSPT）,KSP 公式テスト `testConstructorDeclarations`（`constructorDeclarations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
@@ -330,7 +330,7 @@ KSPT-DeclarationUtil,取り込んだテスト（KSPT）,KSP 公式テスト `tes
 KSPT-Declared,取り込んだテスト（KSPT）,KSP 公式テスト `testDeclared`（`declared.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
 KSPT-DocString,取り込んだテスト（KSPT）,KSP 公式テスト `testDocString`（`docString.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
 KSPT-Equals,取り込んだテスト（KSPT）,KSP 公式テスト `testEquals`（`equals.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
-KSPT-EquivalentJavaWildcards,取り込んだテスト（KSPT）,KSP 公式テスト `testEquivalentJavaWildcards`（`equivalentJavaWildcards.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本
+KSPT-EquivalentJavaWildcards,取り込んだテスト（KSPT）,KSP 公式テスト `testEquivalentJavaWildcards`（`equivalentJavaWildcards.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java 連携
 KSPT-ErrorTypes,取り込んだテスト（KSPT）,KSP 公式テスト `testErrorTypes`（`errorTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
 KSPT-ExplicitBackingFields,取り込んだテスト（KSPT）,KSP 公式テスト `testExplicitBackingFields`（`getSymbolsWithAnnotation/explicitBackingFields.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M3,試験的な API 機能（backing field・context parameter）
 KSPT-BackingFieldsPackageName,取り込んだテスト（KSPT）,KSP 公式テスト `testBackingFieldsPackageName`（`getSymbolsWithAnnotation/backingFieldsPackageName.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M3,試験的な API 機能（backing field・context parameter）
@@ -347,7 +347,7 @@ KSPT-GetSymbolsFromAnnotation,取り込んだテスト（KSPT）,KSP 公式テ�
 KSPT-GetSymbolsFromAnnotationInLib,取り込んだテスト（KSPT）,KSP 公式テスト `testGetSymbolsFromAnnotationInLib`（`getSymbolsFromAnnotationInLib.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,ライブラリ（バイナリの宣言）
 KSPT-GroupedAnnotations,取り込んだテスト（KSPT）,KSP 公式テスト `testGroupedAnnotations`（`getSymbolsWithAnnotation/groupedAnnotations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本
 KSPT-GroupedAnnotationsWithUseSiteTargets,取り込んだテスト（KSPT）,KSP 公式テスト `testGroupedAnnotationsWithUseSiteTargets`（`getSymbolsWithAnnotation/groupedAnnotationsWithUseSiteTargets.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本
-KSPT-Hello,取り込んだテスト（KSPT）,KSP 公式テスト `testHello`（`hello.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
+KSPT-Hello,取り込んだテスト（KSPT）,KSP 公式テスト `testHello`（`hello.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本（Java の宣言を含む）
 KSPT-ImplicitElements,取り込んだテスト（KSPT）,KSP 公式テスト `testImplicitElements`（`implicitElements.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
 KSPT-ImplicitPropertyAccessors,取り込んだテスト（KSPT）,KSP 公式テスト `testImplicitPropertyAccessors`（`implicitPropertyAccessors.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,ライブラリ（バイナリの宣言）
 KSPT-InternalOfFriends,取り込んだテスト（KSPT）,KSP 公式テスト `testInternalOfFriends`（`internalOfFriends.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,ライブラリ（バイナリの宣言）
@@ -363,9 +363,9 @@ KSPT-JavaBackingFieldsParents,取り込んだテスト（KSPT）,KSP 公式テ�
 KSPT-JavaSubtype,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaSubtype`（`javaSubtype.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
 KSPT-JavaSubtypeOfKotlinInterface,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaSubtypeOfKotlinInterface`（`javaSubtypeOfKotlinInterface.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
 KSPT-JavaToKotlinMapper,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaToKotlinMapper`（`javaToKotlinMapper.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M3,JVM シグネチャ・名前の細部
-KSPT-JavaTypes,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaTypes`（`javaTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本
+KSPT-JavaTypes,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaTypes`（`javaTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java 連携
 KSPT-JavaTypes2,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaTypes2`（`javaTypes2.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
-KSPT-JavaWildcards2,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaWildcards2`（`javaWildcards2.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本
+KSPT-JavaWildcards2,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaWildcards2`（`javaWildcards2.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java 連携
 KSPT-JvmName,取り込んだテスト（KSPT）,KSP 公式テスト `testJvmName`（`jvmName.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M3,JVM シグネチャ・名前の細部
 KSPT-JvmNameRecord,取り込んだテスト（KSPT）,KSP 公式テスト `testJvmNameRecord`（`jvmNameRecord.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M3,JVM シグネチャ・名前の細部
 KSPT-JvmModifiersCompanionObject,取り込んだテスト（KSPT）,KSP 公式テスト `testJvmModifiersCompanionObject`（`jvmModifiersCompanionObject.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M3,JVM シグネチャ・名前の細部
@@ -406,7 +406,7 @@ KSPT-RepeatedNonRepeatableAnnotations,取り込んだテスト（KSPT）,KSP 公
 KSPT-ReplaceWithErrorTypeArgs,取り込んだテスト（KSPT）,KSP 公式テスト `testReplaceWithErrorTypeArgs`（`replaceWithErrorTypeArgs.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
 KSPT-ResolveJavaType,取り込んだテスト（KSPT）,KSP 公式テスト `testResolveJavaType`（`resolveJavaType.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
 KSPT-SealedClass,取り込んだテスト（KSPT）,KSP 公式テスト `testSealedClass`（`sealedClass.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,ライブラリ（バイナリの宣言）
-KSPT-JavaWildcardsSelfReferencing,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaWildcardsSelfReferencing`（`javaWildcardsSelfReferencing.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本
+KSPT-JavaWildcardsSelfReferencing,取り込んだテスト（KSPT）,KSP 公式テスト `testJavaWildcardsSelfReferencing`（`javaWildcardsSelfReferencing.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java 連携
 KSPT-ShadowingAnnotations,取り込んだテスト（KSPT）,KSP 公式テスト `testShadowingAnnotations`（`getSymbolsWithAnnotation/shadowingAnnotations.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本
 KSPT-SignatureMapper,取り込んだテスト（KSPT）,KSP 公式テスト `testSignatureMapper`（`signatureMapper.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M3,JVM シグネチャ・名前の細部
 KSPT-SuperTypes,取り込んだテスト（KSPT）,KSP 公式テスト `testSuperTypes`（`superTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
@@ -425,7 +425,7 @@ KSPT-VarargAnnotationApplication,取り込んだテスト（KSPT）,KSP 公式�
 KSPT-VarianceTypeCheck,取り込んだテスト（KSPT）,KSP 公式テスト `testVarianceTypeCheck`（`varianceTypeCheck.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本
 KSPT-ValidateTypes,取り込んだテスト（KSPT）,KSP 公式テスト `testValidateTypes`（`validateTypes.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
 KSPT-Vararg,取り込んだテスト（KSPT）,KSP 公式テスト `testVararg`（`vararg.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
-KSPT-Visibilities,取り込んだテスト（KSPT）,KSP 公式テスト `testVisibilities`（`visibilities.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,Java ソース
+KSPT-Visibilities,取り込んだテスト（KSPT）,KSP 公式テスト `testVisibilities`（`visibilities.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M1,シンボル・アノテーション・型の基本（Java の宣言を含む）
 KSPT-Multipleround,取り込んだテスト（KSPT）,KSP 公式テスト `testMultipleround`（`multipleround.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,マルチラウンド・deferred
 KSPT-DeferredSymbols,取り込んだテスト（KSPT）,KSP 公式テスト `testDeferredSymbols`（`deferredSymbols.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,マルチラウンド・deferred
 KSPT-DeferredJavaSymbols,取り込んだテスト（KSPT）,KSP 公式テスト `testDeferredJavaSymbols`（`deferredJavaSymbols.kt`）が、4 つの API 機能の組すべてで期待どおりの出力になる,D,M2,マルチラウンド・deferred

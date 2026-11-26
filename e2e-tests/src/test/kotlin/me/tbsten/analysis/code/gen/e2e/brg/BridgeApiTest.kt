@@ -471,7 +471,7 @@ class BridgeApiDiffTest : DiffSpec({
         text shouldContain "[fun]"
     }
 
-    case("BRG-09", "ライブラリ（バイナリ）の宣言が KSP2 と同じ Origin・内容で表現される", pending = PendingCase(Milestone.M2)) {
+    case("BRG-09", "ライブラリ（バイナリ）の宣言が KSP2 と同じ Origin・内容で表現される", pending = PendingCase(Milestone.M1)) {
         val pair = inspectBoth(brgSources, ::libraryDump)
         pair.bridge shouldBe pair.ksp2
     }

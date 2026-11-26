@@ -86,17 +86,26 @@ class XdIncrementalPbtTest : PbtSpec({
 class XdCoverageTest : UnitSpec({
     case(
         "XD-11",
-        "直近 24 時間の定期実行で、カタログのパターン・オプション値・オプション値の組・Processor のペアの網羅率がすべて 100%",
+        "Kotlin の版ごとに、その版の一巡（版の数 × 24 時間）の定期実行で、カタログのパターン・オプション値・オプション値の組・Processor のペアの網羅率がすべて 100%",
         pending = PendingCase(Milestone.M2),
     ) {
         // 毎時のワークフロー（pbt-hourly.yml）は acgCheckAll / acgCheckExhaustive が書いた網羅の記録（build/pbt/coverage/*.tsv）を
-        // .pbt-state/coverage/<UTC の yyyyMMddHH>/ に写して持ち回る（ADR-037）。直近 24 時間ぶんのラベルを合わせる。
+        // .pbt-state/coverage/<Kotlin の版>/<UTC の yyyyMMddHH>/ に写して持ち回る。網羅率は版ごとに独立に数える（ADR-055）。
+        // 区画と版の割り当てを 1 日ずつずらすので、版の数 × 24 時間で「全版 × 全区画」が一巡する。
         // 1 行の先頭の欄は空白区切りで複数のラベルを持てる（XD-04・06・07 の網羅層の ID）
-        val root = repoRoot.resolve(".pbt-state/coverage")
+        val versions =
+            repoRoot
+                .resolve("gradle/kotlin-versions.txt")
+                .readLines()
+                .map { it.substringBefore('#').trim() }
+                .filter { it.isNotEmpty() }
+                .map { it.split(Regex("\\s+")).first() }
         val hour = DateTimeFormatter.ofPattern("yyyyMMddHH").withZone(ZoneOffset.UTC)
-        val window = (0 until 24).map { hour.format(Instant.now().minusSeconds(3600L * it)) }.toSet()
-        val seen =
-            root
+        val window = (0 until versions.size * 24).map { hour.format(Instant.now().minusSeconds(3600L * it)) }.toSet()
+
+        fun seen(version: String): Set<String> =
+            repoRoot
+                .resolve(".pbt-state/coverage/$version")
                 .listFiles()
                 .orEmpty()
                 .filter { it.isDirectory && it.name in window }
@@ -130,9 +139,10 @@ class XdCoverageTest : UnitSpec({
         // 全ペアの表が本当にすべての組を覆う形になっている（網羅の基準そのものの確認）
         ProcessorId.entries.forEach { id -> Pairwise.cover(OptionTable.of(id).map { it.values.size }).isNotEmpty() shouldBe true }
 
-        val missing = (expected - seen).sorted()
-        withClue("直近 24 時間で一度も出ていないもの ${missing.size} 件（先頭 30 件）:\n${missing.take(30).joinToString("\n")}") {
-            missing.shouldBeEmpty()
+        val missing = versions.associateWith { (expected - seen(it)).sorted() }.filterValues { it.isNotEmpty() }
+        val report = missing.entries.joinToString("\n") { (v, m) -> "$v: ${m.size} 件（先頭 10 件）\n" + m.take(10).joinToString("\n") }
+        withClue("その版の一巡で一度も出ていないもの:\n$report") {
+            missing.keys.shouldBeEmpty()
         }
     }
 })

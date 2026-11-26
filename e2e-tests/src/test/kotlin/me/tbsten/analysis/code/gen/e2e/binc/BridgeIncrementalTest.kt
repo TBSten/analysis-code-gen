@@ -111,7 +111,7 @@ class BridgeIncrementalE2ETest : E2ESpec({
         lastDirty(probe) shouldBe setOf("A.kt")
     }
 
-    case("BINC-02", "型解決を通じた暗黙の依存（設計文書 11.7 の superTypes の例）で、B.kt を変えると再生成される", pending = PendingCase(Milestone.M3)) {
+    case("BINC-02", "型解決を通じた暗黙の依存（設計文書 11.7 の superTypes の例）で、B.kt を変えると再生成される", pending = PendingCase(Milestone.M2)) {
         binc02(TestEngine.AnalysisCodegen)
     }
     "[KSP2 で期待を確認] BINC-02" { binc02(TestEngine.Ksp2) }

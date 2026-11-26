@@ -32,7 +32,7 @@ KSPT-ObjCacheB,testObjCacheB,objCacheB.kt,M2,ライブラリ（バイナリの�
 KSPT-ChangingBehavior,testChangingBehavior,changingBehavior.kt,M3,試験的な API 機能（backing field・context parameter）,positive
 KSPT-RegisterProcessorForNewFeatures,testRegisterProcessorForNewFeatures,registerProcessorForNewFeatures.kt,M3,試験的な API 機能（backing field・context parameter）,positive
 KSPT-CheckOverride,testCheckOverride,checkOverride.kt,M2,Java ソース,positive
-KSPT-ClassKinds,testClassKinds,classKinds.kt,M2,Java ソース,positive
+KSPT-ClassKinds,testClassKinds,classKinds.kt,M1,シンボル・アノテーション・型の基本（Java の宣言を含む）,positive
 KSPT-Companion,testCompanion,companion.kt,M2,ライブラリ（バイナリの宣言）,positive
 KSPT-ConstProperties,testConstProperties,constProperties.kt,M2,ライブラリ（バイナリの宣言）,positive
 KSPT-ConstructorDeclarations,testConstructorDeclarations,constructorDeclarations.kt,M2,Java ソース,positive
@@ -53,7 +53,7 @@ KSPT-DeclarationUtil,testDeclarationUtil,declarationUtil.kt,M1,シンボル・�
 KSPT-Declared,testDeclared,declared.kt,M2,Java ソース,positive
 KSPT-DocString,testDocString,docString.kt,M2,Java ソース,positive
 KSPT-Equals,testEquals,equals.kt,M2,Java ソース,positive
-KSPT-EquivalentJavaWildcards,testEquivalentJavaWildcards,equivalentJavaWildcards.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-EquivalentJavaWildcards,testEquivalentJavaWildcards,equivalentJavaWildcards.kt,M2,Java 連携,positive
 KSPT-ErrorTypes,testErrorTypes,errorTypes.kt,M2,Java ソース,positive
 KSPT-ExplicitBackingFields,testExplicitBackingFields,getSymbolsWithAnnotation/explicitBackingFields.kt,M3,試験的な API 機能（backing field・context parameter）,positive
 KSPT-BackingFieldsPackageName,testBackingFieldsPackageName,getSymbolsWithAnnotation/backingFieldsPackageName.kt,M3,試験的な API 機能（backing field・context parameter）,positive
@@ -70,7 +70,7 @@ KSPT-GetSymbolsFromAnnotation,testGetSymbolsFromAnnotation,getSymbolsFromAnnotat
 KSPT-GetSymbolsFromAnnotationInLib,testGetSymbolsFromAnnotationInLib,getSymbolsFromAnnotationInLib.kt,M2,ライブラリ（バイナリの宣言）,positive
 KSPT-GroupedAnnotations,testGroupedAnnotations,getSymbolsWithAnnotation/groupedAnnotations.kt,M1,シンボル・アノテーション・型の基本,positive
 KSPT-GroupedAnnotationsWithUseSiteTargets,testGroupedAnnotationsWithUseSiteTargets,getSymbolsWithAnnotation/groupedAnnotationsWithUseSiteTargets.kt,M1,シンボル・アノテーション・型の基本,positive
-KSPT-Hello,testHello,hello.kt,M2,Java ソース,positive
+KSPT-Hello,testHello,hello.kt,M1,シンボル・アノテーション・型の基本（Java の宣言を含む）,positive
 KSPT-ImplicitElements,testImplicitElements,implicitElements.kt,M2,Java ソース,positive
 KSPT-ImplicitPropertyAccessors,testImplicitPropertyAccessors,implicitPropertyAccessors.kt,M2,ライブラリ（バイナリの宣言）,positive
 KSPT-InternalOfFriends,testInternalOfFriends,internalOfFriends.kt,M2,ライブラリ（バイナリの宣言）,positive
@@ -86,9 +86,9 @@ KSPT-JavaBackingFieldsParents,testJavaBackingFieldsParents,getSymbolsWithAnnotat
 KSPT-JavaSubtype,testJavaSubtype,javaSubtype.kt,M2,Java ソース,positive
 KSPT-JavaSubtypeOfKotlinInterface,testJavaSubtypeOfKotlinInterface,javaSubtypeOfKotlinInterface.kt,M2,Java ソース,positive
 KSPT-JavaToKotlinMapper,testJavaToKotlinMapper,javaToKotlinMapper.kt,M3,JVM シグネチャ・名前の細部,positive
-KSPT-JavaTypes,testJavaTypes,javaTypes.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-JavaTypes,testJavaTypes,javaTypes.kt,M2,Java 連携,positive
 KSPT-JavaTypes2,testJavaTypes2,javaTypes2.kt,M2,Java ソース,positive
-KSPT-JavaWildcards2,testJavaWildcards2,javaWildcards2.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-JavaWildcards2,testJavaWildcards2,javaWildcards2.kt,M2,Java 連携,positive
 KSPT-JvmName,testJvmName,jvmName.kt,M3,JVM シグネチャ・名前の細部,positive
 KSPT-JvmNameRecord,testJvmNameRecord,jvmNameRecord.kt,M3,JVM シグネチャ・名前の細部,positive
 KSPT-JvmModifiersCompanionObject,testJvmModifiersCompanionObject,jvmModifiersCompanionObject.kt,M3,JVM シグネチャ・名前の細部,positive
@@ -129,7 +129,7 @@ KSPT-RepeatedNonRepeatableAnnotations,testRepeatedNonRepeatableAnnotations,getSy
 KSPT-ReplaceWithErrorTypeArgs,testReplaceWithErrorTypeArgs,replaceWithErrorTypeArgs.kt,M2,Java ソース,positive
 KSPT-ResolveJavaType,testResolveJavaType,resolveJavaType.kt,M2,Java ソース,positive
 KSPT-SealedClass,testSealedClass,sealedClass.kt,M2,ライブラリ（バイナリの宣言）,positive
-KSPT-JavaWildcardsSelfReferencing,testJavaWildcardsSelfReferencing,javaWildcardsSelfReferencing.kt,M1,シンボル・アノテーション・型の基本,positive
+KSPT-JavaWildcardsSelfReferencing,testJavaWildcardsSelfReferencing,javaWildcardsSelfReferencing.kt,M2,Java 連携,positive
 KSPT-ShadowingAnnotations,testShadowingAnnotations,getSymbolsWithAnnotation/shadowingAnnotations.kt,M1,シンボル・アノテーション・型の基本,positive
 KSPT-SignatureMapper,testSignatureMapper,signatureMapper.kt,M3,JVM シグネチャ・名前の細部,positive
 KSPT-SuperTypes,testSuperTypes,superTypes.kt,M2,Java ソース,positive
@@ -148,7 +148,7 @@ KSPT-VarargAnnotationApplication,testVarargAnnotationApplication,varargAnnotatio
 KSPT-VarianceTypeCheck,testVarianceTypeCheck,varianceTypeCheck.kt,M1,シンボル・アノテーション・型の基本,positive
 KSPT-ValidateTypes,testValidateTypes,validateTypes.kt,M2,Java ソース,positive
 KSPT-Vararg,testVararg,vararg.kt,M2,Java ソース,positive
-KSPT-Visibilities,testVisibilities,visibilities.kt,M2,Java ソース,positive
+KSPT-Visibilities,testVisibilities,visibilities.kt,M1,シンボル・アノテーション・型の基本（Java の宣言を含む）,positive
 KSPT-Multipleround,testMultipleround,multipleround.kt,M2,マルチラウンド・deferred,positive
 KSPT-DeferredSymbols,testDeferredSymbols,deferredSymbols.kt,M2,マルチラウンド・deferred,positive
 KSPT-DeferredJavaSymbols,testDeferredJavaSymbols,deferredJavaSymbols.kt,M2,マルチラウンド・deferred,positive

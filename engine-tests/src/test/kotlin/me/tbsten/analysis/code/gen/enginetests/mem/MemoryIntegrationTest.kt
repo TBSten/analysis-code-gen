@@ -158,7 +158,7 @@ class MemoryIntegrationTest : IntegrationSpec({
     case(
         "MEM-01",
         "解析環境を閉じたあと、IntelliJ Project と Disposer の登録が残らない（GC 後に回収されている）",
-        pending = PendingCase(Milestone.M2),
+        pending = PendingCase(Milestone.M1),
     ) {
         val model = singleFileModel()
         // 1 回目は AA のアプリケーション環境（プロセスで 1 つ、ADR-010）を作るので、2 回目以降の Project を見る

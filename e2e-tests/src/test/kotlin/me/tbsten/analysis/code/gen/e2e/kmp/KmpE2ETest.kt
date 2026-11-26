@@ -98,7 +98,7 @@ class KmpE2ETest : E2ESpec({
         p.generated("commonMain").kotlin("fixture/kmp/JvmModelMapper.kt").isFile shouldBe false
     }
 
-    case("KMP-05", "中間 SourceSet（iosMain / appleMain / nativeMain）に生成し、iosArm64Main・iosSimulatorArm64Main から参照できる", M1) {
+    case("KMP-05", "中間 SourceSet（iosMain / appleMain / nativeMain）に生成し、iosArm64Main・iosSimulatorArm64Main から参照できる", M2) {
         // mac ランナーで動かす
         val p =
             fixtureProject(Fixture.KMP) {
@@ -125,7 +125,7 @@ class KmpE2ETest : E2ESpec({
         p.allGenerated().keys.count { it.endsWith("IosModelMapper.kt") } shouldBe 1
     }
 
-    case("KMP-06", "解析の可視範囲が正しい: commonMain から java.* は解決できず、iosMain から platform.UIKit は解決でき JVM API は解決できない", M1) {
+    case("KMP-06", "解析の可視範囲が正しい: commonMain から java.* は解決できず、iosMain から platform.UIKit は解決でき JVM API は解決できない", M2) {
         // mac ランナーで動かす。TP-Defer は解決できない target を最後まで持ち越し、エラーで一覧を出す（ADR-014）
         val p =
             fixtureProject(Fixture.KMP) {
@@ -250,7 +250,7 @@ class KmpE2ETest : E2ESpec({
         byUnit.values.forEach { it.extra.getValue("dependsOn") shouldContain "commonMain" }
     }
 
-    case("KMP-13", "compilations.all の Processor がプラットフォームごとに別々の集約出力（DI Registry 相当）を作る", M1) {
+    case("KMP-13", "compilations.all の Processor がプラットフォームごとに別々の集約出力（DI Registry 相当）を作る", M2) {
         val p = fixtureProject(Fixture.KMP) { withoutAndroid() }
         p.build("jvmTest", "compileKotlinJs")
         val jvm = p.generatedForCompilation("jvmMain").kotlin("me/tbsten/analysis/code/gen/tp/generated/TpRegistry.kt").readText()
@@ -365,7 +365,7 @@ class KmpE2ETest : E2ESpec({
         result.task(":app:compileFreeDebugKotlin")?.outcome shouldBe TaskOutcome.SUCCESS
     }
 
-    case("KMP-21", "iosMain だけに Processor を付けたとき、他の Compilation のタスクや出力に影響しない", M1) {
+    case("KMP-21", "iosMain だけに Processor を付けたとき、他の Compilation のタスクや出力に影響しない", M2) {
         val p =
             emptyProject {
                 file("src/main").deleteRecursively()

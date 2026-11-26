@@ -9,7 +9,7 @@ GRD-07,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJ
 GRD-08,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-09,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-10,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
-GRD-11,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
+GRD-11,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
 GRD-12,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
 GRD-13,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
 GRD-14,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
@@ -19,7 +19,7 @@ GRD-17,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJ
 GRD-18,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-19,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-20,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
-GRD-21,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
+GRD-21,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-22,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-23,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-24,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
@@ -33,15 +33,15 @@ KMP-01,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ET
 KMP-02,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-03,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-04,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
-KMP-05,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
-KMP-06,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
+KMP-05,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
+KMP-06,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-07,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-08,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-09,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpIntegrationTest
 KMP-10,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpIntegrationTest
 KMP-11,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-12,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
-KMP-13,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
+KMP-13,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-14,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-15,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpIntegrationTest
 KMP-16,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpIntegrationTest
@@ -49,7 +49,7 @@ KMP-17,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ET
 KMP-18,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-19,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-20,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
-KMP-21,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
+KMP-21,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-22,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-23,U,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpNamingUnitTest
 KMP-24,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
@@ -140,7 +140,7 @@ FAIL-02,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.fail.Failu
 FAIL-03,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.fail.FailureRecoveryE2ETest
 FAIL-04,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.fail.RoundFailureTest
 FAIL-05,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.fail.FailureRecoveryE2ETest
-GCC-01,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.gcc.GradleCacheE2ETest
+GCC-01,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.gcc.GradleCacheE2ETest
 GCC-02,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.gcc.GradleCacheE2ETest
 GCC-03,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.gcc.GradleCacheE2ETest
 GCC-04,U,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.gcc.TaskInputPathTest
@@ -153,7 +153,7 @@ BRG-05,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeA
 BRG-06,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeApiIntegrationTest
 BRG-07,D,M1〜M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeSuiteDiffTest
 BRG-08,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeApiIntegrationTest
-BRG-09,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeApiDiffTest
+BRG-09,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeApiDiffTest
 BRG-10,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeApiDiffTest
 BRG-11,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeE2ETest
 BRG-12,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeApiDiffTest
@@ -161,10 +161,10 @@ BRG-13,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeE
 BRG-14,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeE2ETest
 BRG-15,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.brg.BridgeE2ETest
 BINC-01,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.BridgeIncrementalE2ETest
-BINC-02,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.BridgeIncrementalE2ETest
+BINC-02,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.BridgeIncrementalE2ETest
 BINC-03,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.BridgeIncrementalDiffTest
-BINC-04,P,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.pbt.IncrementalPropertyTest
-BINC-05,I,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.binc.BridgeIncrementalEngineTest
+BINC-04,P,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.pbt.IncrementalPropertyTest
+BINC-05,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.binc.BridgeIncrementalEngineTest
 MIX-01,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mix.MixedProcessorsTest
 MIX-02,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mix.MixedProcessorsTest
 MIX-03,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.mix.ThreeRoundAlternationE2ETest
@@ -191,7 +191,7 @@ RW-CRM-N2,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealW
 RW-MSH-B1,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-MSH-B2,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest
 RW-MSH-B3,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
-RW-MSH-N1,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
+RW-MSH-N1,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-KIN-B1,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-KIN-B2,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest
 RW-KIN-B3,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
@@ -201,7 +201,7 @@ RW-KIN-N2,E,任意,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.R
 RW-KOI-B1,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-KOI-B2,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest
 RW-KOI-B3,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
-RW-KOI-N1,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
+RW-KOI-N1,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-KOI-N2,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-CMB-01,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-CMB-02,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
@@ -214,7 +214,7 @@ RW-DAG-B2,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealW
 RW-DAG-B3,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest
 RW-DAG-N1,E,任意,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-DAG-N2,D,任意,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest
-RW-ALL-I1,P,M2 / M3,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldIncrementalPbtTest
+RW-ALL-I1,P,M2,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldIncrementalPbtTest
 RW-ALL-P1,B,M2,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldBenchTest
 TST-01,E,M1,pending,NotImplemented,2,me.tbsten.analysis.code.gen.enginetests.tst.TestingNativeE2ETest
 TST-02,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
@@ -233,7 +233,7 @@ VER-03,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ver.Version
 VER-04,U,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ver.VersionListUnitTest
 VER-05,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ver.VersionOutputDiffTest
 VER-06,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ver.VersionCompatibilityE2ETest
-MEM-01,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mem.MemoryIntegrationTest
+MEM-01,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mem.MemoryIntegrationTest
 MEM-02,B,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.mem.MemoryBenchTest
 MEM-03,B,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.mem.MemoryBenchTest
 MEM-04,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mem.MemoryIntegrationTest
@@ -309,7 +309,7 @@ KSPT-ObjCacheB,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcomp
 KSPT-ChangingBehavior,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-RegisterProcessorForNewFeatures,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-CheckOverride,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
-KSPT-ClassKinds,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
+KSPT-ClassKinds,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-Companion,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-ConstProperties,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-ConstructorDeclarations,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
@@ -330,7 +330,7 @@ KSPT-DeclarationUtil,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.k
 KSPT-Declared,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-DocString,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-Equals,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
-KSPT-EquivalentJavaWildcards,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
+KSPT-EquivalentJavaWildcards,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-ErrorTypes,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-ExplicitBackingFields,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-BackingFieldsPackageName,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
@@ -347,7 +347,7 @@ KSPT-GetSymbolsFromAnnotation,D,M2,pending,NotImplemented,1,me.tbsten.analysis.c
 KSPT-GetSymbolsFromAnnotationInLib,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-GroupedAnnotations,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-GroupedAnnotationsWithUseSiteTargets,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
-KSPT-Hello,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
+KSPT-Hello,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-ImplicitElements,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-ImplicitPropertyAccessors,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-InternalOfFriends,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
@@ -363,9 +363,9 @@ KSPT-JavaBackingFieldsParents,D,M3,pending,NotImplemented,1,me.tbsten.analysis.c
 KSPT-JavaSubtype,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-JavaSubtypeOfKotlinInterface,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-JavaToKotlinMapper,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
-KSPT-JavaTypes,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
+KSPT-JavaTypes,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-JavaTypes2,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
-KSPT-JavaWildcards2,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
+KSPT-JavaWildcards2,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-JvmName,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-JvmNameRecord,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-JvmModifiersCompanionObject,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
@@ -406,7 +406,7 @@ KSPT-RepeatedNonRepeatableAnnotations,D,M1,pending,NotImplemented,1,me.tbsten.an
 KSPT-ReplaceWithErrorTypeArgs,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-ResolveJavaType,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-SealedClass,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
-KSPT-JavaWildcardsSelfReferencing,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
+KSPT-JavaWildcardsSelfReferencing,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-ShadowingAnnotations,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-SignatureMapper,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-SuperTypes,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
@@ -425,7 +425,7 @@ KSPT-VarargAnnotationApplication,D,M2,pending,NotImplemented,1,me.tbsten.analysi
 KSPT-VarianceTypeCheck,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-ValidateTypes,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-Vararg,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
-KSPT-Visibilities,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
+KSPT-Visibilities,D,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-Multipleround,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-DeferredSymbols,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest
 KSPT-DeferredJavaSymbols,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.kspcompatibilitytests.kspt.KsptBridgeTest

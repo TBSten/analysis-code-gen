@@ -134,7 +134,7 @@ class RealWorldIncrementalPbtTest : PbtSpec({
         listOf("CRM", "MSH", "KOI").forEach { incrementalShouldEqualClean(HistoryTarget(it), SampleEngine.Native) }
     }
 
-    // Bridge 版（M3）。同じケース ID の 2 本目。マイルストーンは一覧の M 列の最初の値（M2）に合わせる決まり（ADR-030）
+    // Bridge 版（M2。G0 項目 3 で M3 から前倒し、ADR-054）。同じケース ID の 2 本目
     case(
         "RW-ALL-I1",
         "Bridge 版（6 つすべて。Room は Android サンプル）: 代表的な変更履歴（20 履歴）のあとの増分結果がクリーンビルドと一致する",
