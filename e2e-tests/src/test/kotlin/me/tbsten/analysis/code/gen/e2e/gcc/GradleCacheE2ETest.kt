@@ -22,7 +22,7 @@ class GradleCacheE2ETest : E2ESpec({
     case(
         "GCC-01",
         "Configuration Cache を有効にして 2 回目で再利用され、問題の報告が 0 件（--configuration-cache-problems=fail）",
-        pending = PendingCase(Milestone.M2),
+        pending = PendingCase(Milestone.M1),
     ) {
         val fixture = acg45Project { kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A")) }
         val args = arrayOf(task, "--configuration-cache", "--configuration-cache-problems=fail")

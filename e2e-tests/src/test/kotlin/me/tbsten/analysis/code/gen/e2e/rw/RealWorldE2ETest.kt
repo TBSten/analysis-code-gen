@@ -106,7 +106,7 @@ class RealWorldE2ETest : E2ESpec({
         upstreamSuiteShouldPassOnBridge("MSH", ":moshi-kotlin-tests:test", ":moshi-kotlin-codegen:test")
     }
 
-    case("RW-MSH-N1", "Moshi（Native）: 書き直し版が元と同じ JSON 往復テストを通る", pending = PendingCase(Milestone.M1)) {
+    case("RW-MSH-N1", "Moshi（Native）: 書き直し版が元と同じ JSON 往復テストを通る", pending = PendingCase(Milestone.M2)) {
         RealWorldSample.open("MSH", "jvm").shouldPassSameTestsAs(SampleEngine.Native)
     }
 
@@ -149,7 +149,7 @@ class RealWorldE2ETest : E2ESpec({
         upstreamSuiteShouldPassOnBridge("KOI", "jvmTest")
     }
 
-    case("RW-KOI-N1", "Koin Annotations（Native）: 書き直し版が元と同じ DI の実行時テストを通る", pending = PendingCase(Milestone.M1)) {
+    case("RW-KOI-N1", "Koin Annotations（Native）: 書き直し版が元と同じ DI の実行時テストを通る", pending = PendingCase(Milestone.M2)) {
         RealWorldSample.open("KOI", "jvm").shouldPassSameTestsAs(SampleEngine.Native)
     }
 

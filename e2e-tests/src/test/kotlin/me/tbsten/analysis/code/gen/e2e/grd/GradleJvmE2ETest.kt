@@ -386,7 +386,7 @@ class GradleJvmE2ETest : E2ESpec({
         result.output shouldContain "BUILDSCRIPT_GUAVA=33.4.0-jre"
     }
 
-    case("GRD-21", "AA / IntelliJ Platform がビルドスクリプトの classpath に載らない（Worker 側だけで読み込まれる）", M2) {
+    case("GRD-21", "AA / IntelliJ Platform がビルドスクリプトの classpath に載らない（Worker 側だけで読み込まれる）", M1) {
         val p =
             fixtureProject(Fixture.JVM) {
                 edit("build.gradle.kts") {

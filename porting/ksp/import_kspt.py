@@ -82,6 +82,10 @@ M3_FEATURES = re.compile(r"BackingField|ContextParameter|ChangingBehavior|Regist
 M3_INTERNAL = re.compile(r"^PluginProblemReporter$")
 M2_INCREMENTAL = re.compile(r"^Record")
 M2_ROUNDS = re.compile(r"^(Multipleround|Deferred\w*|ExitCode|PackageProviderForGenerated)$")
+# G0 項目 2（ADR-056）: Java のファイルを含んでいても KSP の入口として M1 に置く基本のテスト（レビューで名指しされたもの）
+M1_BASIC = re.compile(r"^(Hello|ClassKinds|Visibilities)$")
+# 名前に Java を含むテストは Java 連携が主題なので、Java のファイルが無くても M2
+M2_JAVA_NAMED = re.compile(r"Java")
 
 
 def classify(name: str, test_data: str, text: str, annotations: list[str]) -> tuple[str, str]:
@@ -95,6 +99,8 @@ def classify(name: str, test_data: str, text: str, annotations: list[str]) -> tu
         return "M3", "エッジケース（不正な入力）"
     if M3_INTERNAL.search(name):
         return "M3", "エッジケース（Processor の例外の報告）"
+    if M1_BASIC.search(name):
+        return "M1", "シンボル・アノテーション・型の基本（Java の宣言を含む）"
     if M2_INCREMENTAL.search(name):
         return "M2", "増分（lookup の記録）"
     if M2_ROUNDS.search(name):
@@ -103,6 +109,8 @@ def classify(name: str, test_data: str, text: str, annotations: list[str]) -> tu
         return "M2", "Java ソース"
     if re.search(r"^//\s*MODULE:", text, re.M):
         return "M2", "ライブラリ（バイナリの宣言）"
+    if M2_JAVA_NAMED.search(name):
+        return "M2", "Java 連携"
     return "M1", "シンボル・アノテーション・型の基本"
 
 

@@ -21,7 +21,7 @@ private val VARIANTS = listOf("freeDebug", "freeRelease", "paidDebug", "paidRele
 // 5.1 Gradle / AGP 統合（GRD）のうち Android のケース。F-AND（Variant を Compilation として扱う。ADR-016）。
 // Google Maven と Android SDK が要るため、クラウドの Agent 環境では動かず CI の fixtures ジョブで動かす
 class GradleAndroidE2ETest : E2ESpec({
-    case("GRD-11", "Android アプリで 4 Variant それぞれにタスクが登録され、Variant 固有のソース（src/free/ など）が解析される", M1) {
+    case("GRD-11", "Android アプリで 4 Variant それぞれにタスクが登録され、Variant 固有のソース（src/free/ など）が解析される", M2) {
         val p = fixtureProject(Fixture.ANDROID)
         val tasks = p.build(":app:tasks", "--all").output
         VARIANTS.forEach { tasks shouldContain "analysisCodeGen${it.replaceFirstChar(Char::uppercase)}Compilation" }
