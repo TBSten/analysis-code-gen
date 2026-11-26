@@ -6,6 +6,7 @@
 name: Nightly
 
 on:
+  # schedule は default branch（main）のファイルだけが効く。動かないときは .github/CI.md「schedule が動かないとき」
   schedule:
     - cron: "0 19 * * *" # 04:00 JST
   workflow_dispatch:
