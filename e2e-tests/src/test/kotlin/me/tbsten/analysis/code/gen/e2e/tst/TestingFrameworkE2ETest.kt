@@ -155,7 +155,7 @@ class TestingFrameworkE2ETest : E2ESpec({
 
         val result = fixture.build("compileKotlin")
 
-        result.task(":analysisCodeGenMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         fixture.projectDir.resolve("build/generated/analysisCodeGen/main/kotlin/fixture/UserMapper.kt").isFile shouldBe true
         fixture.projectDir.resolve("build/classes/kotlin/main/fixture/UserMapper.class").isFile shouldBe true
     }

@@ -22,22 +22,22 @@ private val M2 = PendingCase(Milestone.M2)
 
 // 5.1 Gradle / KGP 統合（GRD）のうち JVM・Java・マルチモジュール・DSL・Worker のケース。Android は GradleAndroidE2ETest
 class GradleJvmE2ETest : E2ESpec({
-    case("GRD-01", "JVM 単一モジュールに plugin を適用すると analysisCodeGenMain / analysisCodeGenTest が登録され、生成物込みで build が成功する", M1) {
+    case("GRD-01", "JVM 単一モジュールに plugin を適用すると analysisCodeGenMainSourceSet / analysisCodeGenTestSourceSet が登録され、生成物込みで build が成功する", M1) {
         val p = fixtureProject(Fixture.JVM)
         p.build("tasks", "--all").output.let {
-            it shouldContain "analysisCodeGenMain"
-            it shouldContain "analysisCodeGenTest"
+            it shouldContain "analysisCodeGenMainSourceSet"
+            it shouldContain "analysisCodeGenTestSourceSet"
         }
         val result = p.build("build")
-        result.task(":analysisCodeGenMain")?.outcome shouldBe TaskOutcome.SUCCESS
-        result.task(":analysisCodeGenTest")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenTestSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         result.task(":compileKotlin")?.outcome shouldBe TaskOutcome.SUCCESS
         result.task(":test")?.outcome shouldBe TaskOutcome.SUCCESS
     }
 
     case("GRD-02", "生成物が build/generated/analysisCodeGen/<SourceSet>/{kotlin,java,resources} に出力され、他のタスクと同じディレクトリに書かない", M1) {
         val p = fixtureProject(Fixture.JVM)
-        p.build("analysisCodeGenMain")
+        p.build("analysisCodeGenMainSourceSet")
         val main = p.generated("main")
         main.kotlin("fixture/jvm/UserMapper.kt").isFile shouldBe true
         main.java("fixture/jvm/ReportJava.java").isFile shouldBe true
@@ -54,11 +54,11 @@ class GradleJvmE2ETest : E2ESpec({
     case("GRD-03", "Task Graph 上で compile タスクが analysisCodeGen タスクに依存し、自タスクの出力が自タスクの入力に入らない（循環なし）", M1) {
         val p = fixtureProject(Fixture.JVM)
         val planned = p.plannedTasks("compileTestKotlin")
-        planned.shouldContainInOrder(":analysisCodeGenMain", ":compileKotlin")
-        planned.shouldContainInOrder(":analysisCodeGenTest", ":compileTestKotlin")
+        planned.shouldContainInOrder(":analysisCodeGenMainSourceSet", ":compileKotlin")
+        planned.shouldContainInOrder(":analysisCodeGenTestSourceSet", ":compileTestKotlin")
         // 2 回目は入力が変わらないので UP-TO-DATE（自分の出力が入力に入っていれば毎回動く）
-        p.build("analysisCodeGenMain")
-        p.build("analysisCodeGenMain").task(":analysisCodeGenMain")?.outcome shouldBe TaskOutcome.UP_TO_DATE
+        p.build("analysisCodeGenMainSourceSet")
+        p.build("analysisCodeGenMainSourceSet").task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.UP_TO_DATE
     }
 
     case("GRD-04", "生成ディレクトリが IDE 向けのソースルートにも登録される（Tooling API で取得したモデルに含まれる）", M2) {
@@ -97,7 +97,7 @@ class GradleJvmE2ETest : E2ESpec({
                         }
 
                         tasks.register("printClasspaths") {
-                            val task = tasks.named<me.tbsten.analysis.code.gen.gradle.AnalysisCodegenTask>("analysisCodeGenMain")
+                            val task = tasks.named<me.tbsten.analysis.code.gen.gradle.AnalysisCodegenTask>("analysisCodeGenMainSourceSet")
                             val acg = task.flatMap { t -> provider { t.compileClasspath.files.map { f -> f.name }.sorted() } }
                             val compile = configurations.compileClasspath.map { c -> c.files.map { f -> f.name }.sorted() }
                             doLast {
@@ -184,9 +184,9 @@ class GradleJvmE2ETest : E2ESpec({
                     """,
                 )
             }
-        project(21).build("analysisCodeGenMain").output shouldNotContain "NeedsJdk21"
+        project(21).build("analysisCodeGenMainSourceSet").output shouldNotContain "NeedsJdk21"
         val p17 = project(17)
-        val r17 = p17.buildAndFail("analysisCodeGenMain")
+        val r17 = p17.buildAndFail("analysisCodeGenMainSourceSet")
         r17.output shouldContain "java.lang.MatchException"
         p17.generated("main").kotlin("jdk/NeedsJdk21Resolved.kt").isFile shouldBe false
     }
@@ -203,7 +203,7 @@ class GradleJvmE2ETest : E2ESpec({
 
     case("GRD-09", "マルチモジュールで :app の Processor が :lib の公開宣言を解析できる", M1) {
         val p = fixtureProject(Fixture.JVM_MULTI)
-        p.build(":app:analysisCodeGenMain")
+        p.build(":app:analysisCodeGenMainSourceSet")
         p.generated("main", "app").kotlin("fixture/multi/app/AppUserMapper.kt").readText() shouldContain
             "\"lib\" to \"fixture.multi.lib.LibUser\""
     }
@@ -234,7 +234,7 @@ class GradleJvmE2ETest : E2ESpec({
                 )
             }
         val result = p.build("test")
-        result.task(":analysisCodeGenTest")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenTestSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         result.task(":test")?.outcome shouldBe TaskOutcome.SUCCESS
         // main の生成物を test の実行単位が作り直していない
         p.generated("test").kotlin("fixture/jvm/UserMapper.kt").isFile shouldBe false
@@ -252,8 +252,8 @@ class GradleJvmE2ETest : E2ESpec({
                     }
                 }
             }
-        val viaDsl = project(useDependencies = false).also { it.build("analysisCodeGenMain") }
-        val viaDeps = project(useDependencies = true).also { it.build("analysisCodeGenMain") }
+        val viaDsl = project(useDependencies = false).also { it.build("analysisCodeGenMainSourceSet") }
+        val viaDeps = project(useDependencies = true).also { it.build("analysisCodeGenMainSourceSet") }
         viaDsl
             .generated("main")
             .files()
@@ -281,7 +281,7 @@ class GradleJvmE2ETest : E2ESpec({
             it.replace("\"Mapper,Registry,Chain,Body,Defer,Resource\"", "\"Mapper,Probe\"") +
                 "\nanalysisCodeGen { arg(\"tp.probe.out\", \"${out.invariantSeparatorsPath}\") }\n"
         }
-        p.build("analysisCodeGenMain")
+        p.build("analysisCodeGenMainSourceSet")
         // all と main の両方に同じ座標を書いても create は 1 回
         readProbe(out).count { it.event == "create" && it.unit == "main" } shouldBe 1
 
@@ -298,7 +298,7 @@ class GradleJvmE2ETest : E2ESpec({
                     )
                 }
             }
-        conflict.buildAndFail("analysisCodeGenMain").output shouldContain "k"
+        conflict.buildAndFail("analysisCodeGenMainSourceSet").output shouldContain "k"
     }
 
     case("GRD-19", "Processor オプションのグローバル指定と SourceSet スコープ指定が渡り、スコープ側が優先される", M1) {
@@ -332,7 +332,7 @@ class GradleJvmE2ETest : E2ESpec({
                 )
                 file("src/test").deleteRecursively()
             }
-        p.build("analysisCodeGenMain")
+        p.build("analysisCodeGenMainSourceSet")
         val options = readProbe(out).first { it.event == "create" }.options
         options["global.only"] shouldBe "g"
         options["both"] shouldBe "scoped"
@@ -381,7 +381,7 @@ class GradleJvmE2ETest : E2ESpec({
                 )
                 write("src/main/kotlin/a/A.kt", "package a\nclass A")
             }
-        val result = p.build("analysisCodeGenMain", "printGuava")
+        val result = p.build("analysisCodeGenMainSourceSet", "printGuava")
         p.generated("main").kotlin("gen/GuavaVersion.kt").readText() shouldContain "\"20.0\""
         result.output shouldContain "BUILDSCRIPT_GUAVA=33.4.0-jre"
     }
@@ -406,9 +406,9 @@ class GradleJvmE2ETest : E2ESpec({
                         """.trimIndent()
                 }
             }
-        val result = p.build("probeBuildscriptClasspath", "analysisCodeGenMain")
+        val result = p.build("probeBuildscriptClasspath", "analysisCodeGenMainSourceSet")
         result.output.lines().first { it.startsWith("VISIBLE=") } shouldBe "VISIBLE="
-        result.task(":analysisCodeGenMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
     }
 
     case("GRD-22", "遅延設定: help だけを実行したとき analysisCodeGen タスクが realize されない", M2) {
@@ -425,7 +425,7 @@ class GradleJvmE2ETest : E2ESpec({
                 }
             }
         p.build("help").output shouldNotContain "REALIZED analysisCodeGen"
-        p.build("analysisCodeGenMain").output shouldContain "REALIZED analysisCodeGenMain"
+        p.build("analysisCodeGenMainSourceSet").output shouldContain "REALIZED analysisCodeGenMainSourceSet"
     }
 
     case("GRD-23", "同じモジュールで KSP と併用でき、タスクの循環が起きず、生成物の可視性が ADR で決めた規則どおり", M2) {
@@ -444,7 +444,7 @@ class GradleJvmE2ETest : E2ESpec({
                 }
             }
         val planned = p.plannedTasks("compileKotlin")
-        planned.shouldContainAll(":analysisCodeGenMain", ":kspKotlin", ":compileKotlin")
+        planned.shouldContainAll(":analysisCodeGenMainSourceSet", ":kspKotlin", ":compileKotlin")
         val result = p.build("build")
         result.task(":compileKotlin")?.outcome shouldBe TaskOutcome.SUCCESS
         p.generated("main").kotlin("fixture/jvm/UserMapper.kt").isFile shouldBe true
@@ -465,7 +465,7 @@ class GradleJvmE2ETest : E2ESpec({
                 .version,
         )) {
             val p = fixtureProject(Fixture.JVM) { gradleVersion = gradle }
-            p.build("build").task(":analysisCodeGenMain")?.outcome shouldBe TaskOutcome.SUCCESS
+            p.build("build").task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         }
     }
 
@@ -528,8 +528,8 @@ class GradleJvmE2ETest : E2ESpec({
                 edit("build.gradle.kts") { it.replace("test { processor(acg.testProcessors.native) }", "") }
             }
         val result = p.build("build")
-        result.task(":analysisCodeGenMain")?.outcome shouldBe TaskOutcome.SUCCESS
-        val testTask = result.task(":analysisCodeGenTest")
+        result.task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
+        val testTask = result.task(":analysisCodeGenTestSourceSet")
         (testTask == null || testTask.outcome == TaskOutcome.NO_SOURCE) shouldBe true
         p.generated("test").root.exists() shouldBe false
     }
@@ -587,7 +587,7 @@ class GradleJvmE2ETest : E2ESpec({
                 )
                 write("src/main/kotlin/a/A.kt", "package a\nclass A")
             }
-        p.build("analysisCodeGenMain")
+        p.build("analysisCodeGenMainSourceSet")
         val info = p.generated("main").kotlin("gen/JvmInfo.kt").readText()
         info shouldContain "MARKER = \"grd29\""
         // maxMemory は -Xmx より少し小さくなるので上限と下限で見る

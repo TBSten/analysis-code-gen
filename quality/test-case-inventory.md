@@ -178,7 +178,7 @@ Kotlin は 1 つに固定しない。**2.4.0 以降のすべての stable と、
 
 | ID | ケース | 種別 | M | 備考 |
 |---|---|---|---|---|
-| GRD-01 | JVM 単一モジュールに plugin を適用すると `analysisCodeGenMain` / `analysisCodeGenTest` が登録され、生成物込みで `build` が成功する | E | M1 | F-JVM |
+| GRD-01 | JVM 単一モジュールに plugin を適用すると `analysisCodeGenMainSourceSet` / `analysisCodeGenTestSourceSet` が登録され、生成物込みで `build` が成功する | E | M1 | F-JVM |
 | GRD-02 | 生成物が `build/generated/analysisCodeGen/<SourceSet>/{kotlin,java,resources}` に出力され、他のタスクと同じディレクトリに書かない | E | M1 | |
 | GRD-03 | Task Graph 上で compile タスクが analysisCodeGen タスクに依存し、自タスクの出力が自タスクの入力に入らない（循環なし） | E | M1 | |
 | GRD-04 | 生成ディレクトリが IDE 向けのソースルートにも登録される（Tooling API で取得したモデルに含まれる） | E | M2 | |
@@ -235,7 +235,7 @@ Kotlin は 1 つに固定しない。**2.4.0 以降のすべての stable と、
 | KMP-20 | KMP モジュール `:shared` を Android の `:app` が使い、`:shared` の commonMain 生成物が見える | E | M2 | |
 | KMP-21 | iosMain だけに Processor を付けたとき、他の Compilation のタスクや出力に影響しない | E | M1 | |
 | KMP-22 | Linux 上で Apple 向け SourceSet の解析ができる。できない構成では、原因が分かる診断が出る | E | M2 | |
-| KMP-23 | SourceSet / Compilation 名からタスク名を作る規則が一意（`analysisCodeGenIosArm64Main` など、衝突しない） | U | M1 | |
+| KMP-23 | SourceSet / Compilation 名からタスク名を作る規則が一意（`analysisCodeGenIosArm64MainSourceSet` など、衝突しない） | U | M1 | |
 | KMP-24 | KSP の Issue #965 / #2621 の再現シナリオで、共通の生成物が 1 回だけ作られ下流から見える | E | M1 | 回帰テスト |
 | KMP-25 | IDE のインポートで、KMP の各 SourceSet に生成ディレクトリが登録される | E | M2 | |
 

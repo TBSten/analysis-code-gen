@@ -32,7 +32,7 @@ analysisCodeGen {
 }
 
 dependencies {
-    // dependencies { } でも足せる。名前は analysisCodeGen<SourceSet> と analysisCodeGen<Compilation>Compilation
-    "analysisCodeGenJvmMain"(project(":deferred-processor"))
+    // dependencies { } でも足せる。名前は analysisCodeGen<SourceSet>SourceSet と analysisCodeGen<Compilation>Compilation
+    "analysisCodeGenJvmMainSourceSet"(project(":deferred-processor"))
     "analysisCodeGenIosArm64MainCompilation"(project(":deferred-processor"))
 }

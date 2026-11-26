@@ -44,7 +44,7 @@ class KmpE2ETest : E2ESpec({
     case("KMP-01", "commonMain の Processor が commonMain に 1 回だけ生成し、全ターゲットの Compilation から参照してビルドが通る", M1) {
         val p = fixtureProject(Fixture.KMP) { withoutAndroid() }
         val result = p.build(*kmpCompileTasks(isMac).toTypedArray(), "allTests")
-        result.task(":analysisCodeGenCommonMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenCommonMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         kmpCompileTasks(isMac).forEach { result.task(it)?.outcome shouldBe TaskOutcome.SUCCESS }
         p.generated("commonMain").kotlin("fixture/kmp/SharedMapper.kt").isFile shouldBe true
     }
@@ -120,7 +120,7 @@ class KmpE2ETest : E2ESpec({
                 )
             }
         val result = p.build("compileKotlinIosArm64", "compileKotlinIosSimulatorArm64")
-        result.task(":analysisCodeGenIosMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenIosMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         p.generated("iosMain").kotlin("fixture/kmp/IosModelMapper.kt").isFile shouldBe true
         p.allGenerated().keys.count { it.endsWith("IosModelMapper.kt") } shouldBe 1
     }
@@ -152,7 +152,7 @@ class KmpE2ETest : E2ESpec({
                     """,
                 )
             }
-        val result = p.build("analysisCodeGenCommonMain", "analysisCodeGenIosMain")
+        val result = p.build("analysisCodeGenCommonMainSourceSet", "analysisCodeGenIosMainSourceSet")
         p.generated("commonMain").kotlin("fixture/kmp/CommonWantsJavaResolved.kt").isFile shouldBe false
         p.generated("iosMain").kotlin("fixture/kmp/IosWantsUiKitResolved.kt").isFile shouldBe true
         p.generated("iosMain").kotlin("fixture/kmp/IosWantsJavaResolved.kt").isFile shouldBe false
@@ -179,7 +179,7 @@ class KmpE2ETest : E2ESpec({
                     """,
                 )
             }
-        p.build("analysisCodeGenCommonMain")
+        p.build("analysisCodeGenCommonMainSourceSet")
         val mapper = p.generated("commonMain").kotlin("fixture/kmp/FlowsMapper.kt").readText()
         mapper shouldContain "\"flow\" to \"kotlinx.coroutines.flow.Flow<kotlin.Int>\""
         mapper shouldContain "\"job\" to \"kotlinx.coroutines.Job?\""
@@ -199,7 +199,7 @@ class KmpE2ETest : E2ESpec({
                     "package fixture.custom\n@me.tbsten.analysis.code.gen.tp.DeferUntil(\"platform.posix.stat\")\nclass NeedsPosix",
                 )
             }
-        p.build("analysisCodeGenNativeMain")
+        p.build("analysisCodeGenNativeMainSourceSet")
         p.generated("nativeMain").kotlin("fixture/custom/NeedsPosixResolved.kt").isFile shouldBe true
     }
 
@@ -219,9 +219,9 @@ class KmpE2ETest : E2ESpec({
                     "package fixture.kmp\n@me.tbsten.analysis.code.gen.tp.DeferUntil(\"fixture.kmp.SharedMapper\")\nclass NeedsCommonGenerated",
                 )
             }
-        val planned = p.plannedTasks("analysisCodeGenJvmMain")
-        planned.shouldContainInOrder(":analysisCodeGenCommonMain", ":analysisCodeGenJvmMain")
-        p.build("analysisCodeGenJvmMain")
+        val planned = p.plannedTasks("analysisCodeGenJvmMainSourceSet")
+        planned.shouldContainInOrder(":analysisCodeGenCommonMainSourceSet", ":analysisCodeGenJvmMainSourceSet")
+        p.build("analysisCodeGenJvmMainSourceSet")
         p.generated("jvmMain").kotlin("fixture/kmp/NeedsCommonGeneratedResolved.kt").isFile shouldBe true
     }
 
@@ -277,7 +277,7 @@ class KmpE2ETest : E2ESpec({
                 )
             }
         val result = p.build("jvmTest")
-        result.task(":analysisCodeGenCommonTest")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenCommonTestSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         result.task(":jvmTest")?.outcome shouldBe TaskOutcome.SUCCESS
         p.generated("commonTest").kotlin("fixture/kmp/TestModelMapper.kt").readText() shouldContain "fixture.kmp.Shared"
     }
@@ -286,7 +286,7 @@ class KmpE2ETest : E2ESpec({
         // 手で組んだ階層（F-KMP-CUSTOM）: 中間 SourceSet の生成物を jvm と js から使い、actual は Compilation ごと
         val p = fixtureProject(Fixture.KMP_CUSTOM)
         val result = p.build("jvmTest", "compileKotlinJs")
-        result.task(":analysisCodeGenSharedJvmJsMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenSharedJvmJsMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         p.allGenerated().keys.filter { it.endsWith("JvmJsModelMapper.kt") } shouldBe
             listOf("sharedJvmJsMain/kotlin/fixture/custom/JvmJsModelMapper.kt")
         p.generatedForCompilation("jvmMain").kotlin("fixture/custom/CommonActual.kt").readText() shouldContain "\"jvm\""
@@ -361,7 +361,7 @@ class KmpE2ETest : E2ESpec({
                 )
             }
         val result = p.build(":app:assembleFreeDebug")
-        result.task(":shared:analysisCodeGenCommonMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":shared:analysisCodeGenCommonMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         result.task(":app:compileFreeDebugKotlin")?.outcome shouldBe TaskOutcome.SUCCESS
     }
 
@@ -403,7 +403,7 @@ class KmpE2ETest : E2ESpec({
                 .lines()
                 .filter { it.startsWith("analysisCodeGen") }
                 .map { it.substringBefore(' ') }
-        tasks shouldBe listOf("analysisCodeGenIosMain")
+        tasks shouldBe listOf("analysisCodeGenIosMainSourceSet")
     }
 
     case("KMP-22", "Linux 上で Apple 向け SourceSet の解析ができる。できない構成では、原因が分かる診断が出る", M2) {
@@ -426,8 +426,8 @@ class KmpE2ETest : E2ESpec({
                     "package fixture.kmp\n@me.tbsten.analysis.code.gen.tp.Mapped\ndata class UsesUiKit(val view: platform.UIKit.UIView?)",
                 )
             }
-        val result = p.runner("analysisCodeGenIosMain").run()
-        if (result.task(":analysisCodeGenIosMain")?.outcome == TaskOutcome.SUCCESS) {
+        val result = p.runner("analysisCodeGenIosMainSourceSet").run()
+        if (result.task(":analysisCodeGenIosMainSourceSet")?.outcome == TaskOutcome.SUCCESS) {
             p.generated("iosMain").kotlin("fixture/kmp/IosModelMapper.kt").isFile shouldBe true
             p.generated("iosMain").kotlin("fixture/kmp/UsesUiKitMapper.kt").readText() shouldContain "platform.UIKit.UIView?"
         } else {
@@ -491,7 +491,7 @@ class KmpE2ETest : E2ESpec({
                 }
             }
         val result = p.build("prepareKotlinIdeaImport", "printKmpSrcDirs")
-        result.task(":analysisCodeGenCommonMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenCommonMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         val lines = result.output.lines().filter { it.startsWith("SRC ") }
         lines shouldContain "SRC commonMain=${p.dir.invariantSeparatorsPath}/build/generated/analysisCodeGen/commonMain/kotlin"
         lines.none { it.startsWith("SRC jvmMain=") && it.contains("analysisCodeGen/commonMain") } shouldBe true

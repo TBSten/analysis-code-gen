@@ -127,7 +127,7 @@ class GradleAndroidE2ETest : E2ESpec({
                 )
             }
         val result = p.build("assemble")
-        result.task(":analysisCodeGenAndroidMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenAndroidMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         p.generated("androidMain").kotlin("k/ScreenMapper.kt").readText() shouldContain "android.content.Context?"
         p
             .build(
@@ -138,7 +138,7 @@ class GradleAndroidE2ETest : E2ESpec({
             .filter { it.startsWith("analysisCodeGen") }
             .map { it.substringBefore(' ') }
             .shouldContainAll(
-                "analysisCodeGenAndroidMain",
+                "analysisCodeGenAndroidMainSourceSet",
             )
     }
 })

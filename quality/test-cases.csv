@@ -1,5 +1,5 @@
 id,area,case,kind,milestone,note
-GRD-01,Gradle / KGP / AGP 統合（GRD）,JVM 単一モジュールに plugin を適用すると `analysisCodeGenMain` / `analysisCodeGenTest` が登録され、生成物込みで `build` が成功する,E,M1,F-JVM
+GRD-01,Gradle / KGP / AGP 統合（GRD）,JVM 単一モジュールに plugin を適用すると `analysisCodeGenMainSourceSet` / `analysisCodeGenTestSourceSet` が登録され、生成物込みで `build` が成功する,E,M1,F-JVM
 GRD-02,Gradle / KGP / AGP 統合（GRD）,"生成物が `build/generated/analysisCodeGen/<SourceSet>/{kotlin,java,resources}` に出力され、他のタスクと同じディレクトリに書かない",E,M1,
 GRD-03,Gradle / KGP / AGP 統合（GRD）,Task Graph 上で compile タスクが analysisCodeGen タスクに依存し、自タスクの出力が自タスクの入力に入らない（循環なし）,E,M1,
 GRD-04,Gradle / KGP / AGP 統合（GRD）,生成ディレクトリが IDE 向けのソースルートにも登録される（Tooling API で取得したモデルに含まれる）,E,M2,
@@ -51,7 +51,7 @@ KMP-19,KMP の整合性（KMP）,KMP の androidMain で Build Variant ごとに
 KMP-20,KMP の整合性（KMP）,KMP モジュール `:shared` を Android の `:app` が使い、`:shared` の commonMain 生成物が見える,E,M2,
 KMP-21,KMP の整合性（KMP）,iosMain だけに Processor を付けたとき、他の Compilation のタスクや出力に影響しない,E,M1,
 KMP-22,KMP の整合性（KMP）,Linux 上で Apple 向け SourceSet の解析ができる。できない構成では、原因が分かる診断が出る,E,M2,
-KMP-23,KMP の整合性（KMP）,SourceSet / Compilation 名からタスク名を作る規則が一意（`analysisCodeGenIosArm64Main` など、衝突しない）,U,M1,
+KMP-23,KMP の整合性（KMP）,SourceSet / Compilation 名からタスク名を作る規則が一意（`analysisCodeGenIosArm64MainSourceSet` など、衝突しない）,U,M1,
 KMP-24,KMP の整合性（KMP）,KSP の Issue #965 / #2621 の再現シナリオで、共通の生成物が 1 回だけ作られ下流から見える,E,M1,回帰テスト
 KMP-25,KMP の整合性（KMP）,IDE のインポートで、KMP の各 SourceSet に生成ディレクトリが登録される,E,M2,
 API-01,Native Processor API（API）,ServiceLoader で `AnalysisCodegenProcessorProvider` が見つかり、Processor が生成される,I,M1,

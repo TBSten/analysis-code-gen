@@ -146,7 +146,7 @@ fun GradleFixture.generatedNames(
     unit: String = "main",
 ): Set<String> = generatedFiles(engine, unit).keys.map { it.substringAfterLast('/') }.toSet()
 
-/** analysisCodeGen のタスク名（ADR-016）。kotlin("jvm") の main は `analysisCodeGenMain`。KSP2 は `kspKotlin`。 */
+/** analysisCodeGen のタスク名（ADR-016）。kotlin("jvm") の main は `analysisCodeGenMainSourceSet`。KSP2 は `kspKotlin`。 */
 fun codegenTask(
     engine: Acg45Engine,
     unit: String = "main",

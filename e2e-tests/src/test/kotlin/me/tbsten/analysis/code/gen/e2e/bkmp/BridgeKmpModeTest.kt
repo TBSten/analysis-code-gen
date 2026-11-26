@@ -148,7 +148,7 @@ class BridgeKmpModeDiffTest : DiffSpec({
                 }
                 """.trimIndent(),
             )
-        bridge.build("analysisCodeGenCommonMain")
+        bridge.build("analysisCodeGenCommonMainSourceSet")
         val expected = ksp2.ksp2Outputs().mapKeys { it.key.substringAfter('/') }
         expected.keys shouldBe setOf("CommonMapper.kt")
         bridge.sourceSetOutputs().mapKeys { it.key.substringAfter('/') } shouldBe expected

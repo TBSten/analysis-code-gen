@@ -141,7 +141,7 @@ class ThreeRoundAlternationE2ETest : E2ESpec({
             }
 
         val result = project.build("compileKotlin")
-        result.task(":analysisCodeGenMain")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
         result.task(":compileKotlin")?.outcome shouldBe TaskOutcome.SUCCESS
 
         // 交互に進んだ順番（ラウンド番号と作った Processor）
