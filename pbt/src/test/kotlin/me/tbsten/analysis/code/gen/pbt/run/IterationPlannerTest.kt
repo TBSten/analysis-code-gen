@@ -13,7 +13,7 @@ class IterationPlannerTest : FreeSpec({
         val s =
             PbtSettings
                 .fromEnvironment { k -> if (k == "acg.pbt.stateDir") File(dir, "s").path else null }
-                .copy(mode = PbtMode.SCHEDULED, runStartEpochMs = System.currentTimeMillis())
+                .copy(mode = PbtMode.SCHEDULED, runStartEpochMs = System.currentTimeMillis(), testTimeout = 45.minutes)
         return s to TimingStore(s.stateDir)
     }
 
@@ -31,6 +31,20 @@ class IterationPlannerTest : FreeSpec({
         // (30 分 - 6 分) × 1 / (1 + 2) = 8 分
         p.share("a", 1.0) shouldBe 8.minutes
         p.share("b", 2.0) shouldBe 16.minutes
+    }
+
+    "持ち分は kotest の 1 テストの時間切れ − 余裕 を超えない（issue #43）" {
+        val (s, store) = setup()
+        store.update("only", 1e6, 10, 1.0)
+        // kotest 既定の時間切れ 10 分のままだと、予算 30 分を独り占めできても 8 分まで
+        IterationPlanner(s.copy(testTimeout = KOTEST_DEFAULT_TIMEOUT), store).share("only", 1.0) shouldBe 8.minutes
+        // 定期実行では acg.jvm が時間切れを上限 + 5 分（45 分）にするので、予算 30 分をまるごと使える
+        IterationPlanner(s, store).share("only", 1.0) shouldBe 30.minutes
+    }
+
+    "時間切れは kotest.framework.timeout（ミリ秒）から読む" {
+        PbtSettings.fromEnvironment { k -> if (k == "kotest.framework.timeout") "2700000" else null }.testTimeout shouldBe 45.minutes
+        PbtSettings.fromEnvironment { null }.testTimeout shouldBe KOTEST_DEFAULT_TIMEOUT
     }
 
     "次のバッチは残り時間 ÷ 1 試行の時間で、倍々までしか増やさない" {

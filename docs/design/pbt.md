@@ -19,6 +19,8 @@ class FooTest : PbtSpec({
 
 PR では保存した回帰 seed と、名前から決まる固定 seed で `prIterations` 回だけ回る。毎時の定期実行（`pbt-hourly.yml`）では新しい seed で、持ち分の時間に収まるまで回る。
 
+毎時は kotest の時間切れが上限 + 5 分になり、持ち分はその 2 分前まで（ADR-046）。個別の `timeout` は付けない。
+
 ## 使える Arb
 
 | Arb | 中身 |
