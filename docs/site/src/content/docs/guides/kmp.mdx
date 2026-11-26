@@ -32,12 +32,12 @@ flowchart TD
 
 ## 処理対象を上流に広げる
 
-既定では、自分の SourceSet のファイルだけが処理対象です。上流の宣言も処理したいときは `processingScope` を広げます。
+既定では、自分の SourceSet のファイルだけが処理対象です。上流の宣言も処理したいときは `processingScope.includeDependsOn()` で広げます。
 
 ```kotlin title="kmp-lib/build.gradle.kts"
         iosMain {
             processor(project(":greeting-processor"))
-            processingScope = ProcessingScope.IncludeDependsOn
+            processingScope.includeDependsOn()
         }
 ```
 
