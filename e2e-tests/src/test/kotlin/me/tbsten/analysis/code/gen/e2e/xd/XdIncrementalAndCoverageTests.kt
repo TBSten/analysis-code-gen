@@ -102,6 +102,7 @@ class XdCoverageTest : UnitSpec({
                 .map { it.split(Regex("\\s+")).first() }
         val hour = DateTimeFormatter.ofPattern("yyyyMMddHH").withZone(ZoneOffset.UTC)
         val window = (0 until versions.size * 24).map { hour.format(Instant.now().minusSeconds(3600L * it)) }.toSet()
+
         fun seen(version: String): Set<String> =
             repoRoot
                 .resolve(".pbt-state/coverage/$version")
