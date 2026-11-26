@@ -130,7 +130,7 @@ class DeferredLifetimeIntegrationTest : IntegrationSpec({
         restored shouldBe listOf("d.Keep", "f")
     }
 
-    case("DEF-03", "復元できない Pointer（元の宣言が消えた）を ADR どおりに扱い、診断を出す", M2) {
+    case("DEF-03", "復元できない Pointer（元の宣言が消えた）は落とし、Processor 名付きの警告を出してビルドを続ける（ADR-014）", M2) {
         // メモリ上だけのファイル（KtPsiFactory）の宣言はラウンドをまたぐと消える。ADR-014: 落として warning を出し、ビルドは続ける
         var deferredInRound2: Int? = null
         val result =
@@ -161,7 +161,7 @@ class DeferredLifetimeIntegrationTest : IntegrationSpec({
         warning shouldContain "DeferredLifetimeIntegrationTest"
     }
 
-    case("DEF-04", "最終ラウンドで解決できない deferred が残ったら、対象の一覧付きで ADR どおり警告またはエラーにする", M1) {
+    case("DEF-04", "最終ラウンドで解決できない deferred が残ったら、既定はエラー（Warning に変更可）で、残った対象の一覧を出す（ADR-014）", M1) {
         val asError =
             runNative {
                 kotlin("d/NeedsNever.kt", "package d\nclass NeedsNever")

@@ -92,7 +92,7 @@ class StaleOutputE2ETest : E2ESpec({
         fixture.generatedNames(native) shouldNotContain "WaitsResolved.kt"
     }
 
-    case("OUT-05", "生成ディレクトリに手で置かれたファイルを ADR どおりに扱う", pending = PendingCase(Milestone.M2)) {
+    case("OUT-05", "生成ディレクトリに手で置かれたファイルは、次のビルドで警告を出して消す（ADR-014）", pending = PendingCase(Milestone.M2)) {
         // ADR-014: 出力ディレクトリはタスクが所有する。マニフェストに無いファイルは Build Commit で消し、warning を出す
         val fixture = acg45Project(processors = "Mapper") { kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A")) }
         fixture.build(task)

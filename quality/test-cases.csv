@@ -87,8 +87,8 @@ RND-05,マルチラウンド（RND）,出力の検証に失敗したラウンド
 RND-06,マルチラウンド（RND）,前のラウンドで生成した Java ソースを、次のラウンドの Kotlin 解析で解決できる,I,M2,TP-Resource
 DEF-01,Deferred と Lifetime（DEF / LIF）,未解決のシンボルを defer し、次のラウンドで生成物によって解決されて処理される,I,M1,TP-Defer
 DEF-02,Deferred と Lifetime（DEF / LIF）,`KaSymbolPointer` がラウンドをまたいで復元できる,I,M1,
-DEF-03,Deferred と Lifetime（DEF / LIF）,復元できない Pointer（元の宣言が消えた）を ADR どおりに扱い、診断を出す,I,M2,
-DEF-04,Deferred と Lifetime（DEF / LIF）,最終ラウンドで解決できない deferred が残ったら、対象の一覧付きで ADR どおり警告またはエラーにする,I,M1,
+DEF-03,Deferred と Lifetime（DEF / LIF）,復元できない Pointer（元の宣言が消えた）は落とし、Processor 名付きの警告を出してビルドを続ける（ADR-014）,I,M2,
+DEF-04,Deferred と Lifetime（DEF / LIF）,最終ラウンドで解決できない deferred が残ったら、既定はエラー（Warning に変更可）で、残った対象の一覧を出す（ADR-014）,I,M1,
 DEF-05,Deferred と Lifetime（DEF / LIF）,ある Processor の deferred が、別の Processor の生成物で解決される,I,M1,
 LIF-01,Deferred と Lifetime（DEF / LIF）,前のラウンドの `KaSymbol` をラウンド後に使うと、すぐ分かる例外で検出される,I,M2,
 LIF-02,Deferred と Lifetime（DEF / LIF）,`analyze` スコープの外に持ち出した `KaType` の利用が検出される,I,M2,
@@ -134,7 +134,7 @@ OUT-01,不要な生成物の削除（OUT）,ソースを消すと、それから
 OUT-02,不要な生成物の削除（OUT）,Processor を依存から外すと、その Processor の過去の生成物が消える,E,M2,
 OUT-03,不要な生成物の削除（OUT）,出力パスが変わった（パッケージ変更）とき、古いファイルが残らない,E,M2,
 OUT-04,不要な生成物の削除（OUT）,依存の変化で出力集合が小さくなったら、余った出力が消える,E,M2,
-OUT-05,不要な生成物の削除（OUT）,生成ディレクトリに手で置かれたファイルを ADR どおりに扱う,E,M2,
+OUT-05,不要な生成物の削除（OUT）,生成ディレクトリに手で置かれたファイルは、次のビルドで警告を出して消す（ADR-014）,E,M2,
 FAIL-01,失敗からの回復（FAIL）,Processor の例外でビルドが失敗し、出力ディレクトリに途中までの生成物が残らない,E,M1,TP-Bad
 FAIL-02,失敗からの回復（FAIL）,失敗のあとソースを直して再ビルドすると、正しく成功する（増分キャッシュが汚れていない）,E,M2,
 FAIL-03,失敗からの回復（FAIL）,ビルドを強制終了（kill -9）したあとの次のビルドで、出力とキャッシュが整合している,E,M2,
