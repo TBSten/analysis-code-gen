@@ -11,6 +11,21 @@ fixture: fixtures/docs/quick-start
 
 `@Hello` を付けたクラスに `hello()` 関数を生成する Processor を作ります。ここにあるコードは、リポジトリの `fixtures/docs/quick-start` にそのまま置いてあります。
 
+次のように `@Hello` を付けると、
+
+```kotlin title="app/src/main/kotlin/com/example/Main.kt"
+@Hello
+class Greeter
+```
+
+ビルドのときに、次のファイルが生成されます。
+
+```kotlin title="expected/com/example/GreeterHello.kt"
+package com.example
+
+fun Greeter.hello(): String = "Hello, Greeter!"
+```
+
 ## 作るもの
 
 Processor のモジュールと、それを使うアプリのモジュールの 2 つを作ります。
