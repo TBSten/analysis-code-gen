@@ -31,7 +31,7 @@ issue は同じラベルで 1 つだけ開き、続けて落ちたらコメン�
 2 つで分担する。
 
 - `scripts/ci/test_guard.py`（`checks` job）: PR で追加したテストの行に、PendingCase 以外の無効化（`@Ignore` / `@Ignored`、`enabled = false`、`xtest` / `xcase`、`"!名前"`、assume 系）があれば落とす
-- `:quality:checkCaseIds`（ACG-37、`build` に含む）: `quality/case-status.csv` を origin/main と比べ、有効だったケースの保留への逆戻りと消失を落とす。例外は ADR 付きで `quality/case-exceptions.csv`
+- `:quality:checkCaseIds`（ACG-37、`build` に含む）: `quality/case-status.csv` を比較元（PR は最新の main、main への push は push 前の main。ADR-045）と比べ、有効だったケースの保留への逆戻りと消失を落とす。例外は ADR 付きで `quality/case-exceptions.csv`
 
 ## 検査を足すとき
 
