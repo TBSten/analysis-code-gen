@@ -17,7 +17,7 @@ analysisCodeGen {
         // iosMain は commonMain の宣言も処理対象にする（出力先は iosMain のまま）
         iosMain {
             processor(project(":greeting-processor"))
-            processingScope = ProcessingScope.IncludeDependsOn
+            processingScope.includeDependsOn()
         }
         jvmMain {
             processor(project(":greeting-processor"))
