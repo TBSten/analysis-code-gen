@@ -1,6 +1,7 @@
 # 毎時の PBT（ACG-40、ADR-022）。PR ごとには回さない（PR では回帰 seed と固定 seed だけが ./gradlew build の中で回る）。
 # - 新しい seed で、予算 30 分（上限 40 分）に収まる試行数を自動で決める。1 試行の時間は .pbt-state/ に記録し、actions/cache で持ち回る
-# - 決定的な網羅層は UTC の時（0〜23）の区画を回す。Kotlin の版も時ごとに入れ替える（acg.kotlin、ADR-026）
+# - 決定的な網羅層は UTC の時（0〜23）の区画を回す。Kotlin の版は (時 + 日) % 版の数 で選び、1 日ずつずらす（ADR-055）。
+#   同じ区画が毎日同じ版に当たらず、版の数 × 24 時間で「全版 × 全区画」が一巡する。網羅は .pbt-state/coverage/<版>/<時>/ に版ごとに残す
 # - 反例が出たら build/pbt/failures を artifact にし、issue（ラベル pbt-counterexample）を作る。open は 1 つだけ、続けて出たらコメント
 name: PBT hourly
 
@@ -46,9 +47,13 @@ jobs:
       - name: Pick Kotlin version and shard
         id: plan
         run: |
-          hour=$(date -u +%H | sed 's/^0//')
+          epoch_hours=$(( $(date -u +%s) / 3600 ))
+          hour=$(( epoch_hours % 24 ))
+          day=$(( epoch_hours / 24 ))
           mapfile -t versions < <(python3 scripts/kotlin-versions.py matrix full | python3 -c 'import json,sys; print("\n".join(json.load(sys.stdin)))')
-          echo "kotlin=${versions[$((hour % ${#versions[@]}))]}" >> "$GITHUB_OUTPUT"
+          echo "kotlin=${versions[$(( (hour + day) % ${#versions[@]} ))]}" >> "$GITHUB_OUTPUT"
+          echo "shard=$hour" >> "$GITHUB_OUTPUT"
+          echo "stamp=$(date -u +%Y%m%d%H)" >> "$GITHUB_OUTPUT"
           echo "start=$(date +%s%3N)" >> "$GITHUB_OUTPUT"
       - name: Run PBT
         run: |
@@ -56,7 +61,20 @@ jobs:
             -Pacg.pbt.mode=scheduled \
             -Pacg.pbt.budgetMinutes=${{ inputs.budget || '30' }} \
             -Pacg.pbt.runStartEpochMs=${{ steps.plan.outputs.start }} \
+            -Pacg.pbt.shard=${{ steps.plan.outputs.shard }} \
             -Pacg.kotlin=${{ steps.plan.outputs.kotlin }}
+      - name: Keep coverage per Kotlin version
+        if: always()
+        env:
+          KOTLIN: ${{ steps.plan.outputs.kotlin }}
+          STAMP: ${{ steps.plan.outputs.stamp }}
+        run: |
+          # XD-11 が版ごとに数える網羅の記録（ADR-055）。版の数 × 24 時間 + 1 日より古いものは消す
+          dest=".pbt-state/coverage/$KOTLIN/$STAMP"
+          mkdir -p "$dest"
+          find . -path '*/build/pbt/coverage/*.tsv' -not -path './.pbt-state/*' -exec cp {} "$dest/" \;
+          keep_days=$(( $(python3 scripts/kotlin-versions.py matrix full | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))') + 1 ))
+          find .pbt-state/coverage -mindepth 2 -maxdepth 2 -type d -mtime +"$keep_days" -exec rm -rf {} + || true
       - name: Save timing
         if: always()
         uses: actions/cache/save@v4

@@ -37,7 +37,7 @@ flowchart LR
 val catalog = PatternCatalog.load()                     // quality/catalog/index.json
 val usable = catalog.patterns.filter { it.status != Status.Rejected }
 
-// 決定的な網羅層: 1 時間ごとの実行で 24 分割の 1 区画を回し、24 時間で全パターンを一巡する
+// 決定的な網羅層: 1 時間ごとに 24 分割の 1 区画を回す。版ごとの一巡は 版の数 × 24 時間（ADR-055）
 // ⭐️ シャードは ID の CRC32 % 24。index.json に書いてある
 val exhaustive = Exhaustive.collection(usable.filter { it.shard == hourOfDay % 24 })
 
