@@ -12,6 +12,7 @@ import me.tbsten.analysis.code.gen.incremental.DirtyFileCalculator
 import me.tbsten.analysis.code.gen.incremental.IncrementalPlan
 import me.tbsten.analysis.code.gen.incremental.IncrementalState
 import me.tbsten.analysis.code.gen.incremental.InputSnapshot
+import me.tbsten.analysis.code.gen.incremental.OptionChangeJudge
 import me.tbsten.analysis.code.gen.incremental.OutputDependencyKind
 import me.tbsten.analysis.code.gen.incremental.OutputRecord
 import me.tbsten.analysis.code.gen.incremental.PersistentCache
@@ -21,6 +22,7 @@ import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorProvider
 import me.tbsten.analysis.code.gen.processor.AnalysisCodegenRoundContext
 import me.tbsten.analysis.code.gen.processor.Dependencies
 import me.tbsten.analysis.code.gen.processor.InternalAnalysisCodegenApi
+import me.tbsten.analysis.code.gen.processor.OptionImpact
 import me.tbsten.analysis.code.gen.testfoundation.IntegrationSpec
 import me.tbsten.analysis.code.gen.testfoundation.Milestone
 import me.tbsten.analysis.code.gen.testfoundation.PendingCase
@@ -105,5 +107,53 @@ class IncrementalEngineTest : IntegrationSpec({
                 state.snapshot.copy(globalFingerprint = "kotlin=2.4.21;acg=0.2.0"),
             ) { _, _ -> emptySet() }
         plan2.shouldBeInstanceOf<IncrementalPlan.Full>()
+    }
+
+    // ADR-051: オプションの影響は Processor がキーごとに宣言する。宣言の無いキーは Full
+    val provider =
+        object : AnalysisCodegenProcessorProvider {
+            override fun create(environment: AnalysisCodegenProcessorEnvironment): AnalysisCodegenProcessor = error("このテストでは使わない")
+
+            override fun optionImpact(key: String): OptionImpact =
+                when (key) {
+                    "inc.incremental" -> OptionImpact.Incremental
+                    "inc.none" -> OptionImpact.None
+                    else -> super.optionImpact(key)
+                }
+        }
+
+    case(
+        "INC-18",
+        "オプションが変わったとき、キー単位で `Full` が 1 つでもあれば全件、`Incremental` だけなら増分、`None` だけなら無視になる（宣言の無いキーは `Full`。ADR-051）",
+        pending = PendingCase(Milestone.M2),
+    ) {
+        val before = mapOf("inc.incremental" to "1", "inc.none" to "1", "other" to "1")
+
+        fun judge(after: Map<String, String>) = OptionChangeJudge.judge(before, after, provider::optionImpact)
+        // 変化なし
+        judge(before) shouldBe OptionImpact.None
+        // None だけ / Incremental だけ
+        judge(before + ("inc.none" to "2")) shouldBe OptionImpact.None
+        judge(before + ("inc.incremental" to "2")) shouldBe OptionImpact.Incremental
+        judge(before + ("inc.incremental" to "2") + ("inc.none" to "2")) shouldBe OptionImpact.Incremental
+        // 宣言の無いキー（値の変更・追加・削除）は Full。1 つでも Full があれば全体が Full
+        provider.optionImpact("other") shouldBe OptionImpact.Full
+        judge(before + ("other" to "2")) shouldBe OptionImpact.Full
+        judge(before + ("new" to "1")) shouldBe OptionImpact.Full
+        judge(before - "other") shouldBe OptionImpact.Full
+        judge(before + ("inc.incremental" to "2") + ("other" to "2")) shouldBe OptionImpact.Full
+        // KSP Bridge 経由の Processor は宣言を持たないので常に Full
+        OptionChangeJudge.judge(before, before + ("inc.none" to "2")) { OptionImpact.Full } shouldBe OptionImpact.Full
+    }
+
+    case("INC-19", "Processor が `Incremental` と宣言したオプションを変えても、全ファイルは dirty にならず、増分のまま処理される（ADR-051）", pending = PendingCase(Milestone.M2)) {
+        val sources = mapOf("A.kt" to "a1", "B.kt" to "b1")
+        val previous = State(InputSnapshot(sources, "g", emptyMap()), emptyList())
+        // Incremental 宣言のオプションは globalFingerprint に入らないので、変わっても指紋は同じ
+        OptionChangeJudge.judge(mapOf("inc.incremental" to "1"), mapOf("inc.incremental" to "2"), provider::optionImpact) shouldBe
+            OptionImpact.Incremental
+        val plan = DirtyFileCalculator().plan(previous, InputSnapshot(sources, "g", emptyMap())) { _, _ -> emptySet() }
+        val incremental = plan.shouldBeInstanceOf<IncrementalPlan.Incremental>()
+        incremental.dirtySources shouldBe emptySet()
     }
 })

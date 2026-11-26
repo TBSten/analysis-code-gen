@@ -75,7 +75,8 @@ Build Commit は journal を書いてから始め、終わったら消します�
 
 前回の入力のスナップショットと比べます。次のどれかが変わったら全件処理にします。
 
-- classpath・コンパイラオプション・Processor の jar とオプション
+- classpath・コンパイラオプション・Processor の jar
+- Processor が `Full` と宣言した（宣言の無い）オプション（ADR-051）
 - framework・Kotlin の版、キャッシュの形式
 - 前回の Build Commit が途中で止まった、キャッシュが無い
 

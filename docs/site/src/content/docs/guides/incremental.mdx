@@ -69,12 +69,27 @@ context.codeGenerator.generateKotlin(
 
 ```text
 - クラスパス・コンパイラオプション
-- Processor の JAR・オプション
+- Processor の JAR
+- 全件と宣言した（宣言の無い）オプション
 - analysisCodeGen・Kotlin の版
 - 前回のビルドが途中で止まった
 ```
 
 全件でも増分でも、最終的な生成物は同じになります。これは毎時のテストで検査しています。
+
+## オプションの影響を宣言する
+
+オプションが変わると、既定では全件処理です。Provider の `optionImpact` でキーごとに変えられます。
+
+```kotlin title="registry-processor/src/main/kotlin/com/example/registry/RouteRegistryProcessor.kt"
+    // 出力に関わらないオプションは None。宣言しないオプションが変わると全件処理になる
+    override fun optionImpact(key: String): OptionImpact =
+        if (key == "registry.logLevel") OptionImpact.None else OptionImpact.Full
+```
+
+`Incremental` なら増分のままで、そのオプションを読む生成物の作り直しは `Dependencies` で表します。
+
+変わったキーに 1 つでも `Full` があれば全件です。KSP Bridge 経由の Processor は常に `Full` です。
 
 ## まとめ
 
