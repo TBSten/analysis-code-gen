@@ -37,28 +37,44 @@ export default defineConfig({
 			editLink: { baseUrl: `https://github.com/TBSten/${repo}/edit/main/docs/site/` },
 			// 順番は人が決めるので autogenerate は使わない。ページを足したらここにも足す
 			sidebar: [
-				{ label: '概要', slug: '' },
+				// 4 グループ + 移行（ADR-047）。ガイドは使い方だけに絞り、難しめの話と内部の仕組みは Deep dive へ
 				{
 					label: 'はじめる',
 					items: [
+						{ label: '概要', slug: '' },
 						{ label: 'クイックスタート', slug: 'start/quick-start' },
 						{ label: 'インストール', slug: 'start/install' },
+						{ label: '対応バージョン', slug: 'guides/versions' },
 					],
 				},
 				{
-					// 1 要素 1 ページ（ADR-033）。読む順に並べる
+					// 1 要素 1 ページ（ADR-033）。Processor を書いて動かすのに要るものを読む順に並べる
 					label: 'ガイド',
 					items: [
 						{ label: 'Processor と Provider', slug: 'guides/processor' },
-						{ label: 'ラウンドとファイル集合', slug: 'guides/rounds' },
 						{ label: '生成と出力の管理', slug: 'guides/code-generator' },
-						{ label: '増分処理と依存の宣言', slug: 'guides/incremental' },
-						{ label: 'Deferred', slug: 'guides/deferred' },
 						{ label: 'SourceSet First と KMP', slug: 'guides/kmp' },
 						{ label: 'Gradle DSL', slug: 'guides/gradle-dsl' },
-						{ label: 'KSP Bridge', slug: 'guides/ksp-bridge' },
-						{ label: 'Hybrid Processor', slug: 'guides/hybrid' },
-						{ label: '対応バージョン', slug: 'guides/versions' },
+					],
+				},
+				{
+					// 知らなくても Processor は書けるが、凝ったことをするときに読むもの
+					label: 'Deep dive',
+					items: [
+						{ label: 'ラウンドとファイル集合', slug: 'guides/rounds' },
+						{ label: '増分処理と依存の宣言', slug: 'guides/incremental' },
+						{ label: 'Deferred', slug: 'guides/deferred' },
+						{
+							label: '内部の仕組み',
+							collapsed: true,
+							items: [
+								{ label: 'アーキテクチャ', slug: 'internal' },
+								{ label: 'モジュールと依存の向き', slug: 'internal/modules' },
+								{ label: '解析環境と Module Graph', slug: 'internal/analysis-environment' },
+								{ label: 'ラウンドと増分処理', slug: 'internal/rounds' },
+								{ label: 'KSP Bridge の仕組み', slug: 'internal/ksp-bridge' },
+							],
+						},
 					],
 				},
 				{
@@ -69,23 +85,15 @@ export default defineConfig({
 					],
 				},
 				{
-					label: '既存の KSP Processor を移行する',
+					// KSP の利用者向け。KSP Bridge・Hybrid のガイドもここに置く
+					label: 'KSP から移行する',
 					items: [
 						{ label: '移行の流れ', slug: 'migration' },
 						{ label: '1. KSP Bridge に載せ替える', slug: 'migration/bridge' },
 						{ label: '2. Hybrid で AA を使う', slug: 'migration/hybrid' },
 						{ label: '3. Native Processor に書き換える', slug: 'migration/native' },
-					],
-				},
-				{
-					label: '内部の仕組み',
-					collapsed: true,
-					items: [
-						{ label: 'アーキテクチャ', slug: 'internal' },
-						{ label: 'モジュールと依存の向き', slug: 'internal/modules' },
-						{ label: '解析環境と Module Graph', slug: 'internal/analysis-environment' },
-						{ label: 'ラウンドと増分処理', slug: 'internal/rounds' },
-						{ label: 'KSP Bridge の仕組み', slug: 'internal/ksp-bridge' },
+						{ label: 'KSP Bridge', slug: 'guides/ksp-bridge' },
+						{ label: 'Hybrid Processor', slug: 'guides/hybrid' },
 					],
 				},
 				// Dokka の HTML。docs ワークフローが ./gradlew dokkaGenerate の出力を /api/ に置く。base は Starlight が付ける
