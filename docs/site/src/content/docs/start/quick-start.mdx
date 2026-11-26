@@ -21,6 +21,7 @@ class Greeter
 ビルドのときに、次のファイルが生成されます。
 
 ```kotlin title="expected/com/example/GreeterHello.kt"
+// Auto generated
 package com.example
 
 fun Greeter.hello(): String = "Hello, Greeter!"
@@ -57,7 +58,7 @@ class HelloProcessor : AnalysisCodegenProcessor {
 }
 ```
 
-`newFiles` は今回処理すべきファイルです。増分ビルドでは、変わったファイルだけが入ります。
+`newFiles` は今回処理すべきファイルです。
 
 ## ファイルを生成する
 
@@ -70,7 +71,7 @@ private fun generateHello(context: AnalysisCodegenRoundContext, file: KtFile, na
         packageName = pkg,
         fileName = "${name}Hello",
         dependencies = Dependencies.isolating(file),
-        content = "package $pkg\n\nfun $name.hello(): String = \"Hello, $name!\"\n",
+        content = "// Auto generated\npackage $pkg\n\nfun $name.hello(): String = \"Hello, $name!\"\n",
     )
 }
 ```
