@@ -10,7 +10,6 @@ Kotlin Analysis API を直接使うコード生成基盤（KSP2 の代替を目�
 | `analysis-code-gen-gradle-plugin` | 公開 | KGP / AGP 統合 |
 | `analysis-code-gen-testing` | 公開 | kct fork を使ったテストフレームワーク |
 | `analysis-code-gen-ksp-bridge-api` | 公開 | KSP Bridge の公開部分（Hybrid Processor など） |
-| `analysis-code-gen-ksp-bridge-gradle-plugin` | 公開 | KSP Bridge の Gradle plugin |
 | `analysis-code-gen-project-model` | 内部 | SourceSet / Compilation / 依存のモデル |
 | `analysis-code-gen-engine-spi` | 内部 | Bridge などが共通実行基盤に参加する SPI |
 | `analysis-code-gen-analysis-engine` | 内部 | AA 環境・Module Graph・キャッシュ無効化 |

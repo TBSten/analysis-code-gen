@@ -14,7 +14,6 @@ private val PUBLIC_MODULES =
         "analysis-code-gen-gradle-plugin" to "me/tbsten/analysis/code/gen/gradle/AnalysisCodegenExtension",
         "analysis-code-gen-testing" to "me/tbsten/analysis/code/gen/testing/CodegenTestResult",
         "analysis-code-gen-ksp-bridge-api" to "me/tbsten/analysis/code/gen/ksp/hybrid",
-        "analysis-code-gen-ksp-bridge-gradle-plugin" to "me/tbsten/analysis/code/gen/ksp/gradle/KspBridgePlugin",
     )
 
 // 5.3 のうち API-15。ADR-038: KGP 組み込みの ABI 検査（旧 binary-compatibility-validator）を acg.library に入れ、dump は <module>/api/<module>.api

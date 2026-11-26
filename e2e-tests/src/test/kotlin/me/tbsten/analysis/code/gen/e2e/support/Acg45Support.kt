@@ -8,14 +8,14 @@ import java.util.Properties
 
 // ACG-45 の E2E（INC・OUT・FAIL・GCC・BRG・BINC・MIX・BKMP・BIN・HYB）が使う補助（ADR-034）。
 // ACG-44 の support（fixtureProject など）が入ったら、重なる部分はそちらに寄せる。
-// Bridge の道（me.tbsten.analysis.code.gen.ksp-bridge）を使うケースの保留を外すときは、analysis-code-gen-ksp-bridge-gradle-plugin を publishFixtureDeps に足す。
+// Bridge の道も plugin は me.tbsten.analysis.code.gen の 1 つ（ADR-050）。KSP の Processor があれば Bridge が自動で有効になる。
 
 /** どの道でフィクスチャを動かすか。 */
 enum class Acg45Engine {
     /** 公開 DSL + TP の Native 版。 */
     Native,
 
-    /** 公開 DSL + analysis-code-gen-ksp-bridge + TP の KSP 版。 */
+    /** 公開 DSL + TP の KSP 版（Bridge は KSP の Processor があるとき自動で有効になる。ADR-050）。 */
     Bridge,
 
     /** 公式 KSP2 + TP の KSP 版。差分の基準（K）。 */
@@ -86,7 +86,7 @@ fun acg45Project(
                     """
                     plugins {
                         kotlin("jvm") version "{{kotlinVersion}}"
-                        id("me.tbsten.analysis.code.gen.ksp-bridge") version "$v"
+                        id("me.tbsten.analysis.code.gen") version "$v"
                     }
 
                     analysisCodeGen {

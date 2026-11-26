@@ -7,23 +7,24 @@ fixture: fixtures/docs/guides
 :::note[レビューで判断してほしいこと]
 - KMP での既定を `Compatible`（KSP2 と同じ見え方）にした。共通の生成を 1 回にしたいときだけ `SourceSet` を選ぶ
 - 1 つの依存に Native と KSP の両方の Provider があれば、Native だけを使う
+- plugin は `me.tbsten.analysis.code.gen` の 1 つだけ。KSP の Processor があれば Bridge を自動で有効にする（ADR-050）
 :::
 
 KSP Bridge は、KSP の API を analysisCodeGen の上で実装したものです。既存の KSP Processor を変更せずに動かせます。
 
 ## KSP の Processor を動かす
 
-Bridge の plugin を適用し、KSP の Processor を `analysisCodeGen(...)` で足します。本体の plugin も自動で適用されます。
+本体の plugin のまま、KSP の Processor を `analysisCodeGen(...)` で足します。KSP の Processor があれば Bridge が自動で有効になります。
 
 ```kotlin title="bridge-app/build.gradle.kts"
 plugins {
     kotlin("jvm") version "2.4.21"
-    // Bridge の plugin。本体の me.tbsten.analysis.code.gen も自動で適用される
-    id("me.tbsten.analysis.code.gen.ksp-bridge") version "0.1.0"
+    // plugin は 1 つ。KSP の Processor があれば Bridge が自動で有効になる
+    id("me.tbsten.analysis.code.gen") version "0.1.0"
 }
 ```
 
-Bridge を適用せずに KSP の Processor を足すと、Bridge の適用を促すエラーで止まります。
+KSP の Processor が無ければ Bridge は有効にならず、KSP の API は依存にも入りません。
 
 ## Native と一緒に動かす
 
@@ -65,7 +66,7 @@ KMP では、KSP Processor に見せるファイルの範囲を `processingMode`
 
 | 要素 | 役割 |
 |---|---|
-| `me.tbsten.analysis.code.gen.ksp-bridge` | KSP Processor を動かす plugin |
+| `me.tbsten.analysis.code.gen` | Native と KSP の両方を動かす plugin（Bridge は自動） |
 | `analysisCodeGen(...)` | KSP と Native の Processor を足す |
 | `analysisCodeGen { arg() }` | `ksp { arg() }` の移行先 |
 | `processingMode` | KMP で見せるファイルの範囲 |

@@ -72,12 +72,14 @@ analysisCodeGen {
 
 ## KSP の Processor を使う
 
-既存の KSP Processor は、KSP Bridge の plugin を適用すると動きます。本体の plugin も自動で適用されます。
+既存の KSP Processor も、plugin は同じ `me.tbsten.analysis.code.gen` のまま、依存を足すだけで動きます。
+
+KSP の Processor があれば、KSP Bridge が自動で有効になります。
 
 ```kotlin title="bridge-app/build.gradle.kts"
 plugins {
     kotlin("jvm") version "2.4.21"
-    id("me.tbsten.analysis.code.gen.ksp-bridge") version "0.1.0"
+    id("me.tbsten.analysis.code.gen") version "0.1.0"
 }
 
 dependencies {
@@ -112,7 +114,7 @@ dependencies {
 | AA の置き場を足す | `settings.gradle.kts` の `repositories` |
 | Processor を動かす | `me.tbsten.analysis.code.gen` と `analysisCodeGen(...)` |
 | KMP で SourceSet を選ぶ | `analysisCodeGen { sourceSets { } }` |
-| KSP Processor を動かす | `me.tbsten.analysis.code.gen.ksp-bridge` |
+| KSP Processor を動かす | 同じ plugin と `analysisCodeGen(...)`（Bridge は自動） |
 | Processor を作る | `compileOnly` の `analysis-code-gen-processor-api` |
 
 ## 次のステップ

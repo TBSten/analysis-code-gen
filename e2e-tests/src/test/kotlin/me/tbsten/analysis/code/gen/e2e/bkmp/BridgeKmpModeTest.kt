@@ -54,7 +54,7 @@ private fun kmpProject(
     }
 
 private val ksp2Plugin = "id(\"com.google.devtools.ksp\") version \"${Acg45Repo.kspVersion}\""
-private val bridgePlugin = "id(\"me.tbsten.analysis.code.gen.ksp-bridge\") version \"${Acg45Repo.acgVersion}\""
+private val bridgePlugin = "id(\"me.tbsten.analysis.code.gen\") version \"${Acg45Repo.acgVersion}\""
 
 /** [root] 以下の生成 Kotlin を「Compilation（または SourceSet）名 / ファイル名 → 中身」で集める。 */
 private fun collect(
@@ -109,7 +109,7 @@ class BridgeKmpModeDiffTest : DiffSpec({
                 """
                 analysisCodeGen {
                     arg("tp.processors", "Mapper,Registry")
-                    kspBridge { processingMode = me.tbsten.analysis.code.gen.ksp.gradle.KspProcessingMode.Compatible }
+                    kspBridge { processingMode = me.tbsten.analysis.code.gen.gradle.KspProcessingMode.Compatible }
                     compilations {
                         named("jvmMain") { processor("$tp") }
                         named("jsMain") { processor("$tp") }
@@ -143,7 +143,7 @@ class BridgeKmpModeDiffTest : DiffSpec({
                 """
                 analysisCodeGen {
                     arg("tp.processors", "Mapper")
-                    kspBridge { processingMode = me.tbsten.analysis.code.gen.ksp.gradle.KspProcessingMode.SourceSet }
+                    kspBridge { processingMode = me.tbsten.analysis.code.gen.gradle.KspProcessingMode.SourceSet }
                     sourceSets { commonMain { processor("$tp") } }
                 }
                 """.trimIndent(),
@@ -165,7 +165,7 @@ class BridgeKmpModeE2ETest : E2ESpec({
                 analysisCodeGen {
                     arg("tp.processors", "Mapper,Probe")
                     arg("tp.probe.out", "${probe.absolutePath.replace("\\", "/")}")
-                    kspBridge { processingMode = me.tbsten.analysis.code.gen.ksp.gradle.KspProcessingMode.SourceSet }
+                    kspBridge { processingMode = me.tbsten.analysis.code.gen.gradle.KspProcessingMode.SourceSet }
                     sourceSets { all { processor("$tp") } }
                 }
                 """.trimIndent(),

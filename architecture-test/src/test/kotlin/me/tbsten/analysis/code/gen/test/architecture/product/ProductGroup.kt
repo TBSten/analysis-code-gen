@@ -77,18 +77,6 @@ private fun DeclarationContainerScope.publicApiGroup() = "PublicApi".group {
             allow(anythingElse)
         }
     }
-    "KspBridgeGradlePlugin".role {
-        summary = "kspBridge { } DSL と Bridge ランタイムを足す Gradle plugin"
-        layout { mainKotlin("analysis-code-gen-ksp-bridge-gradle-plugin", "ksp/gradle") / "KspBridge*".ktFile() }
-        "gradle-plugin の上に載り、AA・エンジンを載せない".ktFileContent {
-            `package`(matchingDirectory)
-            fileAnnotation("OptIn")
-            `import`("org.gradle.**")
-            `import`("me.tbsten.analysis.code.gen.gradle.**")
-            `import`("me.tbsten.analysis.code.gen.ksp.gradle.**")
-            allow(anythingElse)
-        }
-    }
     "TestingApi".role {
         summary = "利用者向けのテスト補助の公開部分（CodegenTest など。ADR-021）"
         layout {

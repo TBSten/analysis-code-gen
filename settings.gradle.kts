@@ -47,7 +47,6 @@ include(
     ":benchmarks",
     ":analysis-code-gen-ksp-bridge",
     ":analysis-code-gen-ksp-bridge-api",
-    ":analysis-code-gen-ksp-bridge-gradle-plugin",
     ":ksp-compatibility-tests",
     ":e2e-tests",
     // AA の型に触れる I / U の保留テスト（ACG-45、ADR-034）。e2e-tests は AA なしでコンパイルできるままにする
