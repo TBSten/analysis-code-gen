@@ -1,0 +1,71 @@
+# 定期実行の実行履歴（ADR-058）。定期実行が終わるたびに、結果を progress-data branch の history/runs.jsonl に 1 行追記する。
+# cancelled も積む（progress-data.yml は cancelled を積まないが、打ち切りこそ数えたいため）。
+# 読み方: git fetch origin progress-data && git show origin/progress-data:history/runs.jsonl > runs.jsonl
+#         python3 scripts/ci/run_history.py summary --history runs.jsonl --hours 24
+name: Run history
+
+on:
+  workflow_run:
+    workflows: [PBT hourly, Nightly, kspt, fixtures, Kotlin upstream]
+    types: [completed]
+    branches: [main]
+
+# progress-data.yml と同じ branch に push するので、同じ group で 1 本ずつ
+concurrency:
+  group: progress-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RUN_ID: ${{ github.event.workflow_run.id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: src
+      - name: 実行と job の情報を取る
+        run: |
+          gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID" > run.json
+          gh api "repos/${{ github.repository }}/actions/runs/$RUN_ID/jobs?per_page=100&filter=latest" > jobs.json
+      - name: 数値を取ってくる（毎時 PBT・Nightly が上げる run-metrics）
+        uses: actions/download-artifact@v4
+        with:
+          name: run-metrics
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+          path: metrics
+        continue-on-error: true # 数値を上げずに終わった実行（打ち切りなど）も、回数と結果だけは積む
+      - name: progress-data branch の history/runs.jsonl に追記する
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          url="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          for i in 1 2 3 4; do
+            rm -rf data
+            if git ls-remote --exit-code "$url" refs/heads/progress-data > /dev/null; then
+              git clone -q --depth 1 --branch progress-data "$url" data
+            else
+              git init -q -b progress-data data && git -C data remote add origin "$url"
+              printf '# progress-data\n\n進捗レポートの材料（ADR-032）と定期実行の履歴（ADR-058）。CI が自動で積む。手で直さない。\n' > data/README.md
+            fi
+            python3 src/scripts/ci/run_history.py record --run run.json --jobs jobs.json \
+              --metrics metrics/run-metrics.json --out data/history/runs.jsonl
+            git -C data add -A
+            git -C data diff --cached --quiet && exit 0
+            git -C data commit -q -m "履歴: ${{ github.event.workflow_run.name }} $RUN_ID"
+            git -C data push -q origin progress-data && exit 0
+            sleep $((i * 5))
+          done
+          exit 1
+      - name: 直近 24 時間のまとめ
+        if: always()
+        run: |
+          [ -f data/history/runs.jsonl ] || exit 0
+          python3 src/scripts/ci/run_history.py summary --history data/history/runs.jsonl --hours 24 >> "$GITHUB_STEP_SUMMARY"

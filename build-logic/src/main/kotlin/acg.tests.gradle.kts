@@ -2,6 +2,7 @@
 // - テストから :test-foundation（AcgSpec・PendingCase）を使えるようにする
 // - collectCases: テストを実行せずに spec を生成し、ケース宣言を build/acg/cases.csv に書く（:quality:checkCaseIds が集める）
 // - -Pacg.runPending=true で保留中のケースも中身を実行し、結果を build/acg/pending-runs/ に、予想外に通ったものを build/acg/unexpected-pass/ に書く（夜間の強制実行、ADR-026）
+//   -Pacg.pendingTimeoutSeconds=<秒>（既定 300）で保留ケース 1 件の持ち時間、-Pacg.pendingShard=i/n で保留ケースの分割を決める（ADR-057）
 // 適用したモジュールは quality/build.gradle.kts の acgCases にも足すこと
 plugins {
     id("acg.jvm")
@@ -37,11 +38,24 @@ configurations.consumable("acgCasesElements") {
 }
 
 val runPending = providers.gradleProperty("acg.runPending").orElse("false")
+val pendingTimeoutSeconds = providers.gradleProperty("acg.pendingTimeoutSeconds")
+val pendingShard = providers.gradleProperty("acg.pendingShard")
 val pendingResultsDir = layout.buildDirectory.dir("acg")
 
 tasks.withType<Test>().configureEach {
     inputs.property("acg.runPending", runPending)
     systemProperty("acg.runPending", runPending.get())
+    pendingTimeoutSeconds.orNull?.let { systemProperty("acg.pendingTimeoutSeconds", it) }
+    pendingShard.orNull?.let {
+        inputs.property("acg.pendingShard", it)
+        systemProperty("acg.pendingShard", it)
+    }
+    if (runPending.get().toBoolean()) {
+        // 夜間の強制実行は毎回中身を流す（保留ケースの結果はテスト結果のキャッシュに載せない）。
+        // どのケースで時間がかかったかをログで追えるよう、始まり・終わりも出す（ADR-057）
+        outputs.upToDateWhen { false }
+        testLogging.events("started", "passed", "failed")
+    }
     val resultsDir = pendingResultsDir.get().asFile
     systemProperty("acg.pendingResultsDir", resultsDir.absolutePath)
     // 前回の強制実行の結果が残らないよう、実行前に消す

@@ -61,22 +61,21 @@ abstract class AcgSpec(
                 }
             }
         val runPending = CaseRuntime.runPending
-        val enabled = pending == null || runPending
+        val shard = if (runPending) CaseRuntime.pendingShard else null
+        val enabled =
+            when {
+                // 分割して保留ケースだけを流す夜間の job（ADR-057）。有効なケースは別の job が受け持つ
+                shard != null -> pending != null && CaseRuntime.inShard(id, shard)
+                else -> pending == null || runPending
+            }
         val body: suspend TestScope.() -> Unit =
             if (pending == null) {
                 test
             } else {
                 {
-                    val error =
-                        try {
-                            test()
-                            null
-                        } catch (e: VirtualMachineError) {
-                            throw e
-                        } catch (e: Throwable) {
-                            e
-                        }
-                    CaseRuntime.recordPendingRun(declaration, error)
+                    val start = System.nanoTime()
+                    val error = CaseRuntime.runPendingBody(this, test)
+                    CaseRuntime.recordPendingRun(declaration, error, (System.nanoTime() - start) / 1_000_000)
                 }
             }
         declaration.testName.config(enabled = enabled, tags = tags, test = body)

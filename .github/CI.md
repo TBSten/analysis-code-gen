@@ -7,11 +7,13 @@
 | ワークフロー | いつ | 中身 | 知らせ方 |
 |---|---|---|---|
 | `ci.yml` | PR・main への push | 軽い検査（script。doc-lint を含む）、`./gradlew build`（test・ktlint を含む）を Kotlin 2 版で | PR のチェック。必須は `ci-ok` だけ |
-| `nightly.yml` | 毎日 04:00 JST | 全 Kotlin 版の build、macOS、保留中ケースの実行 | issue `nightly-failure` / `unexpected-pass` |
+| `nightly.yml` | 毎日 04:00 JST | 全 Kotlin 版の build、macOS、保留中ケースの実行（4 分割・1 件 5 分まで、ADR-057） | issue `nightly-failure` / `unexpected-pass` |
 | `kotlin-upstream.yml` | 毎日 08:00 JST | Maven Central の Kotlin と `gradle/kotlin-versions.txt` の差 | issue `kotlin-upstream` |
 | `docs.yml` | docs などの PR・main への push | サイトのビルド、Dokka、内部リンク検査、Pages へのデプロイ | PR のチェック |
 | `pbt-hourly.yml` | 毎時 | PBT × E2E（ACG-40 が追加。詳細は ADR-022） | ACG-40 の取り決め |
 | `lic-01.yml` ほか | PR・push | 出所記録・版一覧・Processor 一覧・PoC の検査（ci-ok の外。必要なら必須に足す） | PR のチェック |
+
+定期実行（毎時 PBT・Nightly・kspt・fixtures・Kotlin upstream）が終わるたびに、`run-history.yml` が `progress-data` branch の `history/runs.jsonl` に 1 行追記する（cancelled も含む。ADR-058）。数値は `python3 scripts/ci/run_history.py summary --history runs.jsonl --hours 24` で期待回数と比べて見る。
 
 CI・Nightly・毎時 PBT の main での実行結果は `progress-data.yml`（ACG-30、ADR-032）が集めて `progress-data` branch に push する。ワークフローの `name:` を変えるときは `progress-data.yml` の `workflows:` も合わせる。
 
@@ -46,6 +48,8 @@ Agent の環境からはリポジトリ設定を変えられないため、て�
 3. **Actions の権限**: Settings → Actions → General → Workflow permissions は既定（read）のままでよい。issue を書く job は自分で `issues: write` を宣言している
 
 ## schedule が動かないとき（ACG-53）
+
+2026-11 時点では GitHub の schedule が不安定なため、Claude の定期タスク「定期実行の代わりの起動」（毎時 :40 JST、03〜08 時を除く）が足りない実行を `workflow_dispatch` で起こしている（ADR-059）。毎時 PBT は直近 60 分に実行が無ければ、Nightly・kspt は 02 時台、fixtures は月曜 02 時台、Kotlin upstream は 09 時台に起こす。schedule が遅れて後から起きた実行は、最初の `gate` job（`scripts/ci/schedule_gate.py`）が中身を飛ばす。schedule が 3 日続けて期待回数どおりに動いたら（`run_history.py summary` で確かめる）、定期タスクを止めてよい。
 
 1. `gh api 'repos/tbsten/analysis-code-gen/actions/runs?event=schedule' --jq .total_count` で schedule の run を数える
 2. 0 件なら、まず `workflow_dispatch` で手動起動して中身が動くか確かめる

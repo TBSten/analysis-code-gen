@@ -20,6 +20,15 @@ private class SampleE2ESpec : E2ESpec({
     }
 })
 
+// 中身が止まる保留ケース（持ち時間の確認用、ADR-057）
+private class SampleHangingSpec : E2ESpec({
+    case("GRD-04", "保留で中身が止まるケース", pending = PendingCase(Milestone.M1)) {
+        Thread.sleep(60_000)
+    }
+})
+
+internal val sampleHangingSpecClass: Class<*> = Class.forName("me.tbsten.analysis.code.gen.testfoundation.SampleHangingSpec")
+
 object SampleCounter {
     var enabledRuns = 0
     var pendingRuns = 0
