@@ -19,7 +19,27 @@ permissions:
   contents: read
 
 jobs:
+  # schedule が遅れて起きたとき、代わりの起動（Claude の定期タスクの workflow_dispatch）と 2 度流さない（ADR-059）。12 時間以内に起きていれば飛ばす
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      skip: ${{ steps.gate.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/ci
+      - id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/ci/schedule_gate.py --workflow nightly.yml --hours 12
+
   plan:
+    needs: gate
+    if: needs.gate.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -82,13 +102,18 @@ jobs:
           retention-days: 30
 
   # 保留中（@PendingCase）のケースも実行する。保留中のケースの失敗はビルドを落とさない（ACG-37 の拡張が扱う）。
-  # 予想外に通ったケースは各モジュールの build/acg/unexpected-pass/*.txt に「ID<TAB>テスト名」で 1 行ずつ書かれる
+  # 予想外に通ったケースは各モジュールの build/acg/unexpected-pass/*.txt に「ID<TAB>テスト名」で 1 行ずつ書かれる。
+  # 1 job で全部を流すと 60 分で打ち切られた（2026-11-27、E2E の保留 139 件）ため、ID の CRC32 で 4 分割して並列に流し、
+  # 1 件の持ち時間を 5 分にする（ADR-057）。分割した job は保留ケースだけを流す（有効なケースは matrix job が受け持つ）
   pending:
     needs: plan
     runs-on: ubuntu-latest
-    timeout-minutes: 60
-    outputs:
-      found: ${{ steps.collect.outputs.found }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    name: pending (${{ matrix.shard }}/4)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -97,34 +122,27 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
       - name: 保留中のケースも実行
-        run: ./gradlew test -Pacg.runPending=true -Pacg.kotlin=${{ needs.plan.outputs.latest }} --continue --console=plain
-      - id: collect
-        name: 予想外の通過を集める
+        run: |
+          ./gradlew test --continue --console=plain \
+            -Pacg.runPending=true -Pacg.pendingShard=${{ matrix.shard }}/4 -Pacg.pendingTimeoutSeconds=300 \
+            -Pacg.kotlin=${{ needs.plan.outputs.latest }}
+      - name: 結果を集める
         if: always()
         run: |
-          files=$(find . -path '*/build/acg/unexpected-pass/*.txt' -not -path './.git/*' | sort)
-          if [[ -z "$files" ]]; then echo "found=false" >> "$GITHUB_OUTPUT"; exit 0; fi
-          {
-            echo "## 保留中なのに通ったケース"
-            echo
-            echo "skip を外せる可能性がある。担当スレッドで確認し、外す PR を出す（外す PR でアサーションは変えない）。"
-            echo
-            echo '| ID | テスト |'
-            echo '|---|---|'
-            cat $files | sort -u | awk -F'\t' '{ printf "| %s | %s |\n", $1, $2 }'
-          } > unexpected-pass.md
-          cat unexpected-pass.md >> "$GITHUB_STEP_SUMMARY"
-          echo "found=true" >> "$GITHUB_OUTPUT"
+          mkdir -p pending-out
+          find . -path '*/build/acg/pending-runs/*.tsv' -not -path './.git/*' -exec cat {} + > pending-out/pending-runs.tsv || true
+          find . -path '*/build/acg/unexpected-pass/*.txt' -not -path './.git/*' -exec cat {} + > pending-out/unexpected-pass.tsv || true
+          awk -F'\t' '{ n[$2]++ } END { for (k in n) printf "%s %d\n", k, n[k] }' pending-out/pending-runs.tsv | sort >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: unexpected-pass
-          path: unexpected-pass.md
+          name: pending-${{ matrix.shard }}
+          path: pending-out/
           if-no-files-found: ignore
 
   report:
-    if: always()
-    needs: [plan, matrix, macos, pending]
+    if: always() && needs.gate.outputs.skip != 'true'
+    needs: [gate, plan, matrix, macos, pending]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -137,8 +155,51 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: unexpected-pass
+          pattern: pending-*
+          path: pending
         continue-on-error: true
+      - name: 保留ケースの結果をまとめる
+        id: pending
+        run: |
+          mkdir -p pending out
+          cat pending/*/pending-runs.tsv 2>/dev/null > out/pending-runs.tsv || true
+          cat pending/*/unexpected-pass.tsv 2>/dev/null | sort -u > out/unexpected-pass.tsv || true
+          # 実行履歴（run-history.yml、ADR-058）に載せる数値
+          python3 - <<'EOF'
+          import json, pathlib
+          rows = [l.split("\t") for l in pathlib.Path("out/pending-runs.tsv").read_text(encoding="utf-8").splitlines() if l.strip()]
+          count = lambda o: sum(1 for r in rows if len(r) > 1 and r[1] == o)
+          ms = [int(r[5]) for r in rows if len(r) > 5 and r[5].isdigit()]
+          metrics = {
+              "pending_run": len(rows),
+              "pending_passed": count("passed"),
+              "pending_failed": count("failed"),
+              "pending_timeout": count("timeout"),
+              "pending_max_ms": max(ms, default=0),
+              "pending_total_ms": sum(ms),
+          }
+          pathlib.Path("out/run-metrics.json").write_text(json.dumps(metrics, ensure_ascii=False) + "\n", encoding="utf-8")
+          print(metrics)
+          EOF
+          if [[ -s out/unexpected-pass.tsv ]]; then
+            {
+              echo "## 保留中なのに通ったケース"
+              echo
+              echo "skip を外せる可能性がある。担当スレッドで確認し、外す PR を出す（外す PR でアサーションは変えない）。"
+              echo
+              echo '| ID | テスト |'
+              echo '|---|---|'
+              awk -F'\t' '{ printf "| %s | %s |\n", $1, $2 }' out/unexpected-pass.tsv
+            } > unexpected-pass.md
+            cat unexpected-pass.md >> "$GITHUB_STEP_SUMMARY"
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: run-metrics
+          path: out/run-metrics.json
       - name: 失敗を知らせる / 回復したら閉じる
         env:
           RESULTS: ${{ toJSON(needs) }}
@@ -151,7 +212,7 @@ jobs:
             scripts/ci/report_issue.sh close nightly-failure "回復した: $RUN_URL"
           fi
       - name: 予想外の通過を知らせる
-        if: needs.pending.outputs.found == 'true'
+        if: steps.pending.outputs.found == 'true'
         run: |
           printf '\n\n実行: %s\n' "$RUN_URL" >> unexpected-pass.md
           scripts/ci/report_issue.sh open unexpected-pass "保留中なのに通ったケースがある" unexpected-pass.md

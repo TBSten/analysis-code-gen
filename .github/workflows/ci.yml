@@ -41,7 +41,10 @@ jobs:
         with:
           python-version: "3.12"
       - name: CI script の自己テスト
-        run: python3 scripts/ci/test_test_guard.py
+        run: |
+          python3 scripts/ci/test_test_guard.py
+          python3 scripts/ci/test_run_history.py
+          python3 scripts/ci/test_schedule_gate.py
       # 有効 → 保留の逆戻り・ケースの消失は :quality:checkCaseIds（ACG-37、build に含む）が見る
       - name: PendingCase 以外の無効化の検出
         if: github.event_name == 'pull_request'

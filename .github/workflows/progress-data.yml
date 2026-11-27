@@ -27,7 +27,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: src
+      - name: 飛ばした実行は積まない
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # schedule_gate（ADR-059）で中身を飛ばした実行は、gate 以外の job がすべて skipped になる。結果が無いので積まない
+          ran=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/jobs?per_page=100" \
+            --jq '[.jobs[] | select(.name != "gate" and .conclusion != "skipped")] | length')
+          echo "ran=$ran" >> "$GITHUB_OUTPUT"
       - name: 実行の種類を決める
+        if: steps.gate.outputs.ran != '0'
         id: kind
         env:
           WF_PATH: ${{ github.event.workflow_run.path }}
@@ -39,6 +49,7 @@ jobs:
             *) echo "kind=other" >> "$GITHUB_OUTPUT" ;;
           esac
       - name: テスト結果を取ってくる
+        if: steps.gate.outputs.ran != '0'
         uses: actions/download-artifact@v4
         with:
           run-id: ${{ github.event.workflow_run.id }}
@@ -46,6 +57,7 @@ jobs:
           path: results
         continue-on-error: true # 結果を上げずに落ちた実行も「全部失敗」として記録する
       - name: ケースごとの結果にまとめる
+        if: steps.gate.outputs.ran != '0'
         env:
           RUN: ${{ github.event.workflow_run.id }}
           SHA: ${{ github.event.workflow_run.head_sha }}
@@ -60,6 +72,7 @@ jobs:
             --conclusion "$CONCLUSION" --finished-at "$FINISHED" \
             --out "record/runs/$KIND/$(date -u -d "$FINISHED" +%Y%m%dT%H%M%SZ)-$RUN.json"
       - name: progress-data branch に積む
+        if: steps.gate.outputs.ran != '0'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"

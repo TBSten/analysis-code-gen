@@ -28,7 +28,27 @@ env:
   PBT_TASKS: ":pbt:test"
 
 jobs:
+  # schedule が遅れて起きたとき、代わりの起動（Claude の定期タスクの workflow_dispatch）と 2 度流さない（ADR-059）。40 分以内に起きていれば飛ばす
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      skip: ${{ steps.gate.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/ci
+      - id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/ci/schedule_gate.py --workflow pbt-hourly.yml --hours 0.67
+
   pbt:
+    needs: gate
+    if: needs.gate.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 55
     steps:
@@ -44,6 +64,9 @@ jobs:
           path: .pbt-state
           key: pbt-state-${{ github.run_id }}
           restore-keys: pbt-state-
+      - name: Snapshot timing
+        # 実行履歴（ADR-058）の試行数 = 実行後の累計試行数 - 実行前の累計試行数
+        run: mkdir -p "$RUNNER_TEMP/timing-before" && cp -r .pbt-state/timing/. "$RUNNER_TEMP/timing-before/" 2>/dev/null || true
       - name: Pick Kotlin version and shard
         id: plan
         run: |
@@ -75,6 +98,24 @@ jobs:
           find . -path '*/build/pbt/coverage/*.tsv' -not -path './.pbt-state/*' -exec cp {} "$dest/" \;
           keep_days=$(( $(python3 scripts/kotlin-versions.py matrix full | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))') + 1 ))
           find .pbt-state/coverage -mindepth 2 -maxdepth 2 -type d -mtime +"$keep_days" -exec rm -rf {} + || true
+      - name: Summarize run
+        if: always()
+        run: |
+          mkdir -p build/run-metrics
+          ce=""
+          if find . -path '*/build/pbt/failures/new-regressions.tsv' -not -path './.pbt-state/*' | grep -q .; then ce="--counterexample"; fi
+          results=$(mktemp -d)
+          find . -path '*/build/test-results/test/*.xml' -exec cp {} "$results/" \;
+          python3 scripts/ci/run_history.py pbt-metrics --before "$RUNNER_TEMP/timing-before" --after .pbt-state/timing \
+            --results "$results" --kotlin "${{ steps.plan.outputs.kotlin }}" --shard "${{ steps.plan.outputs.shard }}" \
+            $ce --out build/run-metrics/run-metrics.json
+      - name: Upload metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-metrics
+          path: build/run-metrics/run-metrics.json
+          if-no-files-found: ignore
       - name: Save timing
         if: always()
         uses: actions/cache/save@v4

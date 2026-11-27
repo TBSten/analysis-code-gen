@@ -16,7 +16,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  # schedule が遅れて起きたとき、代わりの起動（Claude の定期タスクの workflow_dispatch）と 2 度流さない（ADR-059）。12 時間以内に起きていれば飛ばす
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      skip: ${{ steps.gate.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/ci
+      - id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/ci/schedule_gate.py --workflow kspt.yml --hours 12
+
   ksp2:
+    needs: gate
+    if: needs.gate.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
