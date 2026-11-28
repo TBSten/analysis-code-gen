@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtPsiFactory
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 
-private val M1 = PendingCase(Milestone.M1)
 private val M2 = PendingCase(Milestone.M2)
 
 /**

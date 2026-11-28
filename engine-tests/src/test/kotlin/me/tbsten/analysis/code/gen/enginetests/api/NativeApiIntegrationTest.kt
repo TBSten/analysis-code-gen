@@ -21,7 +21,6 @@ import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import me.tbsten.analysis.code.gen.testfoundation.UnitSpec
 import org.jetbrains.kotlin.platform.jvm.isJvm
 
-private val M1 = PendingCase(Milestone.M1)
 private val M2 = PendingCase(Milestone.M2)
 
 /** serviceJar の META-INF/services に書いて ServiceLoader で探させる Provider（API-01）。 */

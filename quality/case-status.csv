@@ -96,7 +96,7 @@ LIF-03,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.def
 TRM-01,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.trm.TerminationIntegrationTest
 TRM-02,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.trm.TerminationIntegrationTest
 TRM-03,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.trm.TerminationIntegrationTest
-TRM-04,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.trm.TerminationIntegrationTest
+TRM-04,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.trm.TerminationIntegrationTest
 TRM-05,I,M2,enabled,,1,me.tbsten.analysis.code.gen.enginetests.trm.TerminationIntegrationTest
 TRM-06,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.trm.TerminationIntegrationTest
 TRM-07,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.trm.TrmE2ETest

@@ -8,15 +8,11 @@ import me.tbsten.analysis.code.gen.enginetests.support.runNative
 import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorProvider
 import me.tbsten.analysis.code.gen.processor.Dependencies
 import me.tbsten.analysis.code.gen.testfoundation.IntegrationSpec
-import me.tbsten.analysis.code.gen.testfoundation.Milestone
-import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.pointers.KaSymbolPointer
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
-
-private val M1 = PendingCase(Milestone.M1)
 
 /** 毎ラウンド新しいファイルを作り続ける（TRM-01）。 */
 class InfiniteProvider : AnalysisCodegenProcessorProvider by processorProvider(process = { ctx ->
@@ -107,7 +103,7 @@ class TerminationIntegrationTest : IntegrationSpec({
         laterRound.errors.single().message shouldContain "kotlin/same/Same.kt"
     }
 
-    case("TRM-04", "同じ Processor が同じファイルを 2 回作ったらエラー（KSP 互換モードでは KSP と同じ例外）", M1) {
+    case("TRM-04", "同じ Processor が同じファイルを 2 回作ったらエラー（KSP 互換モードでは KSP と同じ例外）") {
         val result =
             runNative {
                 kotlin("a/A.kt", "package a\nclass A")
