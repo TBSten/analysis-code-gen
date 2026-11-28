@@ -55,15 +55,35 @@ private object XdLoader
  * jar の一覧は system property `acg.realProcessors.<ID>`（パス区切り）で渡す。e2e-tests のビルドが processors.toml の版で解決して渡す（ADR-037）
  */
 internal fun loadRealKspProvider(id: ProcessorId): SymbolProcessorProvider {
-    val paths = System.getProperty("acg.realProcessors.${id.name}")?.split(File.pathSeparator)?.filter { it.isNotBlank() }
-    check(
-        !paths.isNullOrEmpty(),
-    ) { "system property acg.realProcessors.${id.name} が無い（e2e-tests のビルドで ${id.catalogName} の jar を渡す。ADR-037）" }
-    val loader = URLClassLoader(paths.map { File(it).toURI().toURL() }.toTypedArray(), SymbolProcessorProvider::class.java.classLoader)
-    val providers = ServiceLoader.load(SymbolProcessorProvider::class.java, loader).toList()
+    // ClassLoader は Processor ごとに 1 つを使い回す。入力ごとに作ると、カタログの全件（ACG-68）を流すあいだにクラスの領域が溢れる
+    val loader = realProcessorLoaders.getOrPut(id) { realProcessorLoader(id) }
+    // 親（テストの classpath）にあるテスト用 Processor も ServiceLoader に見えるので、この jar から読んだものだけを取る
+    val providers = ServiceLoader.load(SymbolProcessorProvider::class.java, loader).filter { it::class.java.classLoader === loader }
     check(providers.size == 1) { "${id.catalogName} の SymbolProcessorProvider が 1 つでない: ${providers.map { it::class.java.name }}" }
     return providers.single()
 }
+
+private val realProcessorLoaders = java.util.concurrent.ConcurrentHashMap<ProcessorId, ClassLoader>()
+
+private fun realProcessorLoader(id: ProcessorId): ClassLoader {
+    val paths = systemPaths("acg.realProcessors.${id.name}")
+    check(paths.isNotEmpty()) { "system property acg.realProcessors.${id.name} が無い（e2e-tests のビルドで ${id.catalogName} の jar を渡す。ADR-037）" }
+    return URLClassLoader(paths.map { it.toURI().toURL() }.toTypedArray(), SymbolProcessorProvider::class.java.classLoader)
+}
+
+private fun systemPaths(key: String): List<File> =
+    System
+        .getProperty(key)
+        ?.split(File.pathSeparator)
+        ?.filter { it.isNotBlank() }
+        ?.map(::File)
+        .orEmpty()
+
+/**
+ * カタログの入力が使う実行時ライブラリ（cream-runtime・moshi・koin-annotations など）。system property `acg.catalogClasspath.<ID>`。
+ * 利用者のコードはこれを classpath に置いてコンパイルする（ACG-68、ADR-072）。無ければ空
+ */
+internal fun catalogRuntimeClasspath(id: ProcessorId): List<File> = systemPaths("acg.catalogClasspath.${id.name}")
 
 /** 実用 Processor 1 つ。版は processors.toml（ADR-019）、N は移植版があるときだけ。 */
 internal fun realProcessor(id: ProcessorId): DiffProcessor =
@@ -95,6 +115,7 @@ internal fun UserProject.toDiffInput(
         processors = set.order.map(::realProcessor),
         options = options,
         expectation = expect.toExpectation(),
+        classpath = set.order.flatMap(::catalogRuntimeClasspath).distinct(),
     )
 
 internal fun CatalogPattern.toDiffInput(
@@ -117,6 +138,7 @@ internal fun ProjectSpec.toDiffInput(
         processors = set.order.map(::realProcessor),
         options = options,
         expectation = Expectation.Valid,
+        classpath = set.order.flatMap(::catalogRuntimeClasspath).distinct(),
     )
 
 /** 比べる強さを指定したハーネス。K は K 結果キャッシュ付き（ADR-023）。 */
