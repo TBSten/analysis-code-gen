@@ -26,6 +26,7 @@ import me.tbsten.analysis.code.gen.testfoundation.Milestone
 import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaClassSymbol
+import org.jetbrains.kotlin.analysis.api.types.KaClassType
 import org.jetbrains.kotlin.psi.KtClass
 import com.google.devtools.ksp.processing.Dependencies as KspDependencies
 
@@ -74,7 +75,8 @@ class NativeRegistryProvider : AnalysisCodegenProcessorProvider {
                                     .valueParameters
                                     .first()
                                     .returnType
-                                    .toString()
+                                    // toString は AA のデバッグ表示で ClassId の形（mix/User）になるため、FQ 名で書く（ADR-068）
+                                    .let { (it as KaClassType).classId.asFqNameString() }
                             }
                         seenByNative += "${mapper.name}:$targetType"
                         context.codeGenerator.generateKotlin(
