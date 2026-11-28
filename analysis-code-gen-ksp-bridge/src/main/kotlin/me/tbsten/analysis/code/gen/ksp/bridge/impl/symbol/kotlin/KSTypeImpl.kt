@@ -1,0 +1,187 @@
+/*
+ * Copyright 2022 Google LLC
+ * Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+// Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSTypeImpl.kt
+// Modified-By: analysis-code-gen contributors, 2026
+// Modifications: パッケージ名のみ変更
+
+package me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin
+
+import me.tbsten.analysis.code.gen.ksp.bridge.common.IdKey
+import me.tbsten.analysis.code.gen.ksp.bridge.common.KSObjectCache
+import me.tbsten.analysis.code.gen.ksp.bridge.common.errorTypeOnInconsistentArguments
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.ResolverAAImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.recordLookupWithSupertypes
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.resolved.KSAnnotationResolvedImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.resolved.KSTypeArgumentResolvedImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.synthetic.getExtensionFunctionTypeAnnotation
+import com.google.devtools.ksp.symbol.KSAnnotation
+import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeArgument
+import com.google.devtools.ksp.symbol.Nullability
+import org.jetbrains.kotlin.analysis.api.KaImplementationDetail
+import org.jetbrains.kotlin.analysis.api.impl.base.types.KaBaseStarTypeProjection
+import org.jetbrains.kotlin.analysis.api.symbols.*
+import org.jetbrains.kotlin.analysis.api.types.*
+
+class KSTypeImpl private constructor(internal val type: KaType) : KSType {
+    companion object : KSObjectCache<IdKey<KaType>, KSTypeImpl>() {
+        fun getCached(type: KaType): KSTypeImpl = cache.getOrPut(IdKey(type)) {
+            KSTypeImpl(type)
+        }
+    }
+
+    private fun KaType.toDeclaration(): KSDeclaration {
+        return analyze {
+            when (this@toDeclaration) {
+                is KaClassType -> {
+                    when (val symbol = this@toDeclaration.symbol) {
+                        is KaTypeAliasSymbol -> KSTypeAliasImpl.getCached(symbol)
+                        is KaClassSymbol -> KSClassDeclarationImpl.getCached(symbol)
+                    }
+                }
+
+                is KaTypeParameterType -> KSTypeParameterImpl.getCached(symbol)
+                is KaClassErrorType -> KSErrorTypeClassDeclaration(this@KSTypeImpl)
+                is KaFlexibleType ->
+                    type.lowerBoundIfFlexible().toDeclaration()
+
+                is KaDefinitelyNotNullType -> this@toDeclaration.original.toDeclaration()
+                else -> KSErrorTypeClassDeclaration(this@KSTypeImpl)
+            }
+        }
+    }
+
+    override val declaration: KSDeclaration by lazy {
+        (type as? KaFunctionType)?.abbreviatedSymbol()?.toKSDeclaration()
+            ?: type.abbreviation?.toDeclaration() ?: type.toDeclaration()
+    }
+
+    override val nullability: Nullability by lazy {
+        when {
+            type is KaFlexibleType && analyze {
+                !type.lowerBound.isMarkedNullable && type.upperBound.isMarkedNullable
+            } -> Nullability.PLATFORM
+            analyze { type.isNullable } -> Nullability.NULLABLE
+            else -> Nullability.NOT_NULL
+        }
+    }
+
+    override val arguments: List<KSTypeArgument> by lazy {
+        if (ResolverAAImpl.instance.isJavaRawType(this)) {
+            emptyList()
+        } else {
+            if (type is KaFlexibleType) {
+                type.upperBound.typeArguments().map { KSTypeArgumentResolvedImpl.getCached(it) }
+            } else {
+                (type as? KaClassType)?.typeArguments()?.map { KSTypeArgumentResolvedImpl.getCached(it) }
+                    ?: emptyList()
+            }
+        }
+    }
+
+    @OptIn(KaImplementationDetail::class)
+    override val annotations: Sequence<KSAnnotation>
+        get() = type.annotations() +
+            if (type is KaFunctionType && type.receiverType != null) {
+                sequenceOf(
+                    KSAnnotationResolvedImpl.getCached(getExtensionFunctionTypeAnnotation())
+                )
+            } else {
+                emptySequence()
+            }
+
+    override fun isAssignableFrom(that: KSType): Boolean {
+        if (that.isError || this.isError) {
+            return false
+        }
+        recordLookupWithSupertypes((that as KSTypeImpl).type)
+        return type.isAssignableFrom(that.type)
+    }
+
+    override fun isMutabilityFlexible(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun isCovarianceFlexible(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun replace(arguments: List<KSTypeArgument>): KSType {
+        // Do not replace for already error types.
+        if (isError) {
+            return this
+        }
+        errorTypeOnInconsistentArguments(
+            arguments = arguments,
+            placeholdersProvider = { type.typeArguments().map { KSTypeArgumentResolvedImpl.getCached(it) } },
+            withCorrectedArguments = ::replace,
+            errorType = ::KSErrorType,
+        )?.let { error -> return error }
+        return getCached(type.replace(arguments.map { it.toKtTypeProjection() }))
+    }
+
+    @OptIn(KaImplementationDetail::class)
+    override fun starProjection(): KSType {
+        return getCached(type.replace(List(type.typeArguments().size) { KaBaseStarTypeProjection(type.token) }))
+    }
+
+    override fun makeNullable(): KSType {
+        return analyze {
+            getCached(type.withNullability(isMarkedNullable = true))
+        }
+    }
+
+    override fun makeNotNullable(): KSType {
+        return analyze {
+            getCached(type.withNullability(isMarkedNullable = false))
+        }
+    }
+
+    override val isMarkedNullable: Boolean = analyze { type.isMarkedNullable }
+
+    override val isError: Boolean
+        // TODO: non exist type returns KtNonErrorClassType, check upstream for KtClassErrorType usage.
+        get() = type is KaErrorType || type.classifierSymbol() == null
+
+    override val isFunctionType: Boolean
+        get() = type is KaFunctionType && !type.isSuspend
+
+    override val isSuspendFunctionType: Boolean
+        get() = type is KaFunctionType && type.isSuspend
+
+    private val cachedHashCode: Int by lazy {
+        type.fullyExpand().hashCode()
+    }
+
+    override fun hashCode(): Int = cachedHashCode
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is KSTypeImpl) {
+            return false
+        }
+        return analyze {
+            type.semanticallyEquals(other.type)
+        }
+    }
+
+    override fun toString(): String {
+        return type.render()
+    }
+}
+
+internal fun KaType.fullyExpand(): KaType = analyze { fullyExpandedType }
