@@ -117,9 +117,8 @@ class CodegenTestKsp2Test : FreeSpec({
         }.message shouldContain "SourceSet 1 つ"
     }
 
-    "AnalysisCodegen エンジンはエンジン実装（P2）までは未実装を明示する" {
-        shouldThrow<NotImplementedError> {
-            runCodegenTest(TestEngine.AnalysisCodegen) { kotlin("A.kt", "class A") }
-        }
+    "AnalysisCodegen エンジンは例外を投げずに結果を返す（P2 でエンジンが入った。成否の中身は engine-tests のケースで見る）" {
+        // 以前は「P2 までは NotImplementedError」を確かめていた。エンジンが入ったので、ランナーが結果まで返すことを確かめる
+        runCodegenTest(TestEngine.AnalysisCodegen) { kotlin("A.kt", "class A") }.engine shouldBe TestEngine.AnalysisCodegen
     }
 })
