@@ -41,7 +41,7 @@ private val isMac = System.getProperty("os.name").lowercase().contains("mac")
 
 // 5.2 KMP の整合性（KMP）のうち E2E のケース。I / U は engine-tests と KmpNamingTest
 class KmpE2ETest : E2ESpec({
-    case("KMP-01", "commonMain の Processor が commonMain に 1 回だけ生成し、全ターゲットの Compilation から参照してビルドが通る", M1) {
+    case("KMP-01", "commonMain の Processor が commonMain に 1 回だけ生成し、全ターゲットの Compilation から参照してビルドが通る") {
         val p = fixtureProject(Fixture.KMP) { withoutAndroid() }
         val result = p.build(*kmpCompileTasks(isMac).toTypedArray(), "allTests")
         result.task(":analysisCodeGenCommonMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -49,7 +49,7 @@ class KmpE2ETest : E2ESpec({
         p.generated("commonMain").kotlin("fixture/kmp/SharedMapper.kt").isFile shouldBe true
     }
 
-    case("KMP-02", "commonMain の生成物がプラットフォームごとに再生成されない（生成ファイル数と宣言の重複が 0）", M1) {
+    case("KMP-02", "commonMain の生成物がプラットフォームごとに再生成されない（生成ファイル数と宣言の重複が 0）") {
         val p = fixtureProject(Fixture.KMP) { withoutAndroid() }
         p.build(*kmpCompileTasks(isMac).toTypedArray())
         val all = p.allGenerated()
@@ -61,7 +61,7 @@ class KmpE2ETest : E2ESpec({
             setOf("fixture/kmp/SharedActual.kt", "me/tbsten/analysis/code/gen/tp/generated/TpRegistry.kt")
     }
 
-    case("KMP-03", "expect から各プラットフォームに actual を生成し、全ターゲットでコンパイルが通る", M1) {
+    case("KMP-03", "expect から各プラットフォームに actual を生成し、全ターゲットでコンパイルが通る") {
         val p = fixtureProject(Fixture.KMP) { withoutAndroid() }
         p.build(*kmpCompileTasks(isMac).toTypedArray(), "jvmTest", "jsNodeTest")
         p.generatedForCompilation("jvmMain").kotlin("fixture/kmp/SharedActual.kt").readText() shouldContain
@@ -77,7 +77,7 @@ class KmpE2ETest : E2ESpec({
             .none { it.endsWith("Actual.kt") } shouldBe true
     }
 
-    case("KMP-04", "同じモジュールで commonMain と jvmMain に別々の Processor を付け、それぞれ自分の own files だけを処理する", M1) {
+    case("KMP-04", "同じモジュールで commonMain と jvmMain に別々の Processor を付け、それぞれ自分の own files だけを処理する") {
         val p =
             fixtureProject(Fixture.KMP) {
                 withoutAndroid()
@@ -160,7 +160,7 @@ class KmpE2ETest : E2ESpec({
         result.output shouldContain "IosWantsJava"
     }
 
-    case("KMP-07", "commonMain の解析で共通 metadata 依存（kotlinx-coroutines-core の common 部分）が解決される", M1) {
+    case("KMP-07", "commonMain の解析で共通 metadata 依存（kotlinx-coroutines-core の common 部分）が解決される") {
         val p =
             fixtureProject(Fixture.KMP) {
                 withoutAndroid()
@@ -185,7 +185,7 @@ class KmpE2ETest : E2ESpec({
         mapper shouldContain "\"job\" to \"kotlinx.coroutines.Job?\""
     }
 
-    case("KMP-08", "中間 SourceSet で commonize されたプラットフォームライブラリ（platform.posix など）が解決される", M2) {
+    case("KMP-08", "中間 SourceSet で commonize されたプラットフォームライブラリ（platform.posix など）が解決される") {
         val p =
             fixtureProject(Fixture.KMP_CUSTOM) {
                 edit("build.gradle.kts") {
@@ -203,7 +203,7 @@ class KmpE2ETest : E2ESpec({
         p.generated("nativeMain").kotlin("fixture/custom/NeedsPosixResolved.kt").isFile shouldBe true
     }
 
-    case("KMP-11", "commonMain の生成物を jvmMain の Processor が解析できる", M1) {
+    case("KMP-11", "commonMain の生成物を jvmMain の Processor が解析できる") {
         val p =
             fixtureProject(Fixture.KMP) {
                 withoutAndroid()
@@ -250,7 +250,7 @@ class KmpE2ETest : E2ESpec({
         byUnit.values.forEach { it.extra.getValue("dependsOn") shouldContain "commonMain" }
     }
 
-    case("KMP-13", "compilations.all の Processor がプラットフォームごとに別々の集約出力（DI Registry 相当）を作る", M2) {
+    case("KMP-13", "compilations.all の Processor がプラットフォームごとに別々の集約出力（DI Registry 相当）を作る") {
         val p = fixtureProject(Fixture.KMP) { withoutAndroid() }
         p.build("jvmTest", "compileKotlinJs")
         val jvm = p.generatedForCompilation("jvmMain").kotlin("me/tbsten/analysis/code/gen/tp/generated/TpRegistry.kt").readText()
@@ -261,7 +261,7 @@ class KmpE2ETest : E2ESpec({
         js shouldNotContain "JvmOnly"
     }
 
-    case("KMP-14", "commonTest / jvmTest でも生成でき、main の生成物がテストから見える", M2) {
+    case("KMP-14", "commonTest / jvmTest でも生成でき、main の生成物がテストから見える") {
         val p =
             fixtureProject(Fixture.KMP) {
                 withoutAndroid()
@@ -282,7 +282,7 @@ class KmpE2ETest : E2ESpec({
         p.generated("commonTest").kotlin("fixture/kmp/TestModelMapper.kt").readText() shouldContain "fixture.kmp.Shared"
     }
 
-    case("KMP-17", "デフォルト階層テンプレートと手で組んだ dependsOn 階層の両方で KMP-01〜05 が通る", M2) {
+    case("KMP-17", "デフォルト階層テンプレートと手で組んだ dependsOn 階層の両方で KMP-01〜05 が通る") {
         // 手で組んだ階層（F-KMP-CUSTOM）: 中間 SourceSet の生成物を jvm と js から使い、actual は Compilation ごと
         val p = fixtureProject(Fixture.KMP_CUSTOM)
         val result = p.build("jvmTest", "compileKotlinJs")
@@ -437,7 +437,7 @@ class KmpE2ETest : E2ESpec({
         }
     }
 
-    case("KMP-24", "KSP の Issue #965 / #2621 の再現シナリオで、共通の生成物が 1 回だけ作られ下流から見える", M1) {
+    case("KMP-24", "KSP の Issue #965 / #2621 の再現シナリオで、共通の生成物が 1 回だけ作られ下流から見える") {
         // #965: commonMain の生成物が jvmMain / jsMain から見えない、#2621: ターゲットごとに重複して生成され redeclaration になる
         val p =
             emptyProject {

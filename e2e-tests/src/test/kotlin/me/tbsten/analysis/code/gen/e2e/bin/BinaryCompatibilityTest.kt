@@ -7,6 +7,7 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import me.tbsten.analysis.code.gen.e2e.support.ANALYSIS_API_REPOSITORIES
 import me.tbsten.analysis.code.gen.e2e.support.Acg45Engine
 import me.tbsten.analysis.code.gen.e2e.support.Acg45Repo
 import me.tbsten.analysis.code.gen.e2e.support.acg45Project
@@ -29,6 +30,7 @@ private fun moshiProject(codegenVersion: String): GradleFixture =
         val repo = "maven { url = uri(\"${Acg45Repo.fixtureRepo.toURI()}\") }"
         extraPluginRepositories += repo
         extraRepositories += repo
+        extraRepositories += ANALYSIS_API_REPOSITORIES
         buildScript =
             """
             plugins {
@@ -92,11 +94,11 @@ private val internalUser =
     }
 
 class BinaryCompatibilityTest : E2ESpec({
-    case("BIN-01", "Maven Central で公開済みの Processor JAR を、再ビルドせずに Bridge で実行できる", pending = PendingCase(Milestone.M1)) {
+    case("BIN-01", "Maven Central で公開済みの Processor JAR を、再ビルドせずに Bridge で実行できる") {
         moshiProject("1.15.2").shouldGenerateMoshiAdapter()
     }
 
-    case("BIN-02", "対応する KSP API バージョンの最古と最新でビルドされた Processor がどちらも動く", pending = PendingCase(Milestone.M3)) {
+    case("BIN-02", "対応する KSP API バージョンの最古と最新でビルドされた Processor がどちらも動く") {
         // ADR-035: 対応する KSP API の最古は KSP 1.7 系、最新は version catalog の ksp。
         // 最古の代表は moshi-kotlin-codegen 1.14.0（Kotlin 1.7 / KSP 1.7 でビルド）、最新の代表は TP の KSP 版（catalog の ksp でビルド）
         moshiProject("1.14.0").shouldGenerateMoshiAdapter()

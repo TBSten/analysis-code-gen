@@ -115,7 +115,7 @@ class BridgeE2ETest : E2ESpec({
     }
     "[KSP2 で期待を確認] BRG-11" { brg11(TestEngine.Ksp2) }
 
-    case("BRG-13", "analysisCodeGen { arg(...) } で渡した引数が KSP Processor の options に届く", pending = PendingCase(Milestone.M1)) {
+    case("BRG-13", "analysisCodeGen { arg(...) } で渡した引数が KSP Processor の options に届く") {
         val probe = probeFile()
         val fixture =
             acg45Project(Acg45Engine.Bridge, processors = "Probe", probeOut = probe, dsl = "arg(\"brg13.key\", \"hello world\")") {

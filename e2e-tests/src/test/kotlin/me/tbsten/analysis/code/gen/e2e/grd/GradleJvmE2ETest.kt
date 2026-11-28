@@ -22,7 +22,7 @@ private val M2 = PendingCase(Milestone.M2)
 
 // 5.1 Gradle / KGP 統合（GRD）のうち JVM・Java・マルチモジュール・DSL・Worker のケース。Android は GradleAndroidE2ETest
 class GradleJvmE2ETest : E2ESpec({
-    case("GRD-01", "JVM 単一モジュールに plugin を適用すると analysisCodeGenMainSourceSet / analysisCodeGenTestSourceSet が登録され、生成物込みで build が成功する", M1) {
+    case("GRD-01", "JVM 単一モジュールに plugin を適用すると analysisCodeGenMainSourceSet / analysisCodeGenTestSourceSet が登録され、生成物込みで build が成功する") {
         val p = fixtureProject(Fixture.JVM)
         p.build("tasks", "--all").output.let {
             it shouldContain "analysisCodeGenMainSourceSet"
@@ -35,7 +35,7 @@ class GradleJvmE2ETest : E2ESpec({
         result.task(":test")?.outcome shouldBe TaskOutcome.SUCCESS
     }
 
-    case("GRD-02", "生成物が build/generated/analysisCodeGen/<SourceSet>/{kotlin,java,resources} に出力され、他のタスクと同じディレクトリに書かない", M1) {
+    case("GRD-02", "生成物が build/generated/analysisCodeGen/<SourceSet>/{kotlin,java,resources} に出力され、他のタスクと同じディレクトリに書かない") {
         val p = fixtureProject(Fixture.JVM)
         p.build("analysisCodeGenMainSourceSet")
         val main = p.generated("main")
@@ -51,7 +51,7 @@ class GradleJvmE2ETest : E2ESpec({
             .sorted() shouldBe listOf("main", "test")
     }
 
-    case("GRD-03", "Task Graph 上で compile タスクが analysisCodeGen タスクに依存し、自タスクの出力が自タスクの入力に入らない（循環なし）", M1) {
+    case("GRD-03", "Task Graph 上で compile タスクが analysisCodeGen タスクに依存し、自タスクの出力が自タスクの入力に入らない（循環なし）") {
         val p = fixtureProject(Fixture.JVM)
         val planned = p.plannedTasks("compileTestKotlin")
         planned.shouldContainInOrder(":analysisCodeGenMainSourceSet", ":compileKotlin")
@@ -84,7 +84,7 @@ class GradleJvmE2ETest : E2ESpec({
         }
     }
 
-    case("GRD-05", "AA に渡すライブラリ集合が、その SourceSet / Compilation のコンパイルクラスパスと一致する", M1) {
+    case("GRD-05", "AA に渡すライブラリ集合が、その SourceSet / Compilation のコンパイルクラスパスと一致する") {
         val p =
             fixtureProject(Fixture.JVM) {
                 edit("build.gradle.kts") {
@@ -191,7 +191,7 @@ class GradleJvmE2ETest : E2ESpec({
         p17.generated("main").kotlin("jdk/NeedsJdk21Resolved.kt").isFile shouldBe false
     }
 
-    case("GRD-08", "Kotlin + Java 混在で、Kotlin から参照する Java クラスが解析で解決される", M1) {
+    case("GRD-08", "Kotlin + Java 混在で、Kotlin から参照する Java クラスが解析で解決される") {
         val p = fixtureProject(Fixture.JAVA)
         p.build("build")
         val mapper = p.generated("main").kotlin("fixture/java/HolderMapper.kt").readText()
@@ -201,14 +201,14 @@ class GradleJvmE2ETest : E2ESpec({
         p.generated("main").kotlin("fixture/java/NeedsJavaResolved.kt").isFile shouldBe true
     }
 
-    case("GRD-09", "マルチモジュールで :app の Processor が :lib の公開宣言を解析できる", M1) {
+    case("GRD-09", "マルチモジュールで :app の Processor が :lib の公開宣言を解析できる") {
         val p = fixtureProject(Fixture.JVM_MULTI)
         p.build(":app:analysisCodeGenMainSourceSet")
         p.generated("main", "app").kotlin("fixture/multi/app/AppUserMapper.kt").readText() shouldContain
             "\"lib\" to \"fixture.multi.lib.LibUser\""
     }
 
-    case("GRD-10", ":lib の生成物（コンパイル済み）が :app から参照できる", M1) {
+    case("GRD-10", ":lib の生成物（コンパイル済み）が :app から参照できる") {
         val p = fixtureProject(Fixture.JVM_MULTI)
         val result = p.build(":app:build")
         result.task(":app:compileKotlin")?.outcome shouldBe TaskOutcome.SUCCESS
@@ -216,7 +216,7 @@ class GradleJvmE2ETest : E2ESpec({
         p.generated("main", "app").kotlin("fixture/multi/app/NeedsLibMapperResolved.kt").isFile shouldBe true
     }
 
-    case("GRD-16", "JVM の test SourceSet 向けに別タスクが走り、main の生成物が test から見える", M1) {
+    case("GRD-16", "JVM の test SourceSet 向けに別タスクが走り、main の生成物が test から見える") {
         val p =
             fixtureProject(Fixture.JVM) {
                 write(
@@ -240,7 +240,7 @@ class GradleJvmE2ETest : E2ESpec({
         p.generated("test").kotlin("fixture/jvm/UserMapper.kt").isFile shouldBe false
     }
 
-    case("GRD-17", "Processor を analysisCodeGen(...) 依存と SourceSet DSL の processor(...) のどちらで指定しても解決・実行される", M1) {
+    case("GRD-17", "Processor を analysisCodeGen(...) 依存と SourceSet DSL の processor(...) のどちらで指定しても解決・実行される") {
         fun project(useDependencies: Boolean) =
             fixtureProject(Fixture.JVM) {
                 edit("build.gradle.kts") {
@@ -262,7 +262,7 @@ class GradleJvmE2ETest : E2ESpec({
         viaDeps.generated("main").files() shouldBe viaDsl.generated("main").files()
     }
 
-    case("GRD-18", "sourceSets.all / compilations.all の一括登録が効き、個別指定と重なったときの優先順位が ADR どおり", M2) {
+    case("GRD-18", "sourceSets.all / compilations.all の一括登録が効き、個別指定と重なったときの優先順位が ADR どおり") {
         // ADR-016: Processor は all と個別の和集合で、同じ座標は 1 回だけ。同じ実行単位で同じキーに違う値が 2 回なら設定エラー
         val p =
             fixtureProject(Fixture.JVM) {
@@ -301,7 +301,7 @@ class GradleJvmE2ETest : E2ESpec({
         conflict.buildAndFail("analysisCodeGenMainSourceSet").output shouldContain "k"
     }
 
-    case("GRD-19", "Processor オプションのグローバル指定と SourceSet スコープ指定が渡り、スコープ側が優先される", M1) {
+    case("GRD-19", "Processor オプションのグローバル指定と SourceSet スコープ指定が渡り、スコープ側が優先される") {
         val out =
             kotlin.io.path
                 .createTempFile("probe", ".jsonl")
@@ -386,7 +386,7 @@ class GradleJvmE2ETest : E2ESpec({
         result.output shouldContain "BUILDSCRIPT_GUAVA=33.4.0-jre"
     }
 
-    case("GRD-21", "AA / IntelliJ Platform がビルドスクリプトの classpath に載らない（Worker 側だけで読み込まれる）", M1) {
+    case("GRD-21", "AA / IntelliJ Platform がビルドスクリプトの classpath に載らない（Worker 側だけで読み込まれる）") {
         val p =
             fixtureProject(Fixture.JVM) {
                 edit("build.gradle.kts") {
@@ -411,7 +411,7 @@ class GradleJvmE2ETest : E2ESpec({
         result.task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
     }
 
-    case("GRD-22", "遅延設定: help だけを実行したとき analysisCodeGen タスクが realize されない", M2) {
+    case("GRD-22", "遅延設定: help だけを実行したとき analysisCodeGen タスクが realize されない") {
         val p =
             fixtureProject(Fixture.JVM) {
                 edit("build.gradle.kts") {
@@ -469,7 +469,7 @@ class GradleJvmE2ETest : E2ESpec({
         }
     }
 
-    case("GRD-25", "--parallel のマルチモジュールで同時実行しても結果が壊れない", M2) {
+    case("GRD-25", "--parallel のマルチモジュールで同時実行しても結果が壊れない") {
         val serial = fixtureProject(Fixture.JVM_MULTI).also { it.build("build", "--no-parallel") }
         val parallel = fixtureProject(Fixture.JVM_MULTI).also { it.build("build", "--parallel", "--max-workers=4") }
         for (module in listOf("lib", "app")) {
@@ -477,7 +477,7 @@ class GradleJvmE2ETest : E2ESpec({
         }
     }
 
-    case("GRD-26", "Composite build（includeBuild）で開発中の Processor を使える", M2) {
+    case("GRD-26", "Composite build（includeBuild）で開発中の Processor を使える") {
         val p =
             emptyProject {
                 write(

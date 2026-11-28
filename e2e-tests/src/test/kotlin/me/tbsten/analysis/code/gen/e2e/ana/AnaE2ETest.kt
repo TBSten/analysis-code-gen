@@ -13,7 +13,7 @@ import org.gradle.testkit.runner.TaskOutcome
 
 // 5.4 AA ネイティブな解析能力（ANA）のうち E2E のケース。I は engine-tests
 class AnaE2ETest : E2ESpec({
-    case("ANA-01", "関数本体の式と呼び出し先を解決して呼び出しグラフを生成し、生成物がコンパイル・実行できる", PendingCase(Milestone.M1)) {
+    case("ANA-01", "関数本体の式と呼び出し先を解決して呼び出しグラフを生成し、生成物がコンパイル・実行できる") {
         val p =
             fixtureProject(Fixture.JVM) {
                 write(

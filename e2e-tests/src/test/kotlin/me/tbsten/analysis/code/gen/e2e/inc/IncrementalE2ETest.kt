@@ -59,7 +59,7 @@ private fun shouldMatchCleanBuild(
 }
 
 class IncrementalE2ETest : E2ESpec({
-    case("INC-01", "Level 0: --rerun-tasks で全件処理し、通常ビルドと同じ生成物になる", pending = PendingCase(Milestone.M1)) {
+    case("INC-01", "Level 0: --rerun-tasks で全件処理し、通常ビルドと同じ生成物になる") {
         val fixture =
             acg45Project {
                 kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A"))
@@ -73,7 +73,7 @@ class IncrementalE2ETest : E2ESpec({
         fixture.generatedFiles(native) shouldBe normal
     }
 
-    case("INC-02", "Level 1: 入力が変わらなければタスクが UP-TO-DATE", pending = PendingCase(Milestone.M1)) {
+    case("INC-02", "Level 1: 入力が変わらなければタスクが UP-TO-DATE") {
         val fixture = acg45Project { kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A")) }
         fixture.build(task).task(task)?.outcome shouldBe TaskOutcome.SUCCESS
         fixture.build(task).task(task)?.outcome shouldBe TaskOutcome.UP_TO_DATE
@@ -98,7 +98,7 @@ class IncrementalE2ETest : E2ESpec({
         shouldMatchCleanBuild(fixture, "Mapper,Probe")
     }
 
-    case("INC-04", "集約出力: ファイルを追加すると Registry が再生成される", pending = PendingCase(Milestone.M2)) {
+    case("INC-04", "集約出力: ファイルを追加すると Registry が再生成される") {
         val fixture = acg45Project { kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A")) }
         fixture.build(task)
         val registry = {
@@ -117,7 +117,7 @@ class IncrementalE2ETest : E2ESpec({
         shouldMatchCleanBuild(fixture)
     }
 
-    case("INC-05", "ファイルを削除すると対応する出力が消え、集約出力が更新される", pending = PendingCase(Milestone.M2)) {
+    case("INC-05", "ファイルを削除すると対応する出力が消え、集約出力が更新される") {
         val fixture =
             acg45Project {
                 kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A"))
@@ -135,7 +135,7 @@ class IncrementalE2ETest : E2ESpec({
         shouldMatchCleanBuild(fixture)
     }
 
-    case("INC-06", "ファイルの移動・リネームで出力が正しく付け替わる", pending = PendingCase(Milestone.M2)) {
+    case("INC-06", "ファイルの移動・リネームで出力が正しく付け替わる") {
         val fixture = acg45Project { kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A")) }
         fixture.build(task)
         // ファイル名を変え（A.kt → Renamed.kt）、パッケージも移す（com.example → com.moved）
@@ -149,7 +149,7 @@ class IncrementalE2ETest : E2ESpec({
         shouldMatchCleanBuild(fixture)
     }
 
-    case("INC-07", "関数本体だけの変更（ABI 不変）でも、それを読む出力は再生成される", pending = PendingCase(Milestone.M2)) {
+    case("INC-07", "関数本体だけの変更（ABI 不変）でも、それを読む出力は再生成される") {
         val fixture =
             acg45Project(processors = "Body") {
                 kotlin(
@@ -197,7 +197,7 @@ class IncrementalE2ETest : E2ESpec({
         graph() shouldNotContain "first"
     }
 
-    case("INC-08", "依存ライブラリのバージョンが変わると全件処理になる", pending = PendingCase(Milestone.M2)) {
+    case("INC-08", "依存ライブラリのバージョンが変わると全件処理になる") {
         val probe = probeFile()
 
         fun dep(version: String) = "dependencies { implementation(\"org.jetbrains.kotlinx:kotlinx-coroutines-core:$version\") }"
@@ -212,7 +212,7 @@ class IncrementalE2ETest : E2ESpec({
         lastRound1Files(probe) shouldContainExactlyInAnyOrder setOf("A.kt", "B.kt")
     }
 
-    case("INC-09", "Processor の JAR・バージョン、または `Full` と宣言された（宣言の無い）オプションが変わると全件処理になる", pending = PendingCase(Milestone.M2)) {
+    case("INC-09", "Processor の JAR・バージョン、または `Full` と宣言された（宣言の無い）オプションが変わると全件処理になる") {
         val probe = probeFile()
         val fixture =
             acg45Project(processors = "Mapper,Probe", probeOut = probe, dsl = "arg(\"inc09.flag\", \"1\")") {
@@ -356,7 +356,7 @@ class IncrementalE2ETest : E2ESpec({
         lastRound1Files(probe) shouldBe setOf("UsesLib.kt")
     }
 
-    case("INC-17", "変更がラウンド 2 以降の生成物に波及する場合も、増分で正しく再生成される", pending = PendingCase(Milestone.M2)) {
+    case("INC-17", "変更がラウンド 2 以降の生成物に波及する場合も、増分で正しく再生成される") {
         fun chain(depth: Int) =
             """
             package com.example

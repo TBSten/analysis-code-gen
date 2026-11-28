@@ -32,7 +32,7 @@ private fun badTarget(name: String) =
     """.trimIndent()
 
 class FailureRecoveryE2ETest : E2ESpec({
-    case("FAIL-01", "Processor の例外でビルドが失敗し、出力ディレクトリに途中までの生成物が残らない", pending = PendingCase(Milestone.M1)) {
+    case("FAIL-01", "Processor の例外でビルドが失敗し、出力ディレクトリに途中までの生成物が残らない") {
         // TP-Bad の throw はファイルを 1 つ作ってから例外を投げる
         val fixture =
             acg45Project(processors = "Mapper,Bad", dsl = "arg(\"tp.bad.modes\", \"throw\")") {
@@ -100,7 +100,7 @@ class FailureRecoveryE2ETest : E2ESpec({
         fixture.generatedFiles(native) shouldBe clean.generatedFiles(native)
     }
 
-    case("FAIL-05", "生成物が原因でコンパイルエラーになったとき、生成物が残って原因を追える", pending = PendingCase(Milestone.M1)) {
+    case("FAIL-05", "生成物が原因でコンパイルエラーになったとき、生成物が残って原因を追える") {
         // TP-Mapper はプロパティの型をそのまま書く。生成物から参照できない private な型を使うと、生成後のコンパイルで失敗する
         val fixture =
             acg45Project(processors = "Mapper") {
