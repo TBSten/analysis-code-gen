@@ -217,8 +217,8 @@ RW-DAG-N2,D,任意,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.R
 RW-ALL-I1,P,M2,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldIncrementalPbtTest
 RW-ALL-P1,B,M2,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldBenchTest
 TST-01,E,M1,enabled,,2,me.tbsten.analysis.code.gen.enginetests.tst.TestingNativeE2ETest
-TST-02,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
-TST-03,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
+TST-02,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
+TST-03,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
 TST-04,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
 TST-05,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
 TST-06,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
