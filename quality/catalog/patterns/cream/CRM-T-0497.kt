@@ -6,7 +6,7 @@
 // TAGS: cream.family=map
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/SealedCopySnapshotTest/All patterns/option=(notCopyToObject=true, defaultVisibility=INTERNAL)/05--map/mappedNonDataChild.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Source.kt
 package me.tbsten.cream.generated
 

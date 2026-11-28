@@ -5,8 +5,8 @@
 // OPTIONS: KOIN_CONFIG_CHECK=true
 // ORIGIN: real:kotzilla-io/nowinandroid_koin_annotations@6f0e1d2d8880/core/analytics/src/demo/kotlin/com/google/samples/apps/nowinandroid/core/analytics/AnalyticsKoinModule.kt
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: verified
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので
 // FILE: analytics/demo/com/google/samples/apps/nowinandroid/core/analytics/AnalyticsKoinModule.kt
 /*
  * Copyright 2025 The Android Open Source Project

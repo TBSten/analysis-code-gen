@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:cashapp/cash-app-pay-android-sdk@a4979b3d3094/core/src/main/java/app/cash/paykit/core/models/response/ApiErrorResponse.kt
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: ApiErrorResponse.kt:24: Unresolved reference 'ApiError'.
 // FILE: core/main/app/cash/paykit/core/models/response/ApiErrorResponse.kt
 /*
  * Copyright (C) 2023 Cash App

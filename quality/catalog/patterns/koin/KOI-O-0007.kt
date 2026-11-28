@@ -3,7 +3,7 @@
 // PROCESSORS: koin
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // NOTE: FILE の先頭が Gradle モジュール名。app は core に依存する
 // FILE: core/main/com/example/core/CoreModule.kt
 package com.example.core

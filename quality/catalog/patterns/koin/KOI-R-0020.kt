@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:codymikol/git-down@dfbb1e11eab9/src/main/kotlin/com/codymikol/repositories/UserDirectoryRepository.kt
 // LICENSE: MIT
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: Unresolved reference 'harawata'.
 // FILE: root/main/com/codymikol/repositories/UserDirectoryRepository.kt
 package com.codymikol.repositories
 

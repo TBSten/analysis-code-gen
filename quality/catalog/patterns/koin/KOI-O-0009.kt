@@ -3,7 +3,7 @@
 // PROCESSORS: koin
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/qualifier/Dispatchers.kt
 package com.example.qualifier
 

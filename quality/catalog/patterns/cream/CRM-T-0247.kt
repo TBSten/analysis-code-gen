@@ -7,7 +7,7 @@
 // TAGS: cream.family=constructor
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/CopyMappingSnapshotTest/All patterns/option=(prefix=to, escapeDot=replace-to-underscore)/04--constructor/multipleConstructors.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Mapping.kt
 package me.tbsten.cream.generated
 

@@ -6,7 +6,7 @@
 // TAGS: cream.family=deprecated
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/ParentOptionalSnapshotTest/All patterns/option=(notCopyToObject=true, defaultVisibility=INTERNAL)/08--deprecated/deprecatedLevelError.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Source.kt
 package me.tbsten.cream.generated
 

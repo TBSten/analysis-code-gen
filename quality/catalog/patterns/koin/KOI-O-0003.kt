@@ -4,7 +4,7 @@
 // EXPECT: ok
 // TAGS: koin.binding=nullable-param
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/nullable/Analytics.kt
 package com.example.nullable
 

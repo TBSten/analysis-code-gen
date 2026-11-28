@@ -3,7 +3,7 @@
 // PROCESSORS: *
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/NoPackage.kt
 @file:JvmName("NoPackageKt")
 

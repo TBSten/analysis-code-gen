@@ -5,7 +5,7 @@
 // TAGS: cream.family=useCase
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/SealedCopySnapshotTest/UseCase/CounterUiState shared context update in reducer.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: CounterUiState.kt
 package me.tbsten.cream.generated
 

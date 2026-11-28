@@ -6,7 +6,8 @@
 // TAGS: cream.family=invalidUsage
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/ParentOptionalInvalidUsageTest/optionDefaultVisibilityPublicOnInternalParent.output.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: rejected
+// NOTE: K（KSP2 2.3.14）: K でビルドが通った（EXPECT: error）
 // FILE: MyState.kt
 package diag.po
 

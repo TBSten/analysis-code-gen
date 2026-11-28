@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:cashapp/cash-app-pay-android-sdk@a4979b3d3094/core/src/main/java/app/cash/paykit/core/models/response/RequesterProfile.kt
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: verified
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので
 // FILE: core/main/app/cash/paykit/core/models/response/RequesterProfile.kt
 /*
  * Copyright (C) 2023 Cash App

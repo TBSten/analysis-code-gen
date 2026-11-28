@@ -5,7 +5,7 @@
 // TAGS: cream.family=useCase
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/CopyToChildrenSnapshotTest/UseCase/SearchState Koma store.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: SearchState.kt
 package me.tbsten.cream.generated
 

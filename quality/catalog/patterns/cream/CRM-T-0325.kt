@@ -6,7 +6,7 @@
 // TAGS: cream.family=useCase
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/CopyToChildrenSnapshotTest/UseCase/CheckoutUiState nested state machine (notCopyToObject).md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: CheckoutUiState.kt
 package me.tbsten.cream.generated
 

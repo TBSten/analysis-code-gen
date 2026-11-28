@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:ZacSweers/CatchUp@b0873380ad4a/app-scaffold/src/main/kotlin/catchup/app/ui/about/LicensesScreen.kt
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: Unresolved reference 'android'.
 // FILE: app-scaffold/main/catchup/app/ui/about/LicensesScreen.kt
 /*
  * Copyright (C) 2026. Zac Sweers

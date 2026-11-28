@@ -3,7 +3,7 @@
 // PROCESSORS: koin
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/property/Config.kt
 package com.example.property
 

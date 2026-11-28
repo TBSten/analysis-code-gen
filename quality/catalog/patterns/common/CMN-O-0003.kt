@@ -3,7 +3,7 @@
 // PROCESSORS: *
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // NOTE: context parameters は Kotlin 2.2 以降の機能。2.4.0 以降を対象にするので常に使える
 // FILE: main/com/example/bg/lang/Features.kt
 package com.example.bg.lang

@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:skydoves/chatgpt-android@0155011570e6/core-model/src/main/kotlin/com/skydoves/chatgpt/core/model/GPTUsage.kt
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: verified
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので
 // FILE: core-model/main/com/skydoves/chatgpt/core/model/GPTUsage.kt
 /*
  * Designed and developed by 2024 skydoves (Jaewoong Eum)

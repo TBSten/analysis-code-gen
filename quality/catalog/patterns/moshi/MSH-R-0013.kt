@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:christiandeange/ozone@cd044f638de4/generator/src/main/kotlin/sh/christian/ozone/api/lexicon/grammar.kt
 // LICENSE: MIT
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: verified
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので
 // FILE: generator/main/sh/christian/ozone/api/lexicon/grammar.kt
 package sh.christian.ozone.api.lexicon
 

@@ -3,7 +3,7 @@
 // PROCESSORS: moshi
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/moshi/sealed/Shape.kt
 package com.example.moshi.sealed
 
