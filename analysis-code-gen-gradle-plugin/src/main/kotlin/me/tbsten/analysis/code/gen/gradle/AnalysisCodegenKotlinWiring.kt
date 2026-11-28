@@ -14,9 +14,12 @@ import me.tbsten.analysis.code.gen.model.UnitKind
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.FileCollection
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.jvm.toolchain.JavaLauncher
+import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -302,6 +305,18 @@ internal class AnalysisCodegenKotlinWiring(
         t.compileClasspath.from(compilation.compileDependencyFiles)
         t.compileClasspath.from(androidBootClasspath(compilation))
         t.friendPaths.from(compilation.associatedCompilations.map { it.output.classesDirs })
+        jvmLauncher(compilation)?.let(t.javaLauncher::convention)
+    }
+
+    /**
+     * JVM の Compilation が使う JDK。java の toolchain（kotlin { jvmToolchain() } も同じものを設定する）に従い、
+     * 指定が無ければ Gradle を動かしている JDK になる。Android は android.jar を使うので渡さない（GRD-08）。
+     */
+    private fun jvmLauncher(compilation: KotlinCompilation<*>): Provider<JavaLauncher>? {
+        if (compilation.platformType != KotlinPlatformType.jvm) return null
+        val toolchains = project.extensions.findByType(JavaToolchainService::class.java) ?: return null
+        val java = project.extensions.findByType(JavaPluginExtension::class.java)
+        return if (java != null) toolchains.launcherFor(java.toolchain) else toolchains.launcherFor { }
     }
 
     /**

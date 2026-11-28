@@ -26,11 +26,14 @@ import org.gradle.api.tasks.CompileClasspath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
+import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.work.InputChanges
 import org.gradle.workers.WorkerExecutor
 import java.io.File
@@ -122,6 +125,14 @@ public abstract class AnalysisCodegenTask : DefaultTask() {
     @get:Internal
     public abstract val projectDirectory: DirectoryProperty
 
+    /**
+     * JVM の Compilation で JDK の API（java.lang など）を解決するための JDK（GRD-08）。
+     * キャッシュキーに入るのは JDK の版と vendor だけで、インストール先のパスは入らない。
+     */
+    @get:Nested
+    @get:Optional
+    public abstract val javaLauncher: Property<JavaLauncher>
+
     /** Processor の依存グラフ。直接の依存ごとに ProcessorModel を作るために使う。 */
     @get:Internal
     public abstract val processorGraph: Property<ResolvedComponentResult>
@@ -193,6 +204,12 @@ public abstract class AnalysisCodegenTask : DefaultTask() {
                     it.copy(
                         classpath = compileClasspath.files.filter(File::exists).map(::rel),
                         friendPaths = friendPaths.files.filter(File::exists).map(::rel),
+                        jdkHome =
+                            javaLauncher.orNull
+                                ?.metadata
+                                ?.installationPath
+                                ?.asFile
+                                ?.absolutePath,
                     )
                 },
             units = skeleton.units.map { it.copy(processors = processors, options = options.get().toSortedMap()) },

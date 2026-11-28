@@ -35,22 +35,24 @@ fun RepositoryHandler.fixtureRepositories() {
         url = fixtureRepo.toURI()
         content { includeGroupAndSubgroups("me.tbsten.analysis.code.gen") }
     }
-    mavenCentral()
-    google()
-    // Analysis API と IntelliJ Platform（plugin が Worker で使う。docs のインストールと同じ。ADR-063）
-    maven {
-        url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
-        content {
-            includeModuleByRegex("org\\.jetbrains\\.kotlin", ".*-for-ide")
-            includeGroupByRegex("org\\.jetbrains\\.intellij\\.deps.*")
-        }
+    // Analysis API と IntelliJ Platform（plugin が Worker で使う。docs のインストールと同じ。ADR-063）。
+    // ここにしか無いものは exclusiveContent にして Maven Central に問い合わせない（Central の 429 で解決が止まるため）
+    exclusiveContent {
+        forRepository { maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") }
+        filter { includeModuleByRegex("org\\.jetbrains\\.kotlin", ".*-for-ide") }
     }
-    maven {
-        url = uri("https://www.jetbrains.com/intellij-repository/releases")
-        content {
+    exclusiveContent {
+        forRepository { maven("https://www.jetbrains.com/intellij-repository/releases") }
+        filter {
             includeGroup("com.jetbrains.intellij.platform")
             includeGroup("com.jetbrains.intellij.java")
         }
+    }
+    mavenCentral()
+    google()
+    maven {
+        url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
+        content { includeGroupByRegex("org\\.jetbrains\\.intellij\\.deps.*") }
     }
 }
 
