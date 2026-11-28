@@ -62,6 +62,8 @@ include(
     ":test-processors:core",
     ":test-processors:ksp",
     ":test-processors:native",
+    // 実用 Processor の Native 書き直し版（ACG-66、ADR-037・071）
+    ":real-world-ports:cream",
 )
 
 
@@ -77,6 +79,7 @@ val internalOnlyModules = setOf(
     "quality",
     "pbt",
     "test-processors",
+    "real-world-ports",
     // katachi のアーキテクチャ検査（ACG-50、ADR-041）
     "architecture-test",
 )

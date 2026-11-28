@@ -186,7 +186,7 @@ HYB-05,P,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.pbt
 RW-CRM-B1,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-CRM-B2,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest
 RW-CRM-B3,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
-RW-CRM-N1,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
+RW-CRM-N1,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-CRM-N2,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-MSH-B1,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldE2ETest
 RW-MSH-B2,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest

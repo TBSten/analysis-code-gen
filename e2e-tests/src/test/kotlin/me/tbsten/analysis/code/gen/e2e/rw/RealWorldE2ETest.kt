@@ -73,7 +73,7 @@ class RealWorldE2ETest : E2ESpec({
         upstreamSuiteShouldPassOnBridge("CRM", ":test:allTests")
     }
 
-    case("RW-CRM-N1", "cream.kt（Native）: 書き直し版が元と同じ実行時テストを通る", pending = PendingCase(Milestone.M1)) {
+    case("RW-CRM-N1", "cream.kt（Native）: 書き直し版が元と同じ実行時テストを通る") {
         RealWorldSample.open("CRM", "jvm").shouldPassSameTestsAs(SampleEngine.Native)
     }
 
