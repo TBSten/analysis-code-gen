@@ -24,7 +24,7 @@ enum class KsptEngine {
     /** 公式 KSP2 2.3.14（期待値の出どころ。ここで通らないものは取り込まない）。 */
     Ksp2,
 
-    /** analysisCodeGen の KSP Bridge。エンジン（P2）ができるまで NotImplementedError。 */
+    /** analysisCodeGen のエンジンと KSP Bridge（[BridgeKsptRunner]）。 */
     Bridge,
 }
 
@@ -85,7 +85,7 @@ object KsptCases {
     ): String =
         when (engine) {
             KsptEngine.Ksp2 -> Ksp2KsptRunner.run(data, features, workDir)
-            KsptEngine.Bridge -> throw NotImplementedError("KSP Bridge はエンジン（P2）ができてから動かす")
+            KsptEngine.Bridge -> BridgeKsptRunner.run(data, features, workDir)
         }
 
     private fun resource(path: String): String =

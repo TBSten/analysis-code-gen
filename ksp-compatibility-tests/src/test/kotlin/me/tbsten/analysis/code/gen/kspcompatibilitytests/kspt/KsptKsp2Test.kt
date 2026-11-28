@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FreeSpec
 /**
  * 取り込んだ KSPT が公式 KSP2（K）で実際に通ることを確かめる補助テスト（ケース ID なし。進捗に数えない、ADR-024）。
  *
+ * AA の一式を載せない `ksptKsp2Test` タスクで流す（`test` タスクは Bridge 用に AA を先頭に置くため、K が壊れる。ADR-064）。
  * 全件は数分かかるため、既定では M ごとの先頭 1 件だけを流す。全件は `-Pacg.kspt.k=true`（夜間の定期実行）、
  * 1 件だけなら `-Pacg.kspt.only=KSPT-Hello`。期待値は JDK 17 前提なので、JDK 17 の場所を `-Pacg.kspt.jdkHome` か
  * 環境変数 `JAVA_HOME_17_X64` で渡す（無いと [KsptCases.jdk17Only] を流さない）。
