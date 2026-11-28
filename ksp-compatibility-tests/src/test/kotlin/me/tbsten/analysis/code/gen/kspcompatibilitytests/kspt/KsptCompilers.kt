@@ -25,16 +25,15 @@ object KsptCompilers {
         URLClassLoader(entries.map { it.toURI().toURL() }.toTypedArray(), ClassLoader.getPlatformClassLoader())
     }
 
-    /** AA と IntelliJ Platform（再配置されていないもの）を含む JAR を除く。 */
+    /**
+     * AA（`*-for-ide`）と IntelliJ Platform（再配置されていないもの）の JAR を除く。
+     * `org/jetbrains/kotlin/analysis/` では判定しない。kotlin-compiler-embeddable の版によってはその下のクラスを含み、kotlinc ごと消えるため
+     */
     private fun isolatable(entry: File): Boolean {
         if (entry.isDirectory) return true
         if ("-for-ide" in entry.name) return false
         return runCatching {
-            ZipFile(entry).use { zip ->
-                zip.entries().asSequence().none {
-                    it.name.startsWith("com/intellij/") || it.name.startsWith("org/jetbrains/kotlin/analysis/")
-                }
-            }
+            ZipFile(entry).use { zip -> zip.entries().asSequence().none { it.name.startsWith("com/intellij/") } }
         }.getOrDefault(true)
     }
 
