@@ -1,0 +1,1046 @@
+/*
+ * Copyright 2022 Google LLC
+ * Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+// Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/ResolverAAImpl.kt
+// Modified-By: analysis-code-gen contributors, 2026
+// Modifications: パッケージ名のみ変更
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+
+package me.tbsten.analysis.code.gen.ksp.bridge.impl
+
+import com.google.devtools.ksp.ApiFeatures
+import me.tbsten.analysis.code.gen.ksp.bridge.InternalKSPException
+import me.tbsten.analysis.code.gen.ksp.bridge.InternalKSPException.Companion.render
+import com.google.devtools.ksp.KspExperimental
+import com.google.devtools.ksp.buildApiFeatures
+import com.google.devtools.ksp.closestClassDeclaration
+import me.tbsten.analysis.code.gen.ksp.bridge.common.JVM_DEFAULT_ANNOTATION_FQN
+import me.tbsten.analysis.code.gen.ksp.bridge.common.JVM_DEFAULT_WITHOUT_COMPATIBILITY_ANNOTATION_FQN
+import me.tbsten.analysis.code.gen.ksp.bridge.common.JVM_STATIC_ANNOTATION_FQN
+import me.tbsten.analysis.code.gen.ksp.bridge.common.JVM_STRICTFP_ANNOTATION_FQN
+import me.tbsten.analysis.code.gen.ksp.bridge.common.JVM_SYNCHRONIZED_ANNOTATION_FQN
+import me.tbsten.analysis.code.gen.ksp.bridge.common.JVM_TRANSIENT_ANNOTATION_FQN
+import me.tbsten.analysis.code.gen.ksp.bridge.common.JVM_VOLATILE_ANNOTATION_FQN
+import me.tbsten.analysis.code.gen.ksp.bridge.common.extractThrowsAnnotation
+import me.tbsten.analysis.code.gen.ksp.bridge.common.impl.AnnotationResolutionStrategy
+import me.tbsten.analysis.code.gen.ksp.bridge.common.impl.KSNameImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.common.impl.KSTypeReferenceSyntheticImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.common.impl.RefPosition
+import me.tbsten.analysis.code.gen.ksp.bridge.common.impl.findOuterMostRef
+import me.tbsten.analysis.code.gen.ksp.bridge.common.impl.findRefPosition
+import me.tbsten.analysis.code.gen.ksp.bridge.common.impl.isReturnTypeOfAnnotationMethod
+import me.tbsten.analysis.code.gen.ksp.bridge.common.javaModifiers
+import me.tbsten.analysis.code.gen.ksp.bridge.common.lazyMemoizedSequence
+import com.google.devtools.ksp.getClassDeclarationByName
+import com.google.devtools.ksp.getDeclaredFunctions
+import com.google.devtools.ksp.getDeclaredProperties
+import com.google.devtools.ksp.getVisibility
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.java.KSAnnotationJavaImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.AbstractKSDeclarationImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSClassDeclarationEnumEntryImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSClassDeclarationImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSErrorType
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSFileImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSFileJavaImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSFunctionDeclarationImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSFunctionErrorImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSFunctionImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSPropertyAccessorImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSPropertyDeclarationImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSPropertyDeclarationJavaImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSTypeAliasImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSTypeArgumentLiteImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSTypeImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.analyze
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.explictJvmName
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.fillInDeepSubstitutor
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.findParentOfType
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.fullyExpand
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.inlineSuffix
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.internalSuffix
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.isJvmRecord
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.toKSDeclaration
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.toKSName
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.toKtClassSymbol
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.toLocation
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.toWildcard
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.typeArguments
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.updateFromParents
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.util.BinaryClassInfoCache
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.util.DeclarationOrdering
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.util.extractThrowsFromClassFile
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.util.getFileContent
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.util.getVirtualFile
+import com.google.devtools.ksp.isAbstract
+import com.google.devtools.ksp.isConstructor
+import com.google.devtools.ksp.isOpen
+import com.google.devtools.ksp.isVisibleFrom
+import com.google.devtools.ksp.processing.KSBuiltIns
+import com.google.devtools.ksp.processing.KSPConfig
+import com.google.devtools.ksp.processing.Resolver
+import com.google.devtools.ksp.processing.SymbolProcessor
+import com.google.devtools.ksp.symbol.ClassKind
+import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSAnnotation
+import com.google.devtools.ksp.symbol.KSBackingField
+import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSClassifierReference
+import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSDeclarationContainer
+import com.google.devtools.ksp.symbol.KSFile
+import com.google.devtools.ksp.symbol.KSFunction
+import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSName
+import com.google.devtools.ksp.symbol.KSNode
+import com.google.devtools.ksp.symbol.KSPropertyAccessor
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyGetter
+import com.google.devtools.ksp.symbol.KSPropertySetter
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSTypeArgument
+import com.google.devtools.ksp.symbol.KSTypeReference
+import com.google.devtools.ksp.symbol.Modifier
+import com.google.devtools.ksp.symbol.Origin
+import com.google.devtools.ksp.symbol.Variance
+import com.google.devtools.ksp.symbol.Visibility
+import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.impl.file.impl.JavaFileManager
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
+import org.jetbrains.kotlin.analysis.api.KaImplementationDetail
+import org.jetbrains.kotlin.analysis.api.components.buildSubstitutor
+import org.jetbrains.kotlin.analysis.api.fir.symbols.KaFirSymbol
+import org.jetbrains.kotlin.analysis.api.fir.types.KaFirType
+import org.jetbrains.kotlin.analysis.api.projectStructure.KaSourceModule
+import org.jetbrains.kotlin.analysis.api.symbols.KaEnumEntrySymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaFunctionSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaJavaFieldSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaNamedClassSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaPropertyAccessorSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaPropertySymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
+import org.jetbrains.kotlin.analysis.api.symbols.KaTypeAliasSymbol
+import org.jetbrains.kotlin.analysis.api.types.KaType
+import org.jetbrains.kotlin.analysis.api.types.symbol
+import org.jetbrains.kotlin.analysis.decompiler.stub.file.ClsKotlinBinaryClassCache
+import org.jetbrains.kotlin.analysis.low.level.api.fir.api.getResolutionFacade
+import org.jetbrains.kotlin.asJava.classes.KtLightClassForFacade
+import org.jetbrains.kotlin.asJava.findFacadeClass
+import org.jetbrains.kotlin.builtins.jvm.JavaToKotlinClassMap
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCliJavaFileManagerImpl
+import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
+import org.jetbrains.kotlin.fir.types.isRaw
+import org.jetbrains.kotlin.fir.types.typeContext
+import org.jetbrains.kotlin.load.java.JvmAbi
+import org.jetbrains.kotlin.load.kotlin.JvmPackagePartSource
+import org.jetbrains.kotlin.load.kotlin.TypeMappingMode
+import org.jetbrains.kotlin.load.kotlin.getOptimalModeForReturnType
+import org.jetbrains.kotlin.load.kotlin.getOptimalModeForValueParameter
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.FqNameUnsafe
+import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.platform.jvm.JvmPlatform
+import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.org.objectweb.asm.Opcodes
+
+@Suppress("MemberVisibilityCanBePrivate")
+@OptIn(KspExperimental::class)
+class ResolverAAImpl(
+    val allKSFiles: List<KSFile>,
+    val project: Project,
+    val incrementalContext: IncrementalContextAA,
+    val resolutionStrategy: AnnotationResolutionStrategy,
+    val processorsRegisteredForNewFeatures: Set<SymbolProcessor>,
+) : Resolver {
+    companion object {
+        private val instance_prop: ThreadLocal<ResolverAAImpl> = ThreadLocal()
+        var instance: ResolverAAImpl
+            get() = instance_prop.get()
+            set(value) {
+                instance_prop.set(value)
+            }
+
+        private val ktModule_prop: ThreadLocal<KaSourceModule> = ThreadLocal()
+        var ktModule: KaSourceModule
+            get() = ktModule_prop.get()
+            set(value) {
+                ktModule_prop.set(value)
+            }
+
+        private val kspConfig_prop: ThreadLocal<KSPConfig> = ThreadLocal()
+        var kspConfig: KSPConfig
+            get() = kspConfig_prop.get()
+            set(value) {
+                kspConfig_prop.set(value)
+            }
+
+        fun tearDown() {
+            instance_prop.remove()
+            ktModule_prop.remove()
+            kspConfig_prop.remove()
+        }
+    }
+
+    private val LEGACY_REGISTERED_API_FEATURES: ApiFeatures = buildApiFeatures {
+        enableBackingFields = true
+        enableContextParameters = false
+    }
+
+    lateinit var currentProcessor: SymbolProcessor
+
+    internal val currentApiFeatures: ApiFeatures
+        get() = if (currentProcessor in processorsRegisteredForNewFeatures) {
+            LEGACY_REGISTERED_API_FEATURES
+        } else {
+            currentProcessor.apiFeatures
+        }
+
+    lateinit var propertyAsMemberOfCache: MutableMap<Pair<KSPropertyDeclaration, KSType>, KSType>
+    lateinit var functionAsMemberOfCache: MutableMap<Pair<KSFunctionDeclaration, KSType>, KSFunction>
+    val javaFileManager = project.getService(JavaFileManager::class.java) as KotlinCliJavaFileManagerImpl
+    private val classBinaryCache = ClsKotlinBinaryClassCache()
+    private val packageInfoFiles by lazyMemoizedSequence {
+        allKSFiles.filter { it.fileName == "package-info.java" }.asSequence()
+    }
+
+    // TODO: fix in upstream for builtin types.
+    override val builtIns: KSBuiltIns by lazy {
+        val builtIns = analyze { useSiteSession.builtinTypes }
+        object : KSBuiltIns {
+            override val anyType: KSType by lazy { KSTypeImpl.getCached(builtIns.any) }
+            override val nothingType: KSType by lazy { KSTypeImpl.getCached(builtIns.nothing) }
+            override val unitType: KSType by lazy { KSTypeImpl.getCached(builtIns.unit) }
+            override val numberType: KSType by lazy {
+                getClassDeclarationByName("kotlin.Number")!!.asStarProjectedType()
+            }
+            override val byteType: KSType by lazy { KSTypeImpl.getCached(builtIns.byte) }
+            override val shortType: KSType by lazy { KSTypeImpl.getCached(builtIns.short) }
+            override val intType: KSType by lazy { KSTypeImpl.getCached(builtIns.int) }
+            override val longType: KSType by lazy { KSTypeImpl.getCached(builtIns.long) }
+            override val floatType: KSType by lazy { KSTypeImpl.getCached(builtIns.float) }
+            override val doubleType: KSType by lazy { KSTypeImpl.getCached(builtIns.double) }
+            override val charType: KSType by lazy { KSTypeImpl.getCached(builtIns.char) }
+            override val booleanType: KSType by lazy { KSTypeImpl.getCached(builtIns.boolean) }
+            override val stringType: KSType by lazy { KSTypeImpl.getCached(builtIns.string) }
+            override val iterableType: KSType by lazy {
+                getClassDeclarationByName("kotlin.collections.Iterable")!!.asStarProjectedType()
+            }
+            override val annotationType: KSType by lazy {
+                getClassDeclarationByName("kotlin.Annotation")!!.asStarProjectedType()
+            }
+            override val arrayType: KSType by lazy {
+                getClassDeclarationByName("kotlin.Array")!!.asStarProjectedType()
+            }
+        }
+    }
+
+    override fun createKSTypeReferenceFromKSType(type: KSType): KSTypeReference {
+        return KSTypeReferenceSyntheticImpl.getCached(type, null)
+    }
+
+    override fun effectiveJavaModifiers(declaration: KSDeclaration): Set<Modifier> = when (declaration.origin) {
+        Origin.JAVA, Origin.KOTLIN ->
+            existingJavaModifiers(declaration) +
+                kotlinAnnotationsToModifiersIfApplicableTo(declaration) +
+                setOfNotNull(
+                    visibilityModifier(declaration),
+                    abstractModifierIfApplicableTo(declaration),
+                    finalModifierIfApplicableTo(declaration),
+                    staticModifierIfApplicableTo(declaration),
+                )
+
+        Origin.JAVA_LIB, Origin.KOTLIN_LIB ->
+            existingJavaModifiers(declaration) +
+                annotationsToJavaModifiers(declaration.annotations) +
+                setOfNotNull(
+                    visibilityModifier(declaration),
+                    abstractModifierIfApplicableTo(declaration),
+                    transientModifierIfApplicableTo(declaration),
+                    volatileModifierIfApplicableTo(declaration),
+                    strictModifierIfApplicableTo(declaration),
+                    synchronizedModifierIfApplicableTo(declaration),
+                )
+
+        Origin.SYNTHETIC -> existingJavaModifiers(declaration)
+    }
+
+    private fun existingJavaModifiers(declaration: KSDeclaration): Set<Modifier> =
+        declaration.modifiers.filter { it in javaModifiers }.toSet()
+
+    private fun visibilityModifier(declaration: KSDeclaration): Modifier? = when (declaration.getVisibility()) {
+        // TODO: getVisibility might be inlined here or simplified here.
+        // This is only needed by sources.
+        // PUBLIC, PRIVATE, PROTECTED are already handled in descriptor based impls.
+        Visibility.PUBLIC -> Modifier.PUBLIC
+        Visibility.PRIVATE -> Modifier.PRIVATE
+        Visibility.PROTECTED -> Modifier.PROTECTED
+        Visibility.INTERNAL, Visibility.LOCAL, Visibility.JAVA_PACKAGE -> null
+    }
+
+    private fun KSAnnotation.resolvesTo(fqn: String): Boolean =
+        fqn.endsWith(shortName.asString()) &&
+            annotationType.resolve().declaration.qualifiedName?.asString() == fqn
+
+    private fun toJavaModifier(annotation: KSAnnotation): Modifier? = when {
+        annotation.resolvesTo(JVM_DEFAULT_ANNOTATION_FQN) -> Modifier.JAVA_DEFAULT
+        annotation.resolvesTo(JVM_DEFAULT_WITHOUT_COMPATIBILITY_ANNOTATION_FQN) -> Modifier.JAVA_DEFAULT
+        annotation.resolvesTo(JVM_STRICTFP_ANNOTATION_FQN) -> Modifier.JAVA_STRICT
+        annotation.resolvesTo(JVM_SYNCHRONIZED_ANNOTATION_FQN) -> Modifier.JAVA_SYNCHRONIZED
+        annotation.resolvesTo(JVM_TRANSIENT_ANNOTATION_FQN) -> Modifier.JAVA_TRANSIENT
+        annotation.resolvesTo(JVM_VOLATILE_ANNOTATION_FQN) -> Modifier.JAVA_VOLATILE
+        annotation.resolvesTo(JVM_STATIC_ANNOTATION_FQN) -> Modifier.JAVA_STATIC
+        else -> null
+    }
+
+    private fun annotationsToJavaModifiers(annotations: Sequence<KSAnnotation>): Set<Modifier> =
+        annotations.fold(emptySet()) { acc, annotation ->
+            toJavaModifier(annotation)?.let { acc + it } ?: acc
+        }
+
+    private fun abstractModifierIfApplicableTo(declaration: KSDeclaration): Modifier? = when (declaration) {
+        is KSClassDeclaration if declaration.classKind == ClassKind.INTERFACE -> Modifier.ABSTRACT
+        is KSFunctionDeclaration if declaration.isAbstract -> Modifier.ABSTRACT
+        is KSPropertyDeclaration if declaration.isAbstract() -> Modifier.ABSTRACT
+        else -> null
+    }
+
+    private fun finalModifierIfApplicableTo(declaration: KSDeclaration): Modifier? = when (declaration.origin) {
+        Origin.KOTLIN if declaration !is KSBackingField && !declaration.isOpen() -> Modifier.FINAL
+        else -> null
+    }
+
+    private fun staticModifierIfApplicableTo(declaration: KSDeclaration): Modifier? = when (declaration) {
+        is KSClassDeclarationImpl -> analyze {
+            val isInStaticMemberScope = declaration.ktClassOrObjectSymbol.staticMemberScope
+                .declarations.contains(declaration.ktDeclarationSymbol)
+            if (isInStaticMemberScope)
+                Modifier.JAVA_STATIC
+            else
+                null
+        }
+
+        else -> null
+    }
+
+    private fun transientModifierIfApplicableTo(declaration: KSDeclaration): Modifier? = when (declaration) {
+        is KSPropertyDeclaration if declaration.jvmAccessFlag and Opcodes.ACC_TRANSIENT != 0 -> Modifier.JAVA_TRANSIENT
+        else -> null
+    }
+
+    private fun volatileModifierIfApplicableTo(declaration: KSDeclaration): Modifier? = when (declaration) {
+        is KSPropertyDeclaration if declaration.jvmAccessFlag and Opcodes.ACC_VOLATILE != 0 -> Modifier.JAVA_VOLATILE
+        else -> null
+    }
+
+    private fun strictModifierIfApplicableTo(declaration: KSDeclaration): Modifier? = when (declaration) {
+        is KSFunctionDeclaration if declaration.jvmAccessFlag and Opcodes.ACC_STRICT != 0 -> Modifier.JAVA_STRICT
+        else -> null
+    }
+
+    private fun synchronizedModifierIfApplicableTo(declaration: KSDeclaration): Modifier? = when (declaration) {
+        is KSFunctionDeclaration if declaration.jvmAccessFlag and Opcodes.ACC_SYNCHRONIZED != 0 -> Modifier.JAVA_SYNCHRONIZED
+        else -> null
+    }
+
+    private fun kotlinAnnotationsToModifiersIfApplicableTo(declaration: KSDeclaration): Set<Modifier> =
+        when (declaration.origin) {
+            Origin.KOTLIN -> annotationsToJavaModifiers(declaration.annotations)
+            else -> emptySet()
+        }
+
+    internal val KSPropertyDeclaration.jvmAccessFlag: Int
+        // TODO: Might be a good idea to cache this result? Let's hold off until we can measure it.
+        get() = when (origin) {
+            Origin.KOTLIN_LIB, Origin.JAVA_LIB -> {
+                val fileManager = instance.javaFileManager
+                val parentClass = this.findParentOfType<KSClassDeclaration>()
+                val classId = (parentClass as KSClassDeclarationImpl).ktClassOrObjectSymbol.classId!!
+                BinaryClassInfoCache.getCached(classId, fileManager)
+                    ?.fieldAccFlags?.get(this.simpleName.asString()) ?: 0
+            }
+
+            else -> throw InternalKSPException(
+                "Unexpected origin: '$origin', expected 'KOTLIN_LIB' or 'JAVA_LIB'",
+                this.location,
+                this.javaClass
+            )
+        }
+
+    internal val KSFunctionDeclaration.jvmAccessFlag: Int
+        // TODO: Might be a good idea to cache this result? Let's hold off until we can measure it.
+        get() = when (origin) {
+            Origin.KOTLIN_LIB, Origin.JAVA_LIB -> {
+                val jvmDesc = mapToJvmSignatureInternal(this)
+                val fileManager = instance.javaFileManager
+                val parentClass = this.findParentOfType<KSClassDeclaration>()
+                val classId = (parentClass as KSClassDeclarationImpl).ktClassOrObjectSymbol.classId!!
+                BinaryClassInfoCache.getCached(classId, fileManager)
+                    ?.methodAccFlags?.get(this.simpleName.asString() + jvmDesc) ?: 0
+            }
+
+            else -> throw InternalKSPException(
+                "Unexpected origin: '$origin', expected 'KOTLIN_LIB' or 'JAVA_LIB'",
+                this.location,
+                this.javaClass,
+            )
+        }
+
+    override fun getAllFiles(): Sequence<KSFile> {
+        return allKSFiles.asSequence()
+    }
+
+    override fun getClassDeclarationByName(name: KSName): KSClassDeclaration? {
+        fun findClass(name: KSName): KaSymbol? {
+            if (name.asString() == "") {
+                return null
+            }
+            val parent = name.getQualifier()
+            val simpleName = name.getShortName()
+            val classId = ClassId(FqName(parent), Name.identifier(simpleName))
+            analyze {
+                classId.toKtClassSymbol()
+            }?.let { return it }
+            return (findClass(KSNameImpl.getCached(name.getQualifier())) as? KaNamedClassSymbol)?.let {
+                analyze {
+                    (
+                        it.staticMemberScope.classifiers { it.asString() == simpleName }.singleOrNull()
+                            ?: it.memberScope.classifiers { it.asString() == simpleName }.singleOrNull()
+                        ) as? KaNamedClassSymbol
+                        ?: it.staticMemberScope.callables { it.asString() == simpleName }.singleOrNull()
+                            as? KaEnumEntrySymbol
+                }
+            }
+        }
+        return findClass(name)?.let {
+            when (it) {
+                is KaNamedClassSymbol -> KSClassDeclarationImpl.getCached(it)
+                is KaEnumEntrySymbol -> KSClassDeclarationEnumEntryImpl.getCached(it)
+                else -> throw InternalKSPException(
+                    "Unexpected class declaration symbol: '$it'",
+                    it.psi.toLocation(),
+                    it.javaClass,
+                )
+            }
+        }
+    }
+
+    @OptIn(KaExperimentalApi::class)
+    @KspExperimental
+    override fun getDeclarationsFromPackage(packageName: String): Sequence<KSDeclaration> {
+        return analyze {
+            findPackage(FqName(packageName))?.packageScope?.declarations?.distinct()?.mapNotNull { symbol ->
+                when (symbol) {
+                    is KaNamedClassSymbol -> KSClassDeclarationImpl.getCached(symbol)
+                    is KaFunctionSymbol -> KSFunctionDeclarationImpl.getCached(symbol)
+                    is KaPropertySymbol -> KSPropertyDeclarationImpl.getCached(symbol)
+                    is KaTypeAliasSymbol -> KSTypeAliasImpl.getCached(symbol)
+                    is KaJavaFieldSymbol -> KSPropertyDeclarationJavaImpl.getCached(symbol)
+                    else -> null
+                }
+            } ?: emptySequence()
+        }
+    }
+
+    override fun getDeclarationsInSourceOrder(container: KSDeclarationContainer): Sequence<KSDeclaration> {
+        if (container.origin != Origin.KOTLIN_LIB) {
+            return container.declarations
+        }
+
+        // TODO: multiplatform
+        if (!isJvm) {
+            return container.declarations
+        }
+
+        require(container is AbstractKSDeclarationImpl)
+        val fileManager = instance.javaFileManager
+        var parentClass: KSNode = container
+        while (parentClass.parent != null &&
+            (parentClass !is KSClassDeclarationImpl || parentClass.ktClassOrObjectSymbol.classId == null)
+        ) {
+            parentClass = parentClass.parent!!
+        }
+
+        if (parentClass !is KSClassDeclarationImpl) {
+            return container.declarations
+        }
+
+        // Members of Foo's companion object are compiled into Foo and Foo$Companion. Total ordering is not recoverable
+        // from class files. Let's give up and rely on AA for now.
+        if (parentClass.isCompanionObject) {
+            return container.declarations
+        }
+
+        val classId = parentClass.ktClassOrObjectSymbol.classId ?: return container.declarations
+        val virtualFile = classId.getVirtualFile(fileManager) ?: return container.declarations
+        val kotlinClass = classBinaryCache.getKotlinBinaryClass(virtualFile) ?: return container.declarations
+        val declarationOrdering = DeclarationOrdering(kotlinClass)
+
+        @Suppress("UNCHECKED_CAST")
+        return (container.declarations as? Sequence<AbstractKSDeclarationImpl>)
+            ?.sortedWith(declarationOrdering.comparator) ?: container.declarations
+    }
+
+    override fun getFunctionDeclarationsByName(
+        name: KSName,
+        includeTopLevel: Boolean
+    ): Sequence<KSFunctionDeclaration> {
+        val qualifier = name.getQualifier()
+        val functionName = name.getShortName()
+        val nonTopLevelResult = this.getClassDeclarationByName(qualifier)?.getDeclaredFunctions()
+            ?.filter { it.simpleName.asString() == functionName } ?: emptySequence()
+        return if (!includeTopLevel) nonTopLevelResult else {
+            nonTopLevelResult.plus(
+                analyze {
+                    findTopLevelCallables(FqName(qualifier), Name.identifier(functionName))
+                        .filterIsInstance<KaFunctionSymbol>()
+                        .map {
+                            KSFunctionDeclarationImpl.getCached(it)
+                        }
+                }
+            )
+        }
+    }
+
+    @OptIn(KaImplementationDetail::class)
+    override fun getJavaWildcard(reference: KSTypeReference): KSTypeReference {
+        val (ref, indexes) = reference.findOuterMostRef()
+        val type = ref.resolve()
+        if (type.isError)
+            return reference
+        val position = findRefPosition(ref)
+        val ktType = (type as KSTypeImpl).type.fullyExpand()
+        // TODO: Upstream this:
+        // cast to FIR internal needed due to missing support in AA for type mapping mode
+        // and corresponding type mapping APIs.
+        val coneType = (ktType as KaFirType).coneType
+        val mode = analyze {
+            val typeContext = analyze { useSiteModule.getResolutionFacade(project).useSiteFirSession.typeContext }
+            when (position) {
+                RefPosition.RETURN_TYPE -> typeContext.getOptimalModeForReturnType(
+                    coneType,
+                    reference.isReturnTypeOfAnnotationMethod()
+                )
+
+                RefPosition.SUPER_TYPE -> TypeMappingMode.SUPER_TYPE
+                RefPosition.PARAMETER_TYPE -> typeContext.getOptimalModeForValueParameter(coneType)
+            }.updateFromParents(ref)
+        }
+        return analyze {
+            ktType.toWildcard(mode).let {
+                var candidate: KaType = it
+                for (i in indexes.reversed()) {
+                    candidate = candidate.typeArguments()[i].type!!
+                }
+                KSTypeReferenceSyntheticImpl.getCached(KSTypeImpl.getCached(candidate), null)
+            }
+        }
+    }
+
+    override fun getJvmCheckedException(accessor: KSPropertyAccessor): Sequence<KSType> {
+        return when (accessor.origin) {
+            Origin.KOTLIN, Origin.SYNTHETIC -> {
+                extractThrowsAnnotation(accessor)
+            }
+
+            Origin.KOTLIN_LIB, Origin.JAVA_LIB -> {
+                val fileManager = javaFileManager
+                val parentClass = accessor.findParentOfType<KSClassDeclaration>()
+                val classId = (parentClass as KSClassDeclarationImpl).ktClassOrObjectSymbol.classId
+                    ?: return emptySequence()
+                val virtualFileContent = classId.getFileContent(fileManager) ?: return emptySequence()
+                val jvmDesc = this.mapToJvmSignatureInternal(accessor)
+                extractThrowsFromClassFile(
+                    virtualFileContent,
+                    jvmDesc,
+                    (if (accessor is KSPropertyGetter) "get" else "set") +
+                        accessor.receiver.simpleName.asString().replaceFirstChar(Char::uppercaseChar)
+                )
+            }
+
+            else -> emptySequence()
+        }
+    }
+
+    @OptIn(KaExperimentalApi::class)
+    override fun getJvmCheckedException(function: KSFunctionDeclaration): Sequence<KSType> {
+        return when (function.origin) {
+            Origin.JAVA -> {
+                val psi = ((function as KSFunctionDeclarationImpl).ktFunctionSymbol.psi as? PsiMethod)
+                    ?: return emptySequence()
+                psi.throwsList.referencedTypes.asSequence().mapNotNull {
+                    analyze {
+                        it.asKaType(psi)?.let { KSTypeImpl.getCached(it) }
+                    }
+                }
+            }
+
+            Origin.KOTLIN -> {
+                extractThrowsAnnotation(function)
+            }
+
+            Origin.KOTLIN_LIB, Origin.JAVA_LIB -> {
+                val fileManager = javaFileManager
+                val parentClass = function.findParentOfType<KSClassDeclaration>()
+                val classId = (parentClass as KSClassDeclarationImpl).ktClassOrObjectSymbol.classId
+                    ?: return emptySequence()
+                val virtualFileContent = classId.getFileContent(fileManager) ?: return emptySequence()
+                val jvmDesc = this.mapToJvmSignature(function)
+                extractThrowsFromClassFile(virtualFileContent, jvmDesc, function.simpleName.asString())
+            }
+
+            else -> emptySequence()
+        }
+    }
+
+    // TODO: handle library symbols
+    override fun getJvmName(accessor: KSPropertyAccessor): String {
+        val symbol: KaPropertyAccessorSymbol? = when (accessor) {
+            is KSPropertyAccessorImpl -> accessor.ktPropertyAccessorSymbol
+            else -> null
+        }
+
+        symbol?.explictJvmName()?.let {
+            return it
+        }
+
+        val propertyName = accessor.receiver.simpleName.asString()
+        val containingClass = accessor.receiver.closestClassDeclaration()
+
+        val isAnnotationClass = containingClass?.classKind == ClassKind.ANNOTATION_CLASS
+        val isJvmRecord = containingClass is KSClassDeclarationImpl &&
+            containingClass.ktClassOrObjectSymbol.isJvmRecord()
+
+        // Annotation classes and @JvmRecord data classes both use bare property names
+        // as accessor names (no get/set prefix).
+        if (isAnnotationClass || isJvmRecord) {
+            return propertyName
+        }
+        // https://kotlinlang.org/docs/java-to-kotlin-interop.html#properties
+        val prefixedName = when (accessor) {
+            is KSPropertyGetter -> JvmAbi.getterName(propertyName)
+            is KSPropertySetter -> JvmAbi.setterName(propertyName)
+            else -> ""
+        }
+
+        val inlineSuffix = symbol?.inlineSuffix ?: ""
+        val mangledName = symbol?.internalSuffix ?: ""
+        return "$prefixedName$inlineSuffix$mangledName"
+    }
+
+    // TODO: handle library symbols
+    override fun getJvmName(declaration: KSFunctionDeclaration): String {
+        // FAST PATH: Java methods do not have Kotlin name mangling or @JvmName.
+        // Their JVM name is always exactly their simple name.
+        if (declaration.origin == Origin.JAVA || declaration.origin == Origin.JAVA_LIB) {
+            return declaration.simpleName.asString()
+        }
+
+        val symbol: KaFunctionSymbol? = when (declaration) {
+            is KSFunctionDeclarationImpl -> declaration.ktFunctionSymbol
+            else -> null
+        }
+
+        symbol?.explictJvmName()?.let {
+            return it
+        }
+
+        val inlineSuffix = symbol?.inlineSuffix ?: ""
+        val mangledName = symbol?.internalSuffix ?: ""
+        return declaration.simpleName.asString() + inlineSuffix + mangledName
+    }
+
+    override fun getKSNameFromString(name: String): KSName {
+        return KSNameImpl.getCached(name)
+    }
+
+    override fun getNewFiles(): Sequence<KSFile> {
+        return resolutionStrategy.newKSFiles.asSequence()
+    }
+
+    private fun getOwnerJvmClassNameHelper(declaration: KSDeclaration): String? {
+        @Suppress("UNCHECKED_CAST")
+        return declaration.closestClassDeclaration()?.let {
+            // Find classId for JvmClassName for member callables.
+            (it as? KSClassDeclarationImpl)?.ktClassOrObjectSymbol?.classId
+                ?.asString()?.replace(".", "$")?.replace("/", ".")
+        } ?: declaration.containingFile?.let {
+            // Find containing file facade class name from file symbol
+            (it as? KSFileImpl)?.let {
+                ((it.ktFileSymbol.psi as? KtFile)?.findFacadeClass() as? KtLightClassForFacade)
+                    ?.facadeClassFqName?.asString()
+            }
+            // Down cast to fir symbol for library symbols as light facade class for libraries not available in AA.
+        } ?: (
+            ((declaration as? AbstractKSDeclarationImpl)?.ktDeclarationSymbol as? KaFirSymbol<FirCallableSymbol<*>>)
+                ?.firSymbol?.containerSource as? JvmPackagePartSource
+            )?.classId?.asFqNameString()
+    }
+
+    override fun getOwnerJvmClassName(declaration: KSFunctionDeclaration): String? {
+        return getOwnerJvmClassNameHelper(declaration)
+    }
+
+    override fun getOwnerJvmClassName(declaration: KSPropertyDeclaration): String? {
+        return getOwnerJvmClassNameHelper(declaration)
+    }
+
+    override fun getPropertyDeclarationByName(name: KSName, includeTopLevel: Boolean): KSPropertyDeclaration? {
+        val qualifier = name.getQualifier()
+        val propertyName = name.getShortName()
+        val nonTopLevelResult = this.getClassDeclarationByName(qualifier)?.getDeclaredProperties()
+            ?.singleOrNull { it.simpleName.asString() == propertyName }
+        return if (!includeTopLevel) {
+            nonTopLevelResult
+        } else {
+            val topLevelResult = (
+                analyze {
+                    findTopLevelCallables(FqName(qualifier), Name.identifier(propertyName)).singleOrNull {
+                        it is KaPropertySymbol
+                    }?.toKSDeclaration() as? KSPropertyDeclaration
+                }
+                )
+            if (topLevelResult != null && nonTopLevelResult != null) {
+                throw InternalKSPException(
+                    buildString {
+                        appendLine("Found multiple properties with same qualified name.")
+                        appendLine("Top-level: '$topLevelResult' at ${topLevelResult.location.render()}")
+                        appendLine(
+                            "Non-top-level: '$nonTopLevelResult' at ${nonTopLevelResult.location.render()}"
+                        )
+                    },
+                    topLevelResult.location,
+                    topLevelResult.javaClass
+                )
+            }
+            nonTopLevelResult ?: topLevelResult
+        }
+    }
+
+    override fun getSymbolsWithAnnotation(annotationName: String, inDepth: Boolean): Sequence<KSAnnotated> {
+        val expandedIfAlias = analyze {
+            val classId = ClassId.fromString(annotationName)
+            findTypeAlias(classId)?.expandedType?.symbol?.classId?.asFqNameString()
+        }
+        val realAnnotationName = expandedIfAlias ?: annotationName
+
+        return resolutionStrategy.getSymbolsWithAnnotation(
+            realAnnotationName,
+            inDepth,
+            currentApiFeatures
+        )
+    }
+
+    override fun getTypeArgument(typeRef: KSTypeReference, variance: Variance): KSTypeArgument {
+        return KSTypeArgumentLiteImpl.getCached(typeRef, variance)
+    }
+
+    override fun isJavaRawType(type: KSType): Boolean {
+        return type is KSTypeImpl && (type.type as KaFirType).coneType.isRaw()
+    }
+
+    internal fun KSFile.getPackageAnnotations() = (this as? KSFileJavaImpl)?.psi?.packageStatement?.annotationList
+        ?.annotations?.map { KSAnnotationJavaImpl.getCached(it, this) } ?: emptyList<KSAnnotation>()
+
+    @KspExperimental
+    override fun getPackageAnnotations(packageName: String): Sequence<KSAnnotation> {
+        return packageInfoFiles.singleOrNull { it.packageName.asString() == packageName }
+            ?.getPackageAnnotations()?.asSequence() ?: emptySequence()
+    }
+
+    @KspExperimental
+    override fun getPackagesWithAnnotation(annotationName: String): Sequence<String> {
+        return packageInfoFiles.filter {
+            it.getPackageAnnotations().any {
+                (it.annotationType.element as? KSClassifierReference)?.referencedName()
+                    ?.substringAfterLast(".") == annotationName.substringAfterLast(".") &&
+                    it.annotationType.resolve().declaration.qualifiedName?.asString() == annotationName
+            }
+        }.map { it.packageName.asString() }
+    }
+
+    @OptIn(KaExperimentalApi::class)
+    @KspExperimental
+    override fun getModuleName(): KSName {
+        return KSNameImpl.getCached((ktModule.stableModuleName ?: ktModule.name).removeSurrounding("<", ">"))
+    }
+
+    @KspExperimental
+    override fun mapJavaNameToKotlin(javaName: KSName): KSName? {
+        return JavaToKotlinClassMap.mapJavaToKotlin(FqName(javaName.asString()))?.toKSName()
+    }
+
+    @KspExperimental
+    override fun mapKotlinNameToJava(kotlinName: KSName): KSName? {
+        return JavaToKotlinClassMap.mapKotlinToJava(FqNameUnsafe(kotlinName.asString()))?.toKSName()
+    }
+
+    @KspExperimental
+    override fun mapToJvmSignature(declaration: KSDeclaration): String? {
+        return mapToJvmSignatureInternal(declaration)
+    }
+
+    internal fun mapToJvmSignature(accessor: KSPropertyAccessor): String {
+        return mapToJvmSignatureInternal(accessor) ?: ""
+    }
+
+    override fun overrides(overrider: KSDeclaration, overridee: KSDeclaration): Boolean {
+        val overriderSymbol = when (overrider) {
+            is KSFunctionDeclarationImpl -> if (overrider.ktFunctionSymbol is KaPropertyAccessorSymbol) {
+                (overrider.parent as KSPropertyDeclarationImpl).ktPropertySymbol
+            } else {
+                overrider.ktFunctionSymbol
+            }
+
+            is KSPropertyDeclarationImpl -> overrider.ktPropertySymbol
+            else -> return false
+        }
+        val overrideeSymbol = when (overridee) {
+            is KSFunctionDeclarationImpl -> overridee.ktFunctionSymbol
+            is KSPropertyDeclarationImpl -> overridee.ktPropertySymbol
+            else -> return false
+        }
+        overrider.closestClassDeclaration()?.asStarProjectedType()?.let {
+            recordLookupWithSupertypes((it as KSTypeImpl).type)
+        }
+        recordLookupForPropertyOrMethod(overrider)
+        recordLookupForPropertyOrMethod(overridee)
+        if (!overridee.isVisibleFrom(overrider))
+            return false
+        return analyze {
+            overriderSymbol.allOverriddenSymbols.contains(overrideeSymbol) ||
+                overriderSymbol.intersectionOverriddenSymbols.contains(overrideeSymbol)
+        }
+    }
+
+    override fun overrides(
+        overrider: KSDeclaration,
+        overridee: KSDeclaration,
+        containingClass: KSClassDeclaration
+    ): Boolean {
+        recordLookupForPropertyOrMethod(overrider)
+        recordLookupForPropertyOrMethod(overridee)
+        return when (overrider) {
+            is KSPropertyDeclaration -> containingClass.getAllProperties().singleOrNull {
+                recordLookupForPropertyOrMethod(it)
+                it.simpleName.asString() == overrider.simpleName.asString()
+            }?.let { overrides(it, overridee) } ?: false
+
+            is KSFunctionDeclaration -> {
+                val candidates = containingClass.getAllFunctions().filter {
+                    it.simpleName.asString() == overridee.simpleName.asString()
+                }
+                if (overrider.simpleName.asString().startsWith("get") ||
+                    overrider.simpleName.asString().startsWith("set")
+                ) {
+                    candidates.plus(
+                        containingClass.getAllProperties().filter {
+                            val overriderName = overrider.simpleName.asString().substring(3)
+                                .replaceFirstChar { it.lowercase() }
+                            it.simpleName.asString() == overriderName ||
+                                it.simpleName.asString().replaceFirstChar { it.lowercase() } == overriderName
+                        }
+                    ).any { overrides(it, overridee) }
+                } else {
+                    candidates.any {
+                        recordLookupForPropertyOrMethod(it)
+                        overrides(it, overridee)
+                    }
+                }
+            }
+
+            else -> false
+        }
+    }
+
+    @OptIn(KaExperimentalApi::class)
+    internal fun mapToJvmSignatureInternal(ksAnnotated: KSAnnotated): String? {
+        fun KaType.toSignature(): String {
+            return analyze {
+                this@toSignature.mapToJvmType().descriptor.let {
+                    when (it) {
+                        "Ljava.lang.Void;" -> "Ljava/lang/Void;"
+                        "Lkotlin/Unit;" -> "V"
+                        else -> it
+                    }
+                }
+            }
+        }
+
+        fun KSType.toSignature(): String {
+            return if (this is KSTypeImpl) {
+                analyze {
+                    type.toSignature()
+                }
+            } else {
+                "<ERROR>"
+            }
+        }
+
+        return when (ksAnnotated) {
+            is KSClassDeclaration -> analyze {
+                (ksAnnotated.asStarProjectedType() as KSTypeImpl).toSignature()
+            }
+
+            is KSFunctionDeclarationImpl -> {
+                analyze {
+                    buildString {
+                        append("(")
+                        ksAnnotated.parameters.forEach { append(it.type.resolve().toSignature()) }
+                        append(")")
+                        if (ksAnnotated.isConstructor()) {
+                            append("V")
+                        } else {
+                            append(ksAnnotated.returnType!!.resolve().toSignature())
+                        }
+                    }
+                }
+            }
+
+            is KSPropertyDeclaration -> {
+                analyze {
+                    ksAnnotated.type.resolve().toSignature()
+                }
+            }
+
+            is KSPropertyAccessorImpl -> {
+                analyze {
+                    buildString {
+                        append("(")
+                        ksAnnotated.ktPropertyAccessorSymbol.valueParameters.forEach {
+                            append(it.returnType.toSignature())
+                        }
+                        append(")")
+                        append(ksAnnotated.ktPropertyAccessorSymbol.returnType.toSignature())
+                    }
+                }
+            }
+
+            is KSBackingField if currentApiFeatures.enableBackingFields ->
+                ksAnnotated.type.resolve().toSignature()
+
+            else -> null
+        }
+    }
+
+    @OptIn(KaExperimentalApi::class)
+    internal fun computeAsMemberOf(property: KSPropertyDeclaration, containing: KSType): KSType {
+        val declaredIn = property.closestClassDeclaration()
+            ?: throw IllegalArgumentException(
+                "Cannot call asMemberOf with a property that is not declared in a class or an interface"
+            )
+        val key = property to containing
+        return propertyAsMemberOfCache.getOrPut(key) {
+            val resolved = property.type.resolve()
+            if (containing is KSTypeImpl && resolved is KSTypeImpl) {
+                recordLookupWithSupertypes(containing.type)
+                recordLookupForPropertyOrMethod(property)
+                val isSubTypeOf = analyze {
+                    (declaredIn.asStarProjectedType() as? KSTypeImpl)?.type?.let {
+                        containing.type.isSubtypeOf(it)
+                    } ?: false
+                }
+                if (!isSubTypeOf) {
+                    throw IllegalArgumentException(
+                        "$containing is not a sub type of the class/interface that contains `$property` ($declaredIn)"
+                    )
+                }
+                analyze {
+                    buildSubstitutor {
+                        fillInDeepSubstitutor(containing.type, this@buildSubstitutor)
+                    }.let {
+                        // recursively substitute to ensure transitive substitution works.
+                        // should fix in upstream as well.
+                        var result = resolved.type
+                        var cnt = 0
+                        while (it.substitute(result) != result) {
+                            if (cnt > 100) {
+                                throw InternalKSPException(
+                                    message = "Potential infinite loop in type substitution for computeAsMemberOf",
+                                    property.location,
+                                    property.javaClass
+                                )
+                            }
+                            result = it.substitute(result)
+                            cnt += 1
+                        }
+                        KSTypeImpl.getCached(result)
+                    }
+                }
+            } else {
+                return if (resolved.isError) resolved else KSErrorType(resolved.toString())
+            }
+        }
+    }
+
+    @OptIn(KaExperimentalApi::class)
+    internal fun computeAsMemberOf(function: KSFunctionDeclaration, containing: KSType): KSFunction {
+        val propertyDeclaredIn = function.closestClassDeclaration()
+            ?: throw IllegalArgumentException(
+                "Cannot call asMemberOf with a function that is not declared in a class or an interface"
+            )
+        val key = function to containing
+        return functionAsMemberOfCache.getOrPut(key) {
+            if (containing is KSTypeImpl) {
+                recordLookupWithSupertypes(containing.type)
+                recordLookupForPropertyOrMethod(function)
+                val isSubTypeOf = analyze {
+                    (propertyDeclaredIn.asStarProjectedType() as? KSTypeImpl)?.type?.let {
+                        containing.type.isSubtypeOf(it)
+                    } ?: false
+                }
+                if (!isSubTypeOf) {
+                    throw IllegalArgumentException(
+                        "$containing is not a sub type of the class/interface that contains `$function` " +
+                            "($propertyDeclaredIn)"
+                    )
+                }
+                analyze {
+                    buildSubstitutor {
+                        fillInDeepSubstitutor(containing.type, this@buildSubstitutor)
+                    }.let {
+                        // recursively substitute to ensure transitive substitution works.
+                        // should fix in upstream as well.
+                        // for functions we need to test both returnType and value parameters converges.
+                        var funcToSub = (function as KSFunctionDeclarationImpl).ktFunctionSymbol.substitute(it)
+                        var next = funcToSub.substitute(it)
+                        var cnt = 0
+                        while (
+                            funcToSub.returnType != next.returnType ||
+                            funcToSub.valueParameters.zip(next.valueParameters)
+                                .any { it.first.returnType != it.second.returnType } ||
+                            funcToSub.receiverType != next.receiverType
+                        ) {
+                            if (cnt > 100) {
+                                throw InternalKSPException(
+                                    message = "Potential infinite loop in type substitution for computeAsMemberOf",
+                                    function.location,
+                                    function.javaClass
+                                )
+                            }
+                            funcToSub = next
+                            next = funcToSub.substitute(it)
+                            cnt += 1
+                        }
+                        KSFunctionImpl(funcToSub, it)
+                    }
+                }
+            } else KSFunctionErrorImpl(function)
+        }
+    }
+
+    internal val isJvm = ktModule.targetPlatform.all { it is JvmPlatform }
+}
