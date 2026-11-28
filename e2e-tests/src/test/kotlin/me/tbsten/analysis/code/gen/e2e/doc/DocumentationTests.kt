@@ -9,6 +9,7 @@ import io.kotest.matchers.string.shouldContain
 import me.tbsten.analysis.code.gen.e2e.support.SampleEngine
 import me.tbsten.analysis.code.gen.e2e.support.TestReport
 import me.tbsten.analysis.code.gen.e2e.support.copyProject
+import me.tbsten.analysis.code.gen.e2e.support.docsFixtureInitScript
 import me.tbsten.analysis.code.gen.e2e.support.gradleArgs
 import me.tbsten.analysis.code.gen.e2e.support.repoRoot
 import me.tbsten.analysis.code.gen.testfoundation.E2ESpec
@@ -35,7 +36,7 @@ private fun exec(
     return process.exitValue() to output
 }
 
-/** fixtures/docs/<name> を一時ディレクトリに写して Gradle で流す（docs の例は analysisCodeGen の plugin を build/fixture-repo から読む）。 */
+/** fixtures/docs/<name> を一時ディレクトリに写して Gradle で流す（docs の例は analysisCodeGen の plugin を build/fixture-repo から読む。docsFixtureInitScript）。 */
 private fun buildDocsFixture(
     name: String,
     vararg tasks: String,
@@ -47,8 +48,9 @@ private fun buildDocsFixture(
             .create()
             .withProjectDir(
                 dir,
-            ).withArguments(tasks.toList() + gradleArgs(SampleEngine.Native))
-            .forwardOutput()
+            ).withArguments(
+                tasks.toList() + gradleArgs(SampleEngine.Native) + listOf("--init-script", docsFixtureInitScript(dir).absolutePath),
+            ).forwardOutput()
             .build()
     return dir to result
 }
@@ -69,7 +71,7 @@ private fun docsPages(): List<File> =
         }.toList()
 
 class DocumentationUnitTest : UnitSpec({
-    case("DOC-01", "ドキュメントサイトのビルドとリンクチェックが CI で通る", pending = PendingCase(Milestone.M1)) {
+    case("DOC-01", "ドキュメントサイトのビルドとリンクチェックが CI で通る") {
         // サイトのビルド（astro build）は starlight-links-validator でリンク切れを検査し、切れていたら失敗する
         val site = repoRoot.resolve("docs/site")
         val (install, installLog) = exec(site, "npm", "ci")
@@ -119,7 +121,7 @@ class DocumentationUnitTest : UnitSpec({
 })
 
 class DocumentationE2ETest : E2ESpec({
-    case("DOC-02", "Quick start と How to install のコード例が、そのまま E2E テストとしてビルド・実行される", pending = PendingCase(Milestone.M1)) {
+    case("DOC-02", "Quick start と How to install のコード例が、そのまま E2E テストとしてビルド・実行される") {
         snippetsShouldMatch("docs/site/src/content/docs/start/quick-start.mdx", "docs/site/src/content/docs/start/install.mdx")
 
         // Quick start: `:app:run` で挨拶が出て、生成物が expected と同じ（fixtures/docs/quick-start/README.md）

@@ -216,7 +216,7 @@ RW-DAG-N1,E,任意,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.R
 RW-DAG-N2,D,任意,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.rw.RealWorldDiffTest
 RW-ALL-I1,P,M2,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldIncrementalPbtTest
 RW-ALL-P1,B,M2,pending,NotImplemented,2,me.tbsten.analysis.code.gen.e2e.rw.RealWorldBenchTest
-TST-01,E,M1,pending,NotImplemented,2,me.tbsten.analysis.code.gen.enginetests.tst.TestingNativeE2ETest
+TST-01,E,M1,enabled,,2,me.tbsten.analysis.code.gen.enginetests.tst.TestingNativeE2ETest
 TST-02,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
 TST-03,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
 TST-04,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.tst.TestingFrameworkE2ETest
@@ -247,8 +247,8 @@ PERF-07,B,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.perf.Perfo
 PERF-08,B,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.perf.PerformanceBenchTest
 PERF-09,B,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.perf.PerformanceBenchTest
 PERF-10,B,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.perf.PerformanceBenchTest
-DOC-01,U,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.doc.DocumentationUnitTest
-DOC-02,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.doc.DocumentationE2ETest
+DOC-01,U,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.doc.DocumentationUnitTest
+DOC-02,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.doc.DocumentationE2ETest
 DOC-03,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.doc.DocumentationE2ETest
 DOC-04,U,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.doc.DocumentationUnitTest
 DOC-05,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.doc.DocumentationE2ETest

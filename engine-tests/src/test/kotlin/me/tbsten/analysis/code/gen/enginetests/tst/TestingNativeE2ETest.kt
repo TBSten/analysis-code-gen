@@ -7,8 +7,6 @@ import me.tbsten.analysis.code.gen.enginetests.support.processorProvider
 import me.tbsten.analysis.code.gen.processor.AnalysisCodegenRoundContext
 import me.tbsten.analysis.code.gen.processor.Dependencies
 import me.tbsten.analysis.code.gen.testfoundation.E2ESpec
-import me.tbsten.analysis.code.gen.testfoundation.Milestone
-import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import me.tbsten.analysis.code.gen.testing.TestEngine
 import me.tbsten.analysis.code.gen.testing.runCodegenTest
 import org.jetbrains.kotlin.psi.KtClass
@@ -38,7 +36,6 @@ class TestingNativeE2ETest : E2ESpec({
     case(
         "TST-01",
         "ソース文字列を渡して Native Processor を実行し、生成物と診断を取得できる",
-        pending = PendingCase(Milestone.M1),
     ) {
         val result =
             runCodegenTest(TestEngine.AnalysisCodegen) {
@@ -66,7 +63,6 @@ class TestingNativeE2ETest : E2ESpec({
     case(
         "TST-01",
         "ソース文字列を渡して Native Processor を実行し、生成物と診断を取得できる（error ならビルドは失敗）",
-        pending = PendingCase(Milestone.M1),
     ) {
         val result =
             runCodegenTest(TestEngine.AnalysisCodegen) {

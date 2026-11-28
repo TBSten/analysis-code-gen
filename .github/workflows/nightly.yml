@@ -68,6 +68,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      # DOC-01 がテストの中で docs サイトをビルドする（npm ci・astro build、ACG-67）
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - uses: gradle/actions/setup-gradle@v4
       - name: Build and test
         run: ./gradlew build -Pacg.kotlin=${{ matrix.kotlin }} --continue --console=plain
@@ -90,6 +94,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      # DOC-01 がテストの中で docs サイトをビルドする（npm ci・astro build、ACG-67）
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - uses: gradle/actions/setup-gradle@v4
       - name: Build and test
         run: ./gradlew build -Pacg.kotlin=${{ needs.plan.outputs.latest }} --continue --console=plain
@@ -120,6 +128,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      # DOC-01 がテストの中で docs サイトをビルドする（npm ci・astro build、ACG-67）
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - uses: gradle/actions/setup-gradle@v4
       - name: 保留中のケースも実行
         run: |
