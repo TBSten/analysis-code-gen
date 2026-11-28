@@ -48,7 +48,7 @@ private fun acgVersion(): String =
         .trim()
 
 class TestingFrameworkE2ETest : E2ESpec({
-    case("TST-02", "同じ API で KSP Processor（Bridge）もテストできる", pending = PendingCase(Milestone.M1)) {
+    case("TST-02", "同じ API で KSP Processor（Bridge）もテストできる") {
         val k = runCodegenTest(TestEngine.Ksp2) { mapperInput() }
         val b = runCodegenTest(TestEngine.AnalysisCodegen) { mapperInput() }
 
@@ -59,7 +59,7 @@ class TestingFrameworkE2ETest : E2ESpec({
         b.generatedFile("UserMapper.kt") shouldContain "public object UserMapper"
     }
 
-    case("TST-03", "生成物をコンパイルし、生成クラスを読み込んで実行できる", pending = PendingCase(Milestone.M1)) {
+    case("TST-03", "生成物をコンパイルし、生成クラスを読み込んで実行できる") {
         val result = runCodegenTest(TestEngine.AnalysisCodegen) { mapperInput() }
 
         val mapper = result.loadClass("fixture.UserMapper")
