@@ -1,0 +1,153 @@
+/*
+ * Copyright 2022 Google LLC
+ * Copyright 2010-2022 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+// Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSTypeReferenceResolvedImpl.kt
+// Modified-By: analysis-code-gen contributors, 2026
+// Modifications: パッケージ名のみ変更
+
+package me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.resolved
+
+import me.tbsten.analysis.code.gen.ksp.bridge.common.IdKeyTriple
+import me.tbsten.analysis.code.gen.ksp.bridge.common.KSObjectCache
+import me.tbsten.analysis.code.gen.ksp.bridge.common.lazyMemoizedSequence
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.recordLookup
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.Deferrable
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSClassDeclarationImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSTypeImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSTypeParameterImpl
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.Restorable
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.annotations
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.render
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.toClassifierReference
+import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.toLocation
+import com.google.devtools.ksp.symbol.*
+import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiTypeParameter
+import com.intellij.psi.impl.source.PsiClassReferenceType
+import org.jetbrains.kotlin.analysis.api.annotations.KaAnnotation
+import org.jetbrains.kotlin.analysis.api.types.*
+import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.psi.KtTypeParameter
+
+/**
+ * A resolved [KSTypeReference] backed directly by an already resolved Analysis API [KaType],
+ * rather than an unresolved syntax tree node ([KtTypeReference][org.jetbrains.kotlin.psi.KtTypeReference]).
+ *
+ * @param ktType The underlying resolved Analysis API type representing this reference.
+ * @param parent The parent AST node enclosing this type reference (e.g., class, function, property, type parameter, or type argument).
+ * @param index The 0-based positional index of this type reference within a list of references on the [parent]
+ * (e.g., supertypes or type parameter bounds), used to pinpoint the exact source location. Defaults to -1 when not applicable.
+ * @param additionalAnnotations Additional annotations to include on this type reference beyond what is
+ * directly attached to [ktType] (e.g., annotations on an extension receiver such as `fun @Anno Receiver.foo()`).
+ */
+class KSTypeReferenceResolvedImpl private constructor(
+    private val ktType: KaType,
+    override val parent: KSNode?,
+    private val index: Int,
+    private val additionalAnnotations: List<KaAnnotation>
+) : KSTypeReference, Deferrable {
+
+    companion object : KSObjectCache<IdKeyTriple<KaType, KSNode?, Int>, KSTypeReference>() {
+
+        /**
+         * Returns a cached [KSTypeReference] for the given resolved [KaType].
+         *
+         * @param type The underlying resolved Analysis API type representing this reference.
+         * @param parent The parent AST node enclosing this type reference (e.g., class, function, property, type parameter, or type argument).
+         * @param index The 0-based positional index of this type reference within a list of references on the [parent]
+         * (e.g., supertypes or type parameter bounds), used to pinpoint the exact source location. Defaults to -1 when not applicable.
+         * @param additionalAnnotations Additional annotations to include on this type reference beyond what is
+         * directly attached to [type] (e.g., annotations on an extension receiver such as `fun @Anno Receiver.foo()`).
+         */
+        fun getCached(
+            type: KaType,
+            parent: KSNode? = null,
+            index: Int = -1,
+            additionalAnnotations: List<KaAnnotation> = emptyList()
+        ): KSTypeReference =
+            cache.getOrPut(IdKeyTriple(type, parent, index)) {
+                KSTypeReferenceResolvedImpl(type, parent, index, additionalAnnotations)
+            }
+    }
+
+    override val element: KSReferenceElement? by lazy {
+        // FIXME: synthetic elements can have non-synthetic annotations via use-site targets
+        if (parent == null || parent.origin == Origin.SYNTHETIC) {
+            null
+        } else {
+            ktType.toClassifierReference(this)
+        }
+    }
+
+    override fun resolve(): KSType {
+        recordLookup(ktType, parent)
+        return KSTypeImpl.getCached(ktType)
+    }
+
+    override val annotations: Sequence<KSAnnotation> by lazyMemoizedSequence {
+        ktType.annotations(this) +
+            additionalAnnotations.asSequence().map { KSAnnotationResolvedImpl.getCached(it, this, origin) }
+    }
+
+    override val origin: Origin = parent?.origin ?: Origin.SYNTHETIC
+
+    override val location: Location by lazy {
+        if (index <= -1) {
+            parent?.location ?: NonExistLocation
+        } else {
+            when (parent) {
+                is KSClassDeclarationImpl -> {
+                    when (val psi = parent.ktClassOrObjectSymbol.psi) {
+                        is KtClassOrObject -> psi.superTypeListEntries[index].toLocation()
+                        is PsiClass -> (psi as? PsiClassReferenceType)?.reference?.toLocation() ?: NonExistLocation
+                        else -> NonExistLocation
+                    }
+                }
+
+                is KSTypeParameterImpl -> {
+                    when (val psi = parent.ktTypeParameterSymbol.psi) {
+                        is KtTypeParameter -> parent.location
+                        is PsiTypeParameter -> (psi.extendsListTypes[index] as? PsiClassReferenceType)
+                            ?.reference?.toLocation() ?: NonExistLocation
+
+                        else -> NonExistLocation
+                    }
+                }
+
+                else -> NonExistLocation
+            }
+        }
+    }
+
+    override fun <D, R> accept(visitor: KSVisitor<D, R>, data: D): R {
+        return visitor.visitTypeReference(this, data)
+    }
+
+    override val modifiers: Set<Modifier>
+        get() = if (ktType is KaFunctionType && ktType.isSuspend) {
+            setOf(Modifier.SUSPEND)
+        } else {
+            emptySet()
+        }
+
+    override fun toString(): String {
+        return ktType.abbreviationOrSelf.render()
+    }
+
+    override fun defer(): Restorable? {
+        TODO("Not yet implemented")
+    }
+}
