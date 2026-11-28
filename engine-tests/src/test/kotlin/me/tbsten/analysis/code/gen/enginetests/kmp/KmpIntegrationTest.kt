@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 
 // 5.2 KMP の整合性（KMP）のうち I のケース。commonMain ← jvmMain の 2 段を runCodegenTest の SourceSet で組む（TST-04）
 class KmpIntegrationTest : IntegrationSpec({
-    case("KMP-09", "jvmMain の実行で、commonMain の宣言は visibleFiles に入り ownFiles には入らない", PendingCase(Milestone.M1)) {
+    case("KMP-09", "jvmMain の実行で、commonMain の宣言は visibleFiles に入り ownFiles には入らない") {
         var own: List<String>? = null
         var visible: List<String>? = null
         var all: List<String>? = null
