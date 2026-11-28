@@ -9,6 +9,8 @@ dependencies {
     api(project(":analysis-code-gen-processor-api"))
     api(project(":analysis-code-gen-testing-kct"))
     implementation(project(":analysis-code-gen-processing-engine"))
+    // ksp(provider) を Bridge で回す（ADR-017・050）。エンジンは ServiceLoader で Frontend を見つける
+    runtimeOnly(project(":analysis-code-gen-ksp-bridge"))
     // TestKit は利用者のビルドが持っているものを使う（Maven に公開されていないため compileOnly）
     compileOnly(gradleTestKit())
 
