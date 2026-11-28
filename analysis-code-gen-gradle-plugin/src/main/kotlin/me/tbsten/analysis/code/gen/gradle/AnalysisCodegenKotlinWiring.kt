@@ -13,6 +13,8 @@ import me.tbsten.analysis.code.gen.model.SourceSetModel
 import me.tbsten.analysis.code.gen.model.UnitKind
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.file.Directory
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
@@ -51,6 +53,10 @@ internal class AnalysisCodegenKotlinWiring(
     /** SourceSet 名 → その SourceSet 単位のタスク（上流の生成物をたどるため）。 */
     private val sourceSetUnits = mutableMapOf<String, TaskProvider<AnalysisCodegenTask>>()
 
+    /** Android の Variant 名 → その Variant のソースディレクトリ（AGP の Variant API から集める。GRD-12）。 */
+    private val androidVariantSources = mutableMapOf<String, AndroidVariantSources>()
+    private var androidVariantsHooked = false
+
     private val generatedRoot get() = project.layout.buildDirectory.dir("generated/analysisCodeGen")
 
     fun wire(kotlin: KotlinProjectExtension) {
@@ -64,6 +70,9 @@ internal class AnalysisCodegenKotlinWiring(
             addProcessorDependencies(configuration, extension.sourceSets.getByName(sourceSet.name))
             if (sourceSet.name == "main" || sourceSet.name == "commonMain") configuration.extendsFrom(root)
             whenEvaluated { registerSourceSetUnit(sourceSet, configuration) }
+        }
+        listOf("com.android.application", "com.android.library").forEach { id ->
+            project.pluginManager.withPlugin(id) { collectAndroidVariantSources() }
         }
         // KMP のターゲットは kotlin { jvm() } を評価するときに増えるので、今あるものではなく all で受ける
         allTargets { target ->
@@ -149,19 +158,22 @@ internal class AnalysisCodegenKotlinWiring(
                 configureCommon(t, name, outputRel, "sourceSets/$name", configuration, spec)
                 configureAnalysis(t, compilation, ownSourceSet = name)
                 t.modelSkeleton.set(
-                    skeleton(
-                        unit = name,
-                        kind = UnitKind.SourceSet,
-                        compilation = compilation,
-                        scope =
-                            when (spec.processingScope.value.getOrElse(ProcessingScope.Own)) {
-                                ProcessingScope.Own -> ProcessingScopeModel.Own
-                                ProcessingScope.IncludeDependsOn -> ProcessingScopeModel.IncludeDependsOn
-                            },
-                        outputRel = outputRel,
-                        workRel = "sourceSets/$name",
-                        ownSourceSet = name,
-                    ),
+                    // Android の Variant のソースは AGP が Variant を作ってから分かるので、遅らせて組み立てる
+                    project.provider {
+                        skeleton(
+                            unit = name,
+                            kind = UnitKind.SourceSet,
+                            compilation = compilation,
+                            scope =
+                                when (spec.processingScope.value.getOrElse(ProcessingScope.Own)) {
+                                    ProcessingScope.Own -> ProcessingScopeModel.Own
+                                    ProcessingScope.IncludeDependsOn -> ProcessingScopeModel.IncludeDependsOn
+                                },
+                            outputRel = outputRel,
+                            workRel = "sourceSets/$name",
+                            ownSourceSet = name,
+                        )
+                    },
                 )
             }
         sourceSetUnits[name] = task
@@ -216,15 +228,18 @@ internal class AnalysisCodegenKotlinWiring(
                 configureCommon(t, unitName, outputRel, "compilations/$unitName", configuration, spec)
                 configureAnalysis(t, compilation, ownSourceSet = null)
                 t.modelSkeleton.set(
-                    skeleton(
-                        unit = unitName,
-                        kind = UnitKind.Compilation,
-                        compilation = compilation,
-                        scope = ProcessingScopeModel.Own,
-                        outputRel = outputRel,
-                        workRel = "compilations/$unitName",
-                        ownSourceSet = null,
-                    ),
+                    // Android の Variant のソースは AGP が Variant を作ってから分かるので、遅らせて組み立てる
+                    project.provider {
+                        skeleton(
+                            unit = unitName,
+                            kind = UnitKind.Compilation,
+                            compilation = compilation,
+                            scope = ProcessingScopeModel.Own,
+                            outputRel = outputRel,
+                            workRel = "compilations/$unitName",
+                            ownSourceSet = null,
+                        )
+                    },
                 )
             }
         // 生成物はこの Compilation のコンパイルタスクだけが読む。SourceSet に足すと、同じ SourceSet を含むほかの Compilation にも漏れる（KMP-13）
@@ -296,13 +311,16 @@ internal class AnalysisCodegenKotlinWiring(
         val closure = compilation.allKotlinSourceSets
         val dirs = closure.flatMap { kotlinRoots(it) + javaRoots(it) }.distinct()
         t.sources.from(project.files(dirs).asFileTree.matching { it.include("**/*.kt", "**/*.java") })
+        androidVariantSources[compilation.name]?.takeIf { compilation.platformType == KotlinPlatformType.androidJvm }?.let { android ->
+            t.sources.from(project.files(android.all).asFileTree.matching { it.include("**/*.kt", "**/*.java") })
+        }
         closure
             .filter { it.name != ownSourceSet }
             .mapNotNull { sourceSetUnits[it.name] }
             .forEach { upstream ->
                 t.upstreamGenerated.from(upstream.flatMap { it.kotlinOutputDir }, upstream.flatMap { it.javaOutputDir })
             }
-        t.compileClasspath.from(compilation.compileDependencyFiles)
+        t.compileClasspath.from(compileDependencies(compilation))
         t.compileClasspath.from(androidBootClasspath(compilation))
         t.friendPaths.from(compilation.associatedCompilations.map { it.output.classesDirs })
         jvmLauncher(compilation)?.let(t.javaLauncher::convention)
@@ -317,6 +335,21 @@ internal class AnalysisCodegenKotlinWiring(
         val toolchains = project.extensions.findByType(JavaToolchainService::class.java) ?: return null
         val java = project.extensions.findByType(JavaPluginExtension::class.java)
         return if (java != null) toolchains.launcherFor(java.toolchain) else toolchains.launcherFor { }
+    }
+
+    /**
+     * Compilation のコンパイルクラスパス。Android は依存のモジュールが AAR・クラスの JAR など複数の形を出すので、
+     * Configuration をそのまま解決すると形を選べずに失敗する。AGP のコンパイルと同じくクラスの JAR（`android-classes-jar`）を選ぶ（GRD-12）
+     */
+    private fun compileDependencies(compilation: KotlinCompilation<*>): FileCollection {
+        if (compilation.platformType != KotlinPlatformType.androidJvm) return compilation.compileDependencyFiles
+        val configuration =
+            project.configurations.findByName(compilation.compileDependencyConfigurationName)
+                ?: return compilation.compileDependencyFiles
+        return configuration.incoming
+            .artifactView { view ->
+                view.attributes { it.attribute(ARTIFACT_TYPE, "android-classes-jar") }
+            }.files
     }
 
     /**
@@ -347,7 +380,7 @@ internal class AnalysisCodegenKotlinWiring(
     ): String {
         val compilationName = AnalysisCodegenNaming.compilationUnitName(compilation.target.targetNameForModel(), compilation.name)
         val sourceSets =
-            compilation.allKotlinSourceSets.sortedBy { it.name }.map { s ->
+            androidSourceSetModel(compilation)?.let(::listOf) ?: compilation.allKotlinSourceSets.sortedBy { it.name }.map { s ->
                 val javaRoots = javaRoots(s)
                 SourceSetModel(
                     name = s.name,
@@ -371,7 +404,7 @@ internal class AnalysisCodegenKotlinWiring(
                 compilationName = compilation.name,
                 platform = compilation.platformType.toModel(),
                 defaultSourceSet = compilation.defaultSourceSet.name,
-                sourceSets = compilation.allKotlinSourceSets.map { it.name }.sorted(),
+                sourceSets = sourceSets.map { it.name }.sorted(),
                 classpath = emptyList(),
                 friendPaths = emptyList(),
                 jdkHome = null,
@@ -451,6 +484,75 @@ internal class AnalysisCodegenKotlinWiring(
     /** 自分たちの生成物（`build/generated/analysisCodeGen`）は SourceSet のソースとして数えない（GRD-03）。 */
     private fun isGenerated(dir: File): Boolean = dir.startsWith(generatedRoot.get().asFile)
 
+    // --- Android（AGP の組み込み Kotlin）---
+
+    /**
+     * AGP の Variant API（`androidComponents.onVariants`）から Variant ごとのソースディレクトリを集める（GRD-12）。
+     * AGP 9 の組み込み Kotlin では KGP の KotlinSourceSet にソースディレクトリが入らず、AGP の DSL からも読めないため。
+     * AGP の API には依存せず、リフレクションで読む（ADR-063）。
+     */
+    private fun collectAndroidVariantSources() {
+        if (androidVariantsHooked) return
+        val components = project.extensions.findByName("androidComponents") ?: return
+        androidVariantsHooked = true
+        runCatching {
+            val selector = components.javaClass.getMethod("selector").invoke(components)
+            val all = selector.javaClass.getMethod("all").invoke(selector)
+            val onVariants =
+                components.javaClass.methods.first {
+                    it.name == "onVariants" && it.parameterCount == 2 && it.parameterTypes[1] == Function1::class.java
+                }
+            val callback: (Any) -> Unit = { variant -> recordAndroidVariant(variant) }
+            onVariants.invoke(components, all, callback)
+        }.onFailure { e ->
+            project.logger.warn("analysisCodeGen: Android の Variant のソースを読めなかった（${e.javaClass.simpleName}: ${e.message}）")
+        }
+    }
+
+    private fun recordAndroidVariant(variant: Any) {
+        val name = variant.javaClass.getMethod("getName").invoke(variant) as String
+        val sources = variant.javaClass.getMethod("getSources").invoke(variant)
+
+        fun staticDirs(getter: String): Provider<List<File>> {
+            val flat = sources.javaClass.getMethod(getter).invoke(sources) ?: return project.provider { emptyList() }
+            // AGP の版で Provider<List<Directory>> と Provider<List<Collection<Directory>>> のどちらも返るので、入れ子をたどって集める
+            val static = flat.javaClass.getMethod("getStatic").invoke(flat) as Provider<*>
+            return static.map { value -> directories(value).filterNot(::isGenerated).distinct().sorted() }
+        }
+        androidVariantSources[name] = AndroidVariantSources(kotlin = staticDirs("getKotlin"), java = staticDirs("getJava"))
+    }
+
+    private fun directories(value: Any?): List<File> =
+        when (value) {
+            is Directory -> listOf(value.asFile)
+            is File -> listOf(value)
+            is Iterable<*> -> value.flatMap(::directories)
+            else -> emptyList()
+        }
+
+    /** Android の Compilation は Variant のソースをまとめて 1 つの SourceSet として渡す。 */
+    private fun androidSourceSetModel(compilation: KotlinCompilation<*>): SourceSetModel? {
+        if (compilation.platformType != KotlinPlatformType.androidJvm) return null
+        val android = androidVariantSources[compilation.name] ?: return null
+        val java = android.java.get()
+        val kotlinDirs = android.kotlin.get() - java.toSet()
+        return SourceSetModel(
+            name = compilation.defaultSourceSet.name,
+            platform = platformOf(compilation.defaultSourceSet, compilation),
+            kotlinSourceRoots = kotlinDirs.map(::rel),
+            javaSourceRoots = java.map(::rel),
+            dependsOn = emptyList(),
+            upstreamGeneratedRoots = emptyList(),
+        )
+    }
+
+    private class AndroidVariantSources(
+        val kotlin: Provider<List<File>>,
+        val java: Provider<List<File>>,
+    ) {
+        val all: Provider<List<File>> = kotlin.zip(java) { k, j -> (k + j).distinct() }
+    }
+
     private fun kotlinRoots(sourceSet: KotlinSourceSet): List<File> =
         sourceSet.kotlin.srcDirs
             .filterNot(::isGenerated)
@@ -477,6 +579,7 @@ internal class AnalysisCodegenKotlinWiring(
 
     companion object {
         private const val ROOT_CONFIGURATION = "analysisCodeGen"
+        private val ARTIFACT_TYPE: Attribute<String> = Attribute.of("artifactType", String::class.java)
 
         /** プロジェクトに Kotlin の拡張（`kotlin { }`）があれば配線して返す。無ければ null。 */
         fun wireIfKotlin(
