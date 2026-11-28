@@ -209,12 +209,24 @@ internal class UnitRun(
                     componentName = component.coordinates,
                 )
             try {
-                processors += chosen.create(component, environment)
+                processors += chosen.create(component, environment).map(::withUniqueName)
             } catch (f: ProcessorFailure) {
                 diagnostics.exception(f.processorName, f.phase, f)
             } catch (t: Throwable) {
                 diagnostics.exception(component.coordinates, "Processor の作成", t)
             }
+        }
+    }
+
+    /**
+     * 同じクラスの Processor が 2 つ以上あると、出力の持ち主（TRM-03）や診断で区別できない。2 つ目以降は名前に `#n` を足す。
+     */
+    private fun withUniqueName(processor: EngineProcessor): EngineProcessor {
+        val count = processors.count { it.name == processor.name || it.name.startsWith("${processor.name}#") }
+        if (count == 0) return processor
+        val unique = "${processor.name}#${count + 1}"
+        return object : EngineProcessor by processor {
+            override val name: String = unique
         }
     }
 

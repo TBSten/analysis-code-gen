@@ -1,14 +1,17 @@
 package me.tbsten.analysis.code.gen.gradle
 
+import org.gradle.api.GradleException
 import org.gradle.api.Named
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 
 /**
  * SourceSet / Compilation ごとの設定の共通部分（ADR-016）。
  *
- * - [processor] はその実行単位の Configuration（`analysisCodeGen<Name>` など）に依存を足す
+ * - [processor] はその実行単位の Configuration（`analysisCodeGen<Name>SourceSet` など）に依存を足す
  * - 同じキーに違う値の [arg] が 2 回書かれたら設定エラー
  */
 public interface AnalysisCodegenUnitSpec : Named {
@@ -23,27 +26,46 @@ public interface AnalysisCodegenUnitSpec : Named {
     )
 }
 
-public abstract class AnalysisCodegenSourceSetSpec : AnalysisCodegenUnitSpec {
+/**
+ * [AnalysisCodegenUnitSpec] の実装の共通部分。
+ *
+ * [processor] の記法は [processorNotations] に溜め、plugin が実行単位の Configuration へ遅延で足す。
+ * `all { }` と個別の指定はどちらが先に適用されるか決まらないため、同じキーに違う値が来たら順番によらずエラーにする（ADR-016）。
+ */
+public abstract class AnalysisCodegenUnitSpecBase : AnalysisCodegenUnitSpec {
+    /** [processor] で渡された記法。plugin が `dependencies.create` に渡す。 */
+    @get:Internal
+    public abstract val processorNotations: ListProperty<Any>
+
+    private val written = mutableMapOf<String, String>()
+
+    override fun processor(dependencyNotation: Any) {
+        processorNotations.add(dependencyNotation)
+    }
+
+    override fun arg(
+        key: String,
+        value: String,
+    ) {
+        val previous = written[key]
+        if (previous != null && previous != value) {
+            throw GradleException(
+                "analysisCodeGen: 実行単位 '${getName()}' のオプション '$key' に違う値（'$previous' と '$value'）が指定された。" +
+                    "all { } と個別の指定で同じキーを書くときは同じ値にする（ADR-016）",
+            )
+        }
+        written[key] = value
+        args.put(key, value)
+    }
+}
+
+public abstract class AnalysisCodegenSourceSetSpec : AnalysisCodegenUnitSpecBase() {
     /** 処理対象の広さ。既定は自分の SourceSet だけで、`processingScope.includeDependsOn()` で上流も含める。 */
     @get:Nested
     public abstract val processingScope: ProcessingScopeSpec
-
-    override fun processor(dependencyNotation: Any): Unit = TODO()
-
-    override fun arg(
-        key: String,
-        value: String,
-    ): Unit = TODO()
 }
 
-public abstract class AnalysisCodegenCompilationSpec : AnalysisCodegenUnitSpec {
-    override fun processor(dependencyNotation: Any): Unit = TODO()
-
-    override fun arg(
-        key: String,
-        value: String,
-    ): Unit = TODO()
-}
+public abstract class AnalysisCodegenCompilationSpec : AnalysisCodegenUnitSpecBase()
 
 /**
  * SourceSet の処理対象の広さを選ぶ DSL（`processingScope.includeDependsOn()`）。

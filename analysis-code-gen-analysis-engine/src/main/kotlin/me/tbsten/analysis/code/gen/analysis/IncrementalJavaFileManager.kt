@@ -1,0 +1,184 @@
+/*
+ * Copyright Google LLC and the KSP authors
+ * （上流のファイルにヘッダが無いため、google/ksp の LICENSE に基づき追記）
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+// Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/IncrementalJavaFileManager.kt
+// Modified-By: analysis-code-gen contributors, 2026
+// Modifications: ktlint で整形。パッケージ名を変更し internal にした
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+
+package me.tbsten.analysis.code.gen.analysis
+
+import com.intellij.core.CorePackageIndex
+import com.intellij.openapi.roots.PackageIndex
+import com.intellij.psi.PsiJavaFile
+import com.intellij.psi.impl.file.impl.JavaFileManager
+import com.intellij.psi.search.ProjectScope
+import org.jetbrains.kotlin.analysis.api.projectStructure.KaModule
+import org.jetbrains.kotlin.analysis.api.standalone.base.declarations.KotlinStandaloneJvmDependenciesIndex
+import org.jetbrains.kotlin.analysis.api.standalone.base.projectStructure.StandaloneProjectFactory
+import org.jetbrains.kotlin.cli.create
+import org.jetbrains.kotlin.cli.jvm.compiler.JvmPackagePartProvider
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCliJavaFileManagerImpl
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreProjectEnvironment
+import org.jetbrains.kotlin.cli.jvm.compiler.computeDefaultRootModules
+import org.jetbrains.kotlin.cli.jvm.compiler.getJavaModuleRoots
+import org.jetbrains.kotlin.cli.jvm.index.JavaRoot
+import org.jetbrains.kotlin.cli.jvm.index.JvmDependenciesDynamicCompoundIndex
+import org.jetbrains.kotlin.cli.jvm.index.SingleJavaFileRootsIndex
+import org.jetbrains.kotlin.cli.jvm.modules.CliJavaModuleFinder
+import org.jetbrains.kotlin.cli.jvm.modules.JavaModuleGraph
+import org.jetbrains.kotlin.config.ApiVersion
+import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.LanguageVersion
+import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
+
+internal class IncrementalJavaFileManager(
+    val environment: KotlinCoreProjectEnvironment,
+    val rootsIndex: JvmDependenciesDynamicCompoundIndex,
+) {
+    lateinit var packagePartProviders: List<JvmPackagePartProvider>
+    val singleJavaFileRoots = mutableListOf<JavaRoot>()
+
+    fun initialize(
+        modules: List<KaModule>,
+        sourceFiles: Set<PsiJavaFile>,
+    ) {
+        val project = environment.project
+        val javaFileManager = project.getService(JavaFileManager::class.java) as KotlinCliJavaFileManagerImpl
+        val compilerConfiguration = CompilerConfiguration.create()
+        val javaModuleFinder = CliJavaModuleFinder(null, compilerConfiguration, javaFileManager, project, null)
+        val javaModuleGraph = JavaModuleGraph(javaModuleFinder)
+        // StandaloneProjectFactory.findJvmRootsForJavaFiles resolves the package root directories
+        // for each PsiJavaFile (e.g., `/src/main/java` for `package com.example;` in
+        // `/src/main/java/com/example/Foo.java`) so that JvmDependenciesIndex, JavaFileManager,
+        // and PackageIndex can resolve Java packages and package-info.java annotations for source
+        // files.
+        val allSourceFileRoots =
+            StandaloneProjectFactory.findJvmRootsForJavaFiles(sourceFiles.toList()).map {
+                JavaRoot(it.virtualFile, JavaRoot.RootType.SOURCE)
+            }
+        val jdkRoots = getDefaultJdkModuleRoots(javaModuleFinder, javaModuleGraph)
+        val libraryRoots = StandaloneProjectFactory.getAllBinaryRoots(modules, environment.environment)
+
+        val roots =
+            buildList {
+                addAll(libraryRoots)
+                addAll(allSourceFileRoots)
+                addAll(jdkRoots)
+            }
+
+        singleJavaFileRoots.addAll(
+            sourceFiles.map { JavaRoot(it.virtualFile, JavaRoot.RootType.SOURCE) },
+        )
+
+        rootsIndex.apply {
+            addIndex(KotlinStandaloneJvmDependenciesIndex(roots))
+        }
+
+        val corePackageIndex = project.getService(PackageIndex::class.java) as CorePackageIndex
+        roots.forEach { javaRoot ->
+            if (javaRoot.file.isDirectory) {
+                if (javaRoot.type == JavaRoot.RootType.SOURCE) {
+                    // NB: [JavaCoreProjectEnvironment#addSourcesToClasspath] calls:
+                    //   1) [CoreJavaFileManager#addToClasspath], which is used to look up Java roots;
+                    //   2) [CorePackageIndex#addToClasspath], which populates [PackageIndex]; and
+                    //   3) [FileIndexFacade#addLibraryRoot], which conflicts with this SOURCE root when generating a library scope.
+                    // Thus, here we manually call first two, which are used to:
+                    //   1) create [PsiPackage] as a package resolution result; and
+                    //   2) find directories by package name.
+                    // With both supports, annotations defined in package-info.java can be properly propagated.
+                    javaFileManager.addToClasspath(javaRoot.file)
+                    corePackageIndex.addToClasspath(javaRoot.file)
+                } else {
+                    environment.addSourcesToClasspath(javaRoot.file)
+                }
+            }
+        }
+
+        packagePartProviders =
+            listOf(
+                StandaloneProjectFactory
+                    .createPackagePartsProvider(
+                        libraryRoots + jdkRoots,
+                        LanguageVersionSettingsImpl(LanguageVersion.LATEST_STABLE, ApiVersion.LATEST),
+                    ).invoke(ProjectScope.getLibrariesScope(project)),
+            )
+
+        javaFileManager.initialize(
+            rootsIndex,
+            packagePartProviders,
+            SingleJavaFileRootsIndex(singleJavaFileRoots),
+            true,
+            null,
+        )
+    }
+
+    fun add(sourceFiles: Set<PsiJavaFile>) {
+        val project = environment.project
+        val javaFileManager = project.getService(JavaFileManager::class.java) as KotlinCliJavaFileManagerImpl
+        // StandaloneProjectFactory.findJvmRootsForJavaFiles resolves the package root directories
+        // for each PsiJavaFile (e.g., `/src/main/java` for `package com.example;` in
+        // `/src/main/java/com/example/Foo.java`) so that JvmDependenciesIndex, JavaFileManager,
+        // and PackageIndex can resolve Java packages and package-info.java annotations for source
+        // files.
+        val roots =
+            StandaloneProjectFactory.findJvmRootsForJavaFiles(sourceFiles.toList()).map {
+                JavaRoot(it.virtualFile, JavaRoot.RootType.SOURCE)
+            }
+
+        singleJavaFileRoots.addAll(
+            sourceFiles.map { JavaRoot(it.virtualFile, JavaRoot.RootType.SOURCE) },
+        )
+
+        rootsIndex.apply {
+            addIndex(KotlinStandaloneJvmDependenciesIndex(roots))
+        }
+
+        val corePackageIndex = project.getService(PackageIndex::class.java) as CorePackageIndex
+        roots.forEach { javaRoot ->
+            if (javaRoot.file.isDirectory) {
+                if (javaRoot.type == JavaRoot.RootType.SOURCE) {
+                    // NB: [JavaCoreProjectEnvironment#addSourcesToClasspath] calls:
+                    //   1) [CoreJavaFileManager#addToClasspath], which is used to look up Java roots;
+                    //   2) [CorePackageIndex#addToClasspath], which populates [PackageIndex]; and
+                    //   3) [FileIndexFacade#addLibraryRoot], which conflicts with this SOURCE root when generating a library scope.
+                    // Thus, here we manually call first two, which are used to:
+                    //   1) create [PsiPackage] as a package resolution result; and
+                    //   2) find directories by package name.
+                    // With both supports, annotations defined in package-info.java can be properly propagated.
+                    javaFileManager.addToClasspath(javaRoot.file)
+                    corePackageIndex.addToClasspath(javaRoot.file)
+                } else {
+                    environment.addSourcesToClasspath(javaRoot.file)
+                }
+            }
+        }
+
+        javaFileManager.initialize(
+            rootsIndex,
+            packagePartProviders,
+            SingleJavaFileRootsIndex(singleJavaFileRoots),
+            true,
+            null,
+        )
+    }
+}
+
+private fun getDefaultJdkModuleRoots(
+    javaModuleFinder: CliJavaModuleFinder,
+    javaModuleGraph: JavaModuleGraph,
+): List<JavaRoot> {
+    // In contrast to `ClasspathRootsResolver.addModularRoots`, we do not need to handle automatic Java modules because JDK modules
+    // aren't automatic.
+    return javaModuleGraph.getAllDependencies(javaModuleFinder.computeDefaultRootModules()).flatMap { moduleName ->
+        val module = javaModuleFinder.findModule(moduleName) ?: return@flatMap emptyList<JavaRoot>()
+        val result = module.getJavaModuleRoots()
+        result
+    }
+}

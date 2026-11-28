@@ -21,7 +21,6 @@ import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import me.tbsten.analysis.code.gen.testfoundation.UnitSpec
 import org.jetbrains.kotlin.platform.jvm.isJvm
 
-private val M1 = PendingCase(Milestone.M1)
 private val M2 = PendingCase(Milestone.M2)
 
 /** serviceJar の META-INF/services に書いて ServiceLoader で探させる Provider（API-01）。 */
@@ -33,7 +32,7 @@ class ServiceLoadedProvider : AnalysisCodegenProcessorProvider by generateOncePr
 
 // 5.3 Native Processor API（API）のうち I のケース。エンジンを同じプロセスで動かし、Processor が見たものを記録して確かめる
 class NativeApiIntegrationTest : IntegrationSpec({
-    case("API-01", "ServiceLoader で AnalysisCodegenProcessorProvider が見つかり、Processor が生成される", M1) {
+    case("API-01", "ServiceLoader で AnalysisCodegenProcessorProvider が見つかり、Processor が生成される") {
         // Processor の JAR（component）の META-INF/services にだけ書いた Provider を、エンジンが ServiceLoader で探す
         val jar = serviceJar(mapOf(NATIVE_SERVICE to listOf(ServiceLoadedProvider::class.java.name)))
         val result =
@@ -45,7 +44,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
         result.generatedFile("FromServiceLoader.kt") shouldContain "object FromServiceLoader"
     }
 
-    case("API-02", "複数の Processor が同じラウンドで全部実行される", M1) {
+    case("API-02", "複数の Processor が同じラウンドで全部実行される") {
         val calls = mutableListOf<Pair<String, Int>>()
         val result =
             runNative {
@@ -56,7 +55,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
         calls.filter { it.second == 1 }.map { it.first }.sorted() shouldBe listOf("p1", "p2", "p3")
     }
 
-    case("API-03", "オプションが Provider と RoundContext に渡る", M1) {
+    case("API-03", "オプションが Provider と RoundContext に渡る") {
         var fromEnv: Map<String, String>? = null
         var fromRound: Map<String, String>? = null
         runNative {
@@ -71,7 +70,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
         fromRound shouldBe fromEnv
     }
 
-    case("API-05", "CodeGenerator で Kotlin・Java・リソース（META-INF/services など）を生成でき、パッケージとパスが一致する", M1) {
+    case("API-05", "CodeGenerator で Kotlin・Java・リソース（META-INF/services など）を生成でき、パッケージとパスが一致する") {
         val result =
             runNative {
                 kotlin("a/A.kt", "package a\nclass A")
@@ -91,7 +90,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
         result.loadClass("x.y.J").simpleName shouldBe "J"
     }
 
-    case("API-07", "RoundContext の round / allFiles / newFiles / changedFiles が定義どおりの集合になる", M1) {
+    case("API-07", "RoundContext の round / allFiles / newFiles / changedFiles が定義どおりの集合になる") {
         data class Seen(val round: Int, val all: List<String>, val new: List<String>, val changed: List<String>, val removed: Set<String>)
         val seen = mutableListOf<Seen>()
         runNative {
@@ -111,7 +110,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
         seen.size shouldBe 2
     }
 
-    case("API-08", "SourceSetContext の name / platform / ownFiles / visibleFiles / dependencies / module が正しい", M1) {
+    case("API-08", "SourceSetContext の name / platform / ownFiles / visibleFiles / dependencies / module が正しい") {
         data class Seen(
             val name: String,
             val jvm: Boolean,
@@ -147,7 +146,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
         seen.first() shouldBe Seen("jvmMain", true, listOf("J.kt"), listOf("C.kt", "J.kt"), listOf("commonMain"), "jvmMain")
     }
 
-    case("API-09", "finish() は全ラウンド後に 1 回だけ、onError() はエラー時だけ呼ばれる", M1) {
+    case("API-09", "finish() は全ラウンド後に 1 回だけ、onError() はエラー時だけ呼ばれる") {
         val okEvents = mutableListOf<String>()
         runNative {
             kotlin("a/A.kt", "package a\nclass A")
@@ -192,7 +191,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
         result.generatedFiles.keys.shouldBeEmpty()
     }
 
-    case("API-11", "Provider や Processor が例外を投げたら、Processor 名とスタックトレース付きでビルドが失敗する", M1) {
+    case("API-11", "Provider や Processor が例外を投げたら、Processor 名とスタックトレース付きでビルドが失敗する") {
         val fromProcess =
             runNative {
                 kotlin("a/A.kt", "package a\nclass A")
@@ -213,7 +212,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
         fromProvider.messages shouldContain "from create"
     }
 
-    case("API-12", "Processor インスタンスが実行単位の間で同じもの（ラウンドごとに作り直されない）", M1) {
+    case("API-12", "Processor インスタンスが実行単位の間で同じもの（ラウンドごとに作り直されない）") {
         var creates = 0
         val instances = mutableSetOf<Int>()
         runNative {
@@ -241,7 +240,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
         instances.size shouldBe 1
     }
 
-    case("API-14", "Native と KSP の Provider を両方含む JAR で、ADR で決めた規則どおりに片方だけ実行される（二重実行しない）", M2) {
+    case("API-14", "Native と KSP の Provider を両方含む JAR で、ADR で決めた規則どおりに片方だけ実行される（二重実行しない）") {
         // ADR-050: KSP の Provider しか無い component は Bridge を自動で有効にして KSP として動かす（plugin は 1 つ）。
         // ADR-017: 同じ component に Native の Provider があれば Native だけを使い、KSP の Provider は使わず info を出す
         val jar =
@@ -264,7 +263,7 @@ class NativeApiIntegrationTest : IntegrationSpec({
 
 // 5.3 のうち U のケース。CodeGenerator の実装は公開 API 越しにしか触れないため、エンジンを通して呼び出し時の振る舞いを見る
 class NativeApiUnitTest : UnitSpec({
-    case("API-06", "出力ルートの外（../、絶対パス）への書き込みが拒否される", M1) {
+    case("API-06", "出力ルートの外（../、絶対パス）への書き込みが拒否される") {
         val thrown = mutableListOf<Throwable>()
         runNative {
             kotlin("a/A.kt", "package a\nclass A")
@@ -284,7 +283,7 @@ class NativeApiUnitTest : UnitSpec({
         thrown.size shouldBe 3
     }
 
-    case("API-13", "生成ファイルの文字コードが UTF-8、改行が LF に固定される", M1) {
+    case("API-13", "生成ファイルの文字コードが UTF-8、改行が LF に固定される") {
         val result =
             runNative {
                 kotlin("a/A.kt", "package a\nclass A")

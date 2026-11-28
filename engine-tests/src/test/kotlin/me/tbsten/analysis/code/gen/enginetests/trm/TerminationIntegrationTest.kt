@@ -8,15 +8,11 @@ import me.tbsten.analysis.code.gen.enginetests.support.runNative
 import me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorProvider
 import me.tbsten.analysis.code.gen.processor.Dependencies
 import me.tbsten.analysis.code.gen.testfoundation.IntegrationSpec
-import me.tbsten.analysis.code.gen.testfoundation.Milestone
-import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import org.jetbrains.kotlin.analysis.api.analyze
 import org.jetbrains.kotlin.analysis.api.symbols.KaSymbol
 import org.jetbrains.kotlin.analysis.api.symbols.pointers.KaSymbolPointer
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
-
-private val M1 = PendingCase(Milestone.M1)
 
 /** 毎ラウンド新しいファイルを作り続ける（TRM-01）。 */
 class InfiniteProvider : AnalysisCodegenProcessorProvider by processorProvider(process = { ctx ->
@@ -47,7 +43,7 @@ private fun writer(
 
 // 5.7 停止と出力の検証（TRM）のうち I のケース（ADR-014 の表）
 class TerminationIntegrationTest : IntegrationSpec({
-    case("TRM-01", "毎ラウンド新しいファイルを作り続ける Processor を最大ラウンド数で止め、Processor 名とラウンド数を診断に出す", M1) {
+    case("TRM-01", "毎ラウンド新しいファイルを作り続ける Processor を最大ラウンド数で止め、Processor 名とラウンド数を診断に出す") {
         val result =
             runNative {
                 kotlin("a/A.kt", "package a\nclass A")
@@ -61,7 +57,7 @@ class TerminationIntegrationTest : IntegrationSpec({
         message shouldContain "inf/Gen10.kt"
     }
 
-    case("TRM-02", "同じ deferred が進まずに繰り返されたら止めて診断する", M1) {
+    case("TRM-02", "同じ deferred が進まずに繰り返されたら止めて診断する") {
         // 進捗（新しいファイル）があるあいだは maxRounds まで進み、そこで deferred の一覧付きで止まる。
         // 新しいファイルが無くなって deferred だけが残った場合は DEF-04
         val result =
@@ -77,7 +73,7 @@ class TerminationIntegrationTest : IntegrationSpec({
         message shouldContain "8"
     }
 
-    case("TRM-03", "異なる Processor が同じ出力先に書いたらエラー", M1) {
+    case("TRM-03", "異なる Processor が同じ出力先に書いたらエラー") {
         val sameRound =
             runNative {
                 kotlin("a/A.kt", "package a\nclass A")
@@ -107,7 +103,7 @@ class TerminationIntegrationTest : IntegrationSpec({
         laterRound.errors.single().message shouldContain "kotlin/same/Same.kt"
     }
 
-    case("TRM-04", "同じ Processor が同じファイルを 2 回作ったらエラー（KSP 互換モードでは KSP と同じ例外）", M1) {
+    case("TRM-04", "同じ Processor が同じファイルを 2 回作ったらエラー（KSP 互換モードでは KSP と同じ例外）") {
         val result =
             runNative {
                 kotlin("a/A.kt", "package a\nclass A")
@@ -127,7 +123,7 @@ class TerminationIntegrationTest : IntegrationSpec({
         DuplicateKspProvider.secondCallThrew shouldBe true
     }
 
-    case("TRM-05", "内容が同じ再生成を進捗として数えない（それだけで次のラウンドに進まない）", PendingCase(Milestone.M2)) {
+    case("TRM-05", "内容が同じ再生成を進捗として数えない（それだけで次のラウンドに進まない）") {
         val rounds = mutableListOf<Int>()
         val result =
             runNative {
@@ -145,7 +141,7 @@ class TerminationIntegrationTest : IntegrationSpec({
         result.diagnostics.any { it.message.contains("kotlin/same/Same.kt") } shouldBe true
     }
 
-    case("TRM-06", "他の SourceSet の出力ディレクトリや上流の生成物への書き込みを拒否する", M1) {
+    case("TRM-06", "他の SourceSet の出力ディレクトリや上流の生成物への書き込みを拒否する") {
         val thrown = mutableListOf<String>()
         runNative {
             sourceSet("commonMain") { kotlin("c/C.kt", "package c\nclass C") }

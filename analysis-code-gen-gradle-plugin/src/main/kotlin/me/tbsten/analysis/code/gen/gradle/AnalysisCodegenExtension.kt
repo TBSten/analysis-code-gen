@@ -39,7 +39,9 @@ public abstract class AnalysisCodegenExtension
         public fun arg(
             key: String,
             value: String,
-        ): Unit = TODO()
+        ) {
+            args.put(key, value)
+        }
 
         @get:Nested
         public abstract val worker: WorkerSpec
@@ -52,22 +54,87 @@ public abstract class AnalysisCodegenExtension
         @get:Nested
         public abstract val kspBridge: KspBridgeSpec
 
-        public fun kspBridge(action: Action<in KspBridgeSpec>): Unit = TODO()
+        public fun kspBridge(action: Action<in KspBridgeSpec>) {
+            action.execute(kspBridge)
+        }
 
-        public fun worker(action: Action<in WorkerSpec>): Unit = TODO()
+        public fun worker(action: Action<in WorkerSpec>) {
+            action.execute(worker)
+        }
 
-        /** Kotlin の SourceSet を遅延で写したもの。Android（AGP 単体）の SourceSet は含まない。 */
-        public val sourceSets: NamedDomainObjectContainer<AnalysisCodegenSourceSetSpec> =
-            objects.domainObjectContainer(AnalysisCodegenSourceSetSpec::class.java)
+        /**
+         * Kotlin の SourceSet を遅延で写したもの。Android（AGP 単体）の SourceSet は含まない。
+         * `commonMain { }` などよく使う名前は、Kotlin の SourceSet がまだ作られていなくても書けるようメンバーで持つ（ADR-063）。
+         */
+        public val sourceSets: AnalysisCodegenSourceSets =
+            AnalysisCodegenSourceSets(objects.domainObjectContainer(AnalysisCodegenSourceSetSpec::class.java))
 
-        public fun sourceSets(action: Action<in NamedDomainObjectContainer<AnalysisCodegenSourceSetSpec>>): Unit = TODO()
+        public fun sourceSets(action: Action<in AnalysisCodegenSourceSets>) {
+            action.execute(sourceSets)
+        }
 
         /** Compilation（`<target><Compilation>`、Android は Variant）を遅延で写したもの。 */
         public val compilations: NamedDomainObjectContainer<AnalysisCodegenCompilationSpec> =
             objects.domainObjectContainer(AnalysisCodegenCompilationSpec::class.java)
 
-        public fun compilations(action: Action<in NamedDomainObjectContainer<AnalysisCodegenCompilationSpec>>): Unit = TODO()
+        public fun compilations(action: Action<in NamedDomainObjectContainer<AnalysisCodegenCompilationSpec>>) {
+            action.execute(compilations)
+        }
+
+        init {
+            maxRounds.convention(DEFAULT_MAX_ROUNDS)
+            unresolvedDeferred.convention(DeferredSeverity.Error)
+            worker.isolation.convention(WorkerIsolation.ClassLoader)
+            kspBridge.processingMode.convention(KspProcessingMode.Compatible)
+            kspBridge.kspVersionCheck.convention(true)
+        }
+
+        private companion object {
+            const val DEFAULT_MAX_ROUNDS = 100
+        }
     }
+
+/**
+ * `analysisCodeGen { sourceSets { } }` の入れ物。
+ *
+ * Kotlin DSL は、plugins { } を適用し終えた時点で存在する要素にしか `jvmMain { }` のような accessor を作らない。
+ * KMP の `jvmMain` などは `kotlin { jvm() }` を評価してから作られるので、よく使う名前はメンバー関数で受ける（ADR-063）。
+ * それ以外の名前は `named("x") { }`、`maybeCreate("x")`、`"x" { }` で書ける。
+ */
+public class AnalysisCodegenSourceSets internal constructor(
+    private val delegate: NamedDomainObjectContainer<AnalysisCodegenSourceSetSpec>,
+) : NamedDomainObjectContainer<AnalysisCodegenSourceSetSpec> by delegate {
+    private fun spec(
+        name: String,
+        action: Action<in AnalysisCodegenSourceSetSpec>,
+    ): AnalysisCodegenSourceSetSpec = maybeCreate(name).also(action::execute)
+
+    public fun main(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("main", action)
+
+    public fun test(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("test", action)
+
+    public fun commonMain(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("commonMain", action)
+
+    public fun commonTest(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("commonTest", action)
+
+    public fun jvmMain(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("jvmMain", action)
+
+    public fun jvmTest(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("jvmTest", action)
+
+    public fun androidMain(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("androidMain", action)
+
+    public fun jsMain(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("jsMain", action)
+
+    public fun wasmJsMain(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("wasmJsMain", action)
+
+    public fun nativeMain(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("nativeMain", action)
+
+    public fun appleMain(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("appleMain", action)
+
+    public fun iosMain(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("iosMain", action)
+
+    public fun linuxX64Main(action: Action<in AnalysisCodegenSourceSetSpec>): AnalysisCodegenSourceSetSpec = spec("linuxX64Main", action)
+}
 
 public enum class DeferredSeverity { Error, Warning }
 

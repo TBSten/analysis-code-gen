@@ -15,11 +15,19 @@ dependencies {
 // 対象は acg.fixture-publish を適用したモジュール
 tasks.register("publishFixtureDeps") {
     group = "fixtures"
-    description = "フィクスチャが使うテスト用 Processor と Gradle plugin を build/fixture-repo に publish する"
+    description = "フィクスチャが使うテスト用 Processor・Gradle plugin・エンジンを build/fixture-repo に publish する"
     dependsOn(
         listOf(
             ":analysis-code-gen-project-model",
             ":analysis-code-gen-gradle-plugin",
+            // Worker が解決するエンジン一式（ADR-063）。plugin は自分と同じ版の analysis-code-gen-processing-engine を取りに行く
+            ":analysis-code-gen-processor-api",
+            ":analysis-code-gen-engine-spi",
+            ":analysis-code-gen-analysis-engine",
+            ":analysis-code-gen-incremental-engine",
+            ":analysis-code-gen-processing-engine",
+            ":analysis-code-gen-ksp-bridge-api",
+            ":analysis-code-gen-ksp-bridge",
             ":test-processors:core",
             ":test-processors:ksp",
             ":test-processors:native",
