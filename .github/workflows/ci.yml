@@ -85,6 +85,10 @@ jobs:
           java-version: |
             17
             21
+      # DOC-01 がテストの中で docs サイトをビルドする（npm ci・astro build、ACG-67）
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - uses: gradle/actions/setup-gradle@v4
       # ケース ID 整合チェック（:quality:checkCaseIds、ADR-030、build に含む）の比較元を refs/acg/case-base に取る（ADR-045）
       # - PR: 最新の main。main への push: push 前の main（github.event.before）。走行中に main が進んでも比較元は動かない

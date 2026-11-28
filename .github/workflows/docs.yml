@@ -1,5 +1,5 @@
 # ドキュメントサイトのビルド・リンクチェック・GitHub Pages へのデプロイ（ADR-026）
-#   - サイト: docs/ 配下で "astro" に依存する package.json のあるディレクトリ（ACG-47）。無ければ飛ばす
+#   - サイト: docs/site（ACG-47）。無ければ飛ばす
 #   - API: build-logic などに Dokka が入っていれば ./gradlew dokkaGenerate の出力を <サイト>/api/ に置く
 #   - リンク: 生成物の内部リンクを lychee で検査（外部リンクは見ない。結果がぶれないように）
 #   - デプロイ: main への push だけ。リポジトリで Pages（Source: GitHub Actions）が有効なときだけ（.github/CI.md）
@@ -32,7 +32,8 @@ jobs:
       - id: detect
         name: サイトと Dokka の有無
         run: |
-          site=$(grep -l '"astro"' docs/package.json docs/*/package.json 2>/dev/null | head -1 | xargs -r dirname)
+          # サイトは docs/site（ACG-47・ADR-031）。DOC-01 はこの workflow が PR ごとに docs/site を npm run build することを確かめる
+          site=$(test -f docs/site/package.json && echo docs/site)
           echo "site=$site" >> "$GITHUB_OUTPUT"
           if grep -rqs --include='*.gradle.kts' --include='*.toml' -i 'dokka' build-logic gradle *.gradle.kts */build.gradle.kts; then
             echo "dokka=true" >> "$GITHUB_OUTPUT"
