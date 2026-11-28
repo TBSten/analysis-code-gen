@@ -151,7 +151,10 @@ private fun DeclarationContainerScope.engineGroup() = "Engine".group {
         "ラウンド制御（processing-engine）を知らない".ktFileContent {
             `package`(matchingDirectory)
             fileAnnotation("OptIn")
+            // KSP2 から写した環境構築は AA の internal を使う（INVISIBLE_REFERENCE の抑止。ADR-060）
+            fileAnnotation("Suppress")
             `import`("java.io.**")
+            `import`("java.nio.**")
             `import`(KOTLIN_COMPILER)
             `import`(INTELLIJ)
             `import`("me.tbsten.analysis.code.gen.processor.**")
@@ -159,6 +162,10 @@ private fun DeclarationContainerScope.engineGroup() = "Engine".group {
             `import`("me.tbsten.analysis.code.gen.analysis.**")
             allow(anythingElse)
         }
+    }
+    "AnalysisEngineCoroutinesShim".role {
+        summary = "IntelliJ Platform が JetBrains 版 kotlinx-coroutines にだけある前提で呼ぶクラスの代替（ADR-060）"
+        layout { "analysis-code-gen-analysis-engine/src/main/kotlin/kotlinx/coroutines/internal/intellij" / "IntellijCoroutines".ktFile() }
     }
     "IncrementalEngine".role {
         summary = "依存グラフ・入力スナップショット・dirty 計算（ADR-015）"
