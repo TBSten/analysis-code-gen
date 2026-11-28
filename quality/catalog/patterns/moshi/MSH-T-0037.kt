@@ -5,7 +5,8 @@
 // TAGS: moshi.shape=default-values, moshi.shape=inheritance
 // ORIGIN: test:square/moshi@7f957b18ea12/kotlin/tests/codegen-only/src/test/kotlin/com/squareup/moshi/kotlin/codegen/CompileOnlyTests.kt#DataClassInModuleB
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: rejected
+// NOTE: K（KSP2 2.3.14）: K でビルドが失敗した: DataClassInModuleB.kt:9: Unresolved reference 'AbstractClassInModuleA'.
 // FILE: DataClassInModuleB.kt
 package com.squareup.moshi.kotlin.codegen
 

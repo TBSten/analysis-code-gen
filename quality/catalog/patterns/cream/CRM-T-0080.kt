@@ -6,7 +6,7 @@
 // TAGS: cream.family=valueClassMapping
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/CombineMappingSnapshotTest/All patterns/option=(autoValueClassMapping=true)/13--valueClassMapping/unwrapFromSecondarySource.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Mapping.kt
 package me.tbsten.cream.generated
 

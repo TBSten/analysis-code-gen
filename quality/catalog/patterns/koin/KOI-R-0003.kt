@@ -5,8 +5,8 @@
 // OPTIONS: KOIN_CONFIG_CHECK=true, KOIN_LOG_TIMES=true
 // ORIGIN: real:kotzilla-io/nowinandroid_koin_annotations@6f0e1d2d8880/feature/topic/src/main/kotlin/com/google/samples/apps/nowinandroid/feature/topic/TopicViewModel.kt
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: Unresolved reference 'androidx'.
 // FILE: topic/main/com/google/samples/apps/nowinandroid/feature/topic/TopicViewModel.kt
 /*
  * Copyright 2021 The Android Open Source Project

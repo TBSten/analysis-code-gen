@@ -5,7 +5,7 @@
 // TAGS: moshi.shape=default-values, moshi.shape=generic-class, moshi.shape=inheritance, moshi.shape=nullable-props
 // ORIGIN: test:square/moshi@7f957b18ea12/kotlin/tests/codegen-only/src/test/kotlin/com/squareup/moshi/kotlin/codegen/ComplexGenericsInheritanceTest.kt#Layer4
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Layer4.kt
 package com.squareup.moshi.kotlin.codegen
 

@@ -3,7 +3,7 @@
 // PROCESSORS: *
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: api/main/com/example/bg/modules/api/Repository.kt
 package com.example.bg.modules.api
 

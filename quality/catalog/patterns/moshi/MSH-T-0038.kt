@@ -5,7 +5,7 @@
 // TAGS: moshi.shape=default-values, moshi.shape=inheritance
 // ORIGIN: test:square/moshi@7f957b18ea12/kotlin/tests/codegen-only/src/test/kotlin/com/squareup/moshi/kotlin/codegen/ComplexGenericsInheritanceTest.kt#Person
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Person.kt
 package com.squareup.moshi.kotlin.codegen
 

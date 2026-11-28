@@ -6,7 +6,7 @@
 // OPTIONS: cream.copyFunNamingStrategy=full-name, cream.notCopyToObject=true, cream.defaultVisibility=INTERNAL, cream.autoValueClassMapping=true
 // TAGS: cream.family=options
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/cream/options/Cart.kt
 package com.example.cream.options
 

@@ -3,7 +3,7 @@
 // PROCESSORS: *
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/bg/annotations/Annotations.kt
 package com.example.bg.annotations
 

@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:ZacSweers/CatchUp@b0873380ad4a/services/uplabs/src/main/kotlin/catchup/service/uplabs/model/UplabsModels.kt
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: verified
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので
 // FILE: uplabs/main/catchup/service/uplabs/model/UplabsModels.kt
 /*
  * Copyright (C) 2026. Zac Sweers

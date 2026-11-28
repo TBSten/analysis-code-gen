@@ -3,7 +3,7 @@
 // PROCESSORS: moshi
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: core/main/com/example/moshi/core/Money.kt
 package com.example.moshi.core
 

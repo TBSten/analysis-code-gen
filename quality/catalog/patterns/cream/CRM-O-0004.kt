@@ -3,7 +3,7 @@
 // PROCESSORS: cream
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // NOTE: cream.kt は外部の利用プロジェクトが無いので、典型的な使い方を自作で補う（ADR-020）
 // FILE: main/com/example/cream/mvi/Order.kt
 package com.example.cream.mvi
@@ -38,6 +38,6 @@ package com.example.cream.mvi
 
 fun reduce(state: OrderUiState, loaded: Order?): OrderUiState =
     when {
-        loaded != null -> state.copyToOrderUiStateLoaded(order = loaded)
+        loaded != null -> state.copyToOrderUiStateLoaded(order = loaded, editing = false)
         else -> state.copyToOrderUiStateFailed(message = "not found")
     }

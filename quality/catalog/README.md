@@ -53,7 +53,9 @@ package com.example.app
 ```sh
 python3 quality/catalog/scripts/catalog.py check              # 形式・ID・必須の網羅・生成物が最新か（CI）
 python3 quality/catalog/scripts/catalog.py index              # index.json・coverage.md・THIRD_PARTY.md を作り直す
-python3 quality/catalog/scripts/catalog.py import-all ~/.cache/acg-catalog   # 固定コミットを取得して ①② を取り込み直す
+python3 quality/catalog/scripts/catalog.py import-all ~/.cache/acg-catalog   # 固定コミットを取得して ①② を取り込み直す（中身が同じなら K の判定を引き継ぐ）
+./gradlew :e2e-tests:verifyCatalog -Pacg.catalog.out=/tmp/k.tsv            # 全パターンを K（KSP2）で動かす（ADR-072）
+python3 quality/catalog/scripts/catalog.py apply-k /tmp/k.tsv                 # 判定を STATUS・NOTE に書く
 ```
 
 ③ を足すときは、`coverage.md` の「薄いところ」や ⚠️ の値を見て、その値を含む最小のパターンを書き、`index` を実行してコミットする。

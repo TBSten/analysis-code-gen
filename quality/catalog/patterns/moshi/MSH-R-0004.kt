@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:simpledotorg/simple-android@482bb8c9bcdd/app/src/main/java/org/simple/clinic/patient/onlinelookup/api/RetentionType.kt
 // LICENSE: MIT
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: verified
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので
 // FILE: app/main/org/simple/clinic/patient/onlinelookup/api/RetentionType.kt
 package org.simple.clinic.patient.onlinelookup.api
 

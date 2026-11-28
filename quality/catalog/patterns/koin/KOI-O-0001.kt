@@ -5,7 +5,7 @@
 // OPTIONS: KOIN_DEFAULT_MODULE=true
 // TAGS: koin.module=default-module
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/defaultmodule/Services.kt
 package com.example.defaultmodule
 

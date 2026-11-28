@@ -6,8 +6,8 @@
 // TAGS: koin.other=cycle
 // ORIGIN: test:InsertKoinIO/koin-annotations@1d4c1af21faa/examples/cycle-module
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: サンプルのモジュール丸ごと（テストソースは除く）
+// STATUS: rejected
+// NOTE: サンプルのモジュール丸ごと（テストソースは除く） K（KSP2 2.3.14）: K でビルドが失敗した: ---> Cycle detected: org.koin.example.cycle.CycleA -> org.koin.example.cycle.CycleB -> org.koin.example.cycle.CycleC -> org.koin.example.cycle.CycleA
 // FILE: main/org/koin/example/cycle/Cycle.kt
 package org.koin.example.cycle
 

@@ -5,7 +5,7 @@
 // TAGS: cream.family=useCase
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/CopyMappingSnapshotTest/UseCase/GetItemApiResponse Item to domain Item mapping.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: ItemMapping.kt
 package me.tbsten.cream.generated
 

@@ -4,7 +4,7 @@
 // EXPECT: ok
 // OPTIONS: KOIN_GENERATION_PACKAGE=com.example.generated.di
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/genpackage/Module.kt
 package com.example.genpackage
 

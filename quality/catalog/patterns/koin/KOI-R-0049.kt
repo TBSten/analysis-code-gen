@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:MythicDrops/MythicDrops@b4ee6c605f64/spigot/src/main/kotlin/com/tealcube/minecraft/bukkit/mythicdrops/errors/MythicLoadingErrorManager.kt
 // LICENSE: MIT
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: Unresolved reference 'api'.
 // FILE: spigot/main/com/tealcube/minecraft/bukkit/mythicdrops/errors/MythicLoadingErrorManager.kt
 /*
  * This file is part of MythicDrops, licensed under the MIT License.

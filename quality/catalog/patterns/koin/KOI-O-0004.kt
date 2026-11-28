@@ -6,7 +6,7 @@
 // OPTIONS: KOIN_CONFIG_CHECK=true
 // TAGS: koin.other=config-check-error
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/configcheck/App.kt
 package com.example.configcheck
 

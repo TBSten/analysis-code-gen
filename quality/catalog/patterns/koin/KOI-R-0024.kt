@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:msimonides/homerplayer2@ec5f4317b5fb/app/src/main/java/com/studio4plus/homerplayer2/app/AppModule.kt
 // LICENSE: MIT
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: Unresolved reference 'android'.
 // FILE: app/main/com/studio4plus/homerplayer2/app/AppModule.kt
 /*
  * MIT License

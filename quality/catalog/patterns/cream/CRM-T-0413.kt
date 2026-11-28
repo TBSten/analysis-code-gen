@@ -6,7 +6,7 @@
 // TAGS: cream.family=invalidUsage
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/MultipleDiagnosticsTest/reportsEveryMisuseInOneRound.output.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: NotSealedForChildren.kt
 package multi.diag
 

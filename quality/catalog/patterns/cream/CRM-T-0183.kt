@@ -7,7 +7,7 @@
 // TAGS: cream.family=targetKind
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/CopyFromSnapshotTest/All patterns/option=(prefix=to, escapeDot=replace-to-underscore)/01--targetKind/annotationClassTarget.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Target.kt
 package me.tbsten.cream.generated
 

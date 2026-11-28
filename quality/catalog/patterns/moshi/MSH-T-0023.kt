@@ -5,7 +5,8 @@
 // EXPECT_MESSAGE: JsonQualifier @UpperCase must have RUNTIME retention
 // ORIGIN: test:square/moshi@7f957b18ea12/moshi-kotlin-codegen/src/test/java/com/squareup/moshi/kotlin/codegen/ksp/JsonClassSymbolProcessorTest.kt#nonRuntimeQualifier
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: rejected
+// NOTE: K（KSP2 2.3.14）: K の失敗の文言に EXPECT_MESSAGE が無い: Error preparing ClassWithQualifier: jdk.proxy1/jdk.proxy1.$Proxy42.value(Unknown Source) com.squareup.moshi.kotlin.codegen.ksp.MoshiApiUtilKt.generator(MoshiApiUtil.kt:77) com.squareup.moshi.kotlin.codegen.ksp.JsonClassSymbolProcessor.adapterGenerator(JsonClassSymbolProcessorProvider.kt:122) com.squareup.moshi.kotlin.codegen.ksp.JsonClassSymbolProcessor.process(JsonCl
 // FILE: source.kt
 package test
 import com.squareup.moshi.JsonClass

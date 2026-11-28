@@ -5,7 +5,7 @@
 // TAGS: moshi.shape=default-values
 // ORIGIN: test:square/moshi@7f957b18ea12/kotlin/tests/codegen-only/src/test/kotlin/com/squareup/moshi/kotlin/codegen/LooksLikeAClass/ClassInPackageThatLooksLikeAClass.kt#ClassInPackageThatLooksLikeAClass
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: ClassInPackageThatLooksLikeAClass.kt
 package com.squareup.moshi.kotlin.codegen.LooksLikeAClass
 

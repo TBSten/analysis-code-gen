@@ -6,7 +6,8 @@
 // TAGS: cream.family=options
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/OptionsDiagnosticTest/invalidDefaultVisibility.output.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: rejected
+// NOTE: K（KSP2 2.3.14）: K でビルドが通った（EXPECT: error）
 // FILE: Source.kt
 package options.diag
 

@@ -5,8 +5,8 @@
 // OPTIONS: KOIN_CONFIG_CHECK=true
 // ORIGIN: real:kotzilla-io/nowinandroid_koin_annotations@6f0e1d2d8880/app/src/main/kotlin/com/google/samples/apps/nowinandroid/di/AppModule.kt
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: Unresolved reference 'MainActivityViewModel'.
 // FILE: app/main/com/google/samples/apps/nowinandroid/di/AppModule.kt
 /*
  * Copyright 2025 The Android Open Source Project

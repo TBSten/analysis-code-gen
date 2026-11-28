@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:simpledotorg/simple-android@482bb8c9bcdd/app/src/main/java/org/simple/clinic/questionnaireresponse/sync/QuestionnaireResponsePayload.kt
 // LICENSE: MIT
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: QuestionnaireResponsePayload.kt:42: Unresolved reference 'SyncStatus'.
 // FILE: app/main/org/simple/clinic/questionnaireresponse/sync/QuestionnaireResponsePayload.kt
 package org.simple.clinic.questionnaireresponse.sync
 
