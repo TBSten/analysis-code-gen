@@ -189,8 +189,8 @@ private fun DeclarationContainerScope.engineGroup() = "Engine".group {
         }
     }
     "KspBridge".role {
-        summary = "KSP API の AA 実装（KSP2 から移植）と Processor Adapter（ADR-017、ADR-018）"
-        layout { mainKotlin("analysis-code-gen-ksp-bridge", "ksp/bridge") / "**" / "*".ktFile() }
+        summary = "KSP の Processor をエンジンのラウンドで回す Adapter（Frontend・CodeGenerator・Logger の橋渡し、ADR-017、ADR-062）"
+        layout { mainKotlin("analysis-code-gen-ksp-bridge", "ksp/bridge") / "{Ksp,Bridge}*".ktFile() }
         "エンジンとは engine-spi だけでやり取りする（ADR-012）".ktFileContent {
             `package`(matchingDirectory)
             fileAnnotation("OptIn")
@@ -202,6 +202,37 @@ private fun DeclarationContainerScope.engineGroup() = "Engine".group {
             `import`("me.tbsten.analysis.code.gen.engine.spi.**")
             `import`("me.tbsten.analysis.code.gen.ksp.**")
             allow(anythingElse)
+        }
+    }
+    "KspBridgePorted".role {
+        summary = "KSP2 から写した KSP API の AA 実装（Resolver・KS*・増分の土台、ADR-018、ADR-062）。上流との差分を小さく保つ"
+        documented = false
+        layout {
+            mainKotlin("analysis-code-gen-ksp-bridge", "ksp/bridge") / "{common,impl}" / "**" / "*".ktFile()
+            mainKotlin("analysis-code-gen-ksp-bridge", "ksp/bridge") / "InternalKSPException".ktFile()
+        }
+        portedFromHeader()
+        "エンジンとは engine-spi だけでやり取りする（ADR-012）。上流の書き方（JDK・kotlinx.serialization）はそのまま".ktFileContent {
+            `package`(matchingDirectory)
+            fileAnnotation("OptIn")
+            fileAnnotation("Suppress")
+            `import`("java.**")
+            `import`("kotlin.**")
+            `import`("kotlinx.serialization.**")
+            `import`("com.google.devtools.ksp.**")
+            `import`(KOTLIN_COMPILER)
+            `import`(INTELLIJ)
+            `import`("org.jetbrains.org.objectweb.asm.**")
+            `import`("me.tbsten.analysis.code.gen.ksp.bridge.**")
+            allow(anythingElse)
+        }
+    }
+    "KspBridgeServiceRegistration".role {
+        summary = "KSP の Frontend をエンジンの ServiceLoader に登録するファイル（ADR-017）"
+        documented = false
+        layout {
+            "analysis-code-gen-ksp-bridge/src/main/resources/META-INF/services" /
+                "me.tbsten.analysis.code.gen.engine.spi.ProcessorFrontend".file()
         }
     }
     "Cli".role {

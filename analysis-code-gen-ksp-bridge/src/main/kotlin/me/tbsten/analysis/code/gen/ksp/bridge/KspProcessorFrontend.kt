@@ -2,6 +2,7 @@
 
 package me.tbsten.analysis.code.gen.ksp.bridge
 
+import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import me.tbsten.analysis.code.gen.engine.spi.EngineProcessor
 import me.tbsten.analysis.code.gen.engine.spi.EngineProcessorEnvironment
 import me.tbsten.analysis.code.gen.engine.spi.ProcessorComponent
@@ -17,12 +18,15 @@ import me.tbsten.analysis.code.gen.processor.InternalAnalysisCodegenApi
 public class KspProcessorFrontend : ProcessorFrontend {
     override val id: String = "ksp"
 
-    override fun canHandle(component: ProcessorComponent): Boolean = TODO()
+    override fun canHandle(component: ProcessorComponent): Boolean = component.hasService(KSP_PROVIDER_SERVICE)
 
     override fun create(
         component: ProcessorComponent,
         environment: EngineProcessorEnvironment,
-    ): List<EngineProcessor> = TODO()
+    ): List<EngineProcessor> =
+        component
+            .loadServices(SymbolProcessorProvider::class.java)
+            .map { provider -> KspEngineProcessor(provider, environment) }
 
     public companion object {
         public const val KSP_PROVIDER_SERVICE: String =
