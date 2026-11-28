@@ -16,7 +16,7 @@
  */
 // Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/util.kt
 // Modified-By: analysis-code-gen contributors, 2026
-// Modifications: パッケージ名のみ変更
+// Modifications: パッケージ名を変更。toLocation の PsiDocumentManager を KSPCoreEnvironment ではなく Project から取る（AA 環境は analysis-engine が持つため）
 
 @file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 
@@ -25,7 +25,6 @@ package me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin
 import me.tbsten.analysis.code.gen.ksp.bridge.InternalKSPException
 import me.tbsten.analysis.code.gen.ksp.bridge.common.impl.KSNameImpl
 import com.google.devtools.ksp.containingFile
-import me.tbsten.analysis.code.gen.ksp.bridge.impl.KSPCoreEnvironment
 import me.tbsten.analysis.code.gen.ksp.bridge.impl.ResolverAAImpl
 import me.tbsten.analysis.code.gen.ksp.bridge.impl.recordClassReferenceLookup
 import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.resolved.KSAnnotationResolvedImpl
@@ -55,6 +54,7 @@ import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.symbol.NonExistLocation
 import com.google.devtools.ksp.symbol.Origin
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.impl.compiled.ClsMemberImpl
@@ -318,7 +318,7 @@ internal fun PsiElement?.toLocation(): Location {
         return NonExistLocation
     }
     val file = this.containingFile
-    val document = KSPCoreEnvironment.instance.psiDocumentManager.getDocument(file) ?: return NonExistLocation
+    val document = PsiDocumentManager.getInstance(file.project).getDocument(file) ?: return NonExistLocation
     return FileLocation(file.virtualFile.path, document.getLineNumber(this.textOffset) + 1)
 }
 

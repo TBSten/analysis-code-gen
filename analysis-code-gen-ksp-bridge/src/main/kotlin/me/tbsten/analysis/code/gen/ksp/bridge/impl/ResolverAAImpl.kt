@@ -16,7 +16,7 @@
  */
 // Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/ResolverAAImpl.kt
 // Modified-By: analysis-code-gen contributors, 2026
-// Modifications: パッケージ名のみ変更
+// Modifications: パッケージ名を変更。AA 2.4.21 で mapToJvmType().descriptor が使えないため拡張関数 mapToJvmTypeDescriptor() に置き換えた
 @file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 
 package me.tbsten.analysis.code.gen.ksp.bridge.impl
@@ -122,6 +122,7 @@ import com.intellij.psi.impl.file.impl.JavaFileManager
 import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
 import org.jetbrains.kotlin.analysis.api.KaImplementationDetail
 import org.jetbrains.kotlin.analysis.api.components.buildSubstitutor
+import org.jetbrains.kotlin.analysis.api.components.mapToJvmTypeDescriptor
 import org.jetbrains.kotlin.analysis.api.fir.symbols.KaFirSymbol
 import org.jetbrains.kotlin.analysis.api.fir.types.KaFirType
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaSourceModule
@@ -870,7 +871,7 @@ class ResolverAAImpl(
     internal fun mapToJvmSignatureInternal(ksAnnotated: KSAnnotated): String? {
         fun KaType.toSignature(): String {
             return analyze {
-                this@toSignature.mapToJvmType().descriptor.let {
+                this@toSignature.mapToJvmTypeDescriptor().let {
                     when (it) {
                         "Ljava.lang.Void;" -> "Ljava/lang/Void;"
                         "Lkotlin/Unit;" -> "V"

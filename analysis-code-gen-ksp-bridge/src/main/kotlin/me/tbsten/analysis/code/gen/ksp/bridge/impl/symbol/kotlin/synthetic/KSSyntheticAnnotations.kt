@@ -8,7 +8,7 @@
  */
 // Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/synthetic/KSSyntheticAnnotations.kt
 // Modified-By: analysis-code-gen contributors, 2026
-// Modifications: パッケージ名のみ変更
+// Modifications: パッケージ名を変更。AA 2.4.21 の KaAnnotationImpl の引数に合わせた
 package me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.synthetic
 
 import me.tbsten.analysis.code.gen.ksp.bridge.impl.ResolverAAImpl
@@ -21,7 +21,6 @@ import org.jetbrains.kotlin.name.ClassId
 @OptIn(KaImplementationDetail::class, KaPlatformInterface::class)
 fun getExtensionFunctionTypeAnnotation() = KaAnnotationImpl(
     ClassId.fromString(ExtensionFunctionType::class.qualifiedName!!),
-    null,
     null,
     lazyOf(emptyList()),
     null,
