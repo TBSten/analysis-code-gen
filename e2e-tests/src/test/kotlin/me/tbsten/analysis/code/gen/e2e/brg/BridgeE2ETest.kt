@@ -128,7 +128,7 @@ class BridgeE2ETest : E2ESpec({
         create shouldContain "\"tp.processors\":\"Probe\""
     }
 
-    case("BRG-14", "KSP の Processor が無いプロジェクト（Bridge が有効にならない）の依存に KSP API が含まれない", pending = PendingCase(Milestone.M1)) {
+    case("BRG-14", "KSP の Processor が無いプロジェクト（Bridge が有効にならない）の依存に KSP API が含まれない") {
         val fixture = acg45Project(Acg45Engine.Native) { kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A")) }
         // ビルドスクリプトの classpath と、全 Configuration の依存
         val result = fixture.build("buildEnvironment", "dependencies", codegenTask(Acg45Engine.Native))

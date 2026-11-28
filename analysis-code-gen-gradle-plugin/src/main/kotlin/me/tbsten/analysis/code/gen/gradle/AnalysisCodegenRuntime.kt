@@ -16,7 +16,7 @@ import java.util.Properties
  * Worker に載せるエンジンと AA 一式を解決する（ADR-011、ADR-012、ADR-063）。
  *
  * - `analysisCodeGenRuntime`: analysis-code-gen-processing-engine（plugin と同じ版）と、AA 一式（エンジンをビルドした版。ADR-063）
- * - `analysisCodeGenKspBridgeRuntime`: analysis-code-gen-ksp-bridge。KSP の Processor があるときだけ解決する（ADR-050）
+ * - KSP Bridge（analysis-code-gen-ksp-bridge）: KSP の Processor があるときだけ解決する。Configuration には登録しない（ADR-050・074）
  *
  * AA 一式の座標は、ビルド時に version catalog の bundle `aa-runtime` から書き出した resource を読む。
  */
@@ -56,17 +56,20 @@ internal class AnalysisCodegenRuntime(
             c.dependencies.addAllLater(analysisApiVersion.map(::analysisApiDependencies))
         }
 
-    val kspBridgeRuntime: Configuration =
-        project.configurations.create(KSP_BRIDGE_CONFIGURATION) { c ->
-            c.description = "analysisCodeGen の KSP Bridge（KSP の Processor があるときだけ Worker に載せる）"
-            c.isCanBeConsumed = false
-            c.isCanBeResolved = true
-            c.isVisible = false
-            c.jvmRuntimeAttributes()
-            c.dependencies.addLater(
-                project.provider { project.dependencies.create("$GROUP:analysis-code-gen-ksp-bridge:$pluginVersion") },
-            )
-        }
+    /**
+     * KSP Bridge。KSP の Processor があるときだけ Worker に載せる。
+     * ⭐️ プロジェクトの Configuration に登録しない（detached）。登録すると `dependencies` に KSP API が現れ、
+     * Bridge が無効なプロジェクトの依存に KSP API が含まれてしまう（BRG-14、ADR-074）。
+     */
+    val kspBridgeRuntime: Configuration by lazy {
+        project.configurations
+            .detachedConfiguration(project.dependencies.create("$GROUP:analysis-code-gen-ksp-bridge:$pluginVersion"))
+            .also { c ->
+                c.isCanBeConsumed = false
+                c.isCanBeResolved = true
+                c.jvmRuntimeAttributes()
+            }
+    }
 
     /**
      * AA 一式。`*-for-ide` は推移的な依存を宣言していないため、bundle に全部を並べて非推移で解決する（acg.analysis-api と同じ扱い）。
@@ -117,7 +120,6 @@ internal class AnalysisCodegenRuntime(
     companion object {
         const val GROUP: String = "me.tbsten.analysis.code.gen"
         const val RUNTIME_CONFIGURATION: String = "analysisCodeGenRuntime"
-        const val KSP_BRIDGE_CONFIGURATION: String = "analysisCodeGenKspBridgeRuntime"
         private const val BUILD_INFO = "/me/tbsten/analysis/code/gen/gradle/acg-build-info.properties"
     }
 }

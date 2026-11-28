@@ -40,7 +40,7 @@ import java.nio.file.Files
  * - SourceSet ごとに実行単位を 1 つ作り、`dependsOn` の上流から順に流す
  * - Processor はインスタンスのまま渡す（`InstanceProcessorComponent`）。JAR は classpath の component にする
  * - [CodegenTestResult.generatedFiles] のキーは出力ルートからの相対パス（`kotlin/…`）。SourceSet が 2 つ以上なら先頭に `<SourceSet>/` が付く
- * - KMP の SourceSet も、コンパイルはまとめて JVM として行う（expect / actual を含むものは M2 以降）
+ * - KMP の SourceSet（`dependsOn` がある）は、コンパイルも SourceSet を Fragment として渡して JVM で行う。expect / actual を含められる（KMP-10、ADR-074）
  */
 internal object AnalysisCodegenTestRunner {
     fun run(spec: CodegenTestSpec): CodegenTestResult {
@@ -102,15 +102,31 @@ internal object AnalysisCodegenTestRunner {
         rendered: String,
         classpath: List<File>,
     ): CodegenTestResult {
-        val sources =
-            sourceSets.flatMap { ss -> ss.files.map { File(root, "src/${ss.name}/${dirOf(it.path)}/${it.path}") } } +
-                sourceSets.flatMap { ss ->
+        val filesBySourceSet =
+            sourceSets.associate { ss ->
+                ss.name to
+                    ss.files.map { File(root, "src/${ss.name}/${dirOf(it.path)}/${it.path}") } +
                     readTree(File(root, outputBase(ss.name)))
                         .keys
                         .filter { it.endsWith(".kt") || it.endsWith(".java") }
                         .map { File(root, "${outputBase(ss.name)}/$it") }
+            }
+        val sources = filesBySourceSet.values.flatten()
+        // ⭐️ KMP は SourceSet を Fragment にして渡す。単一モジュールでも expect / actual が使える
+        val kotlincArguments =
+            if (sourceSets.any { it.dependsOn.isNotEmpty() }) {
+                buildList {
+                    add("-Xfragments=" + sourceSets.joinToString(",") { it.name })
+                    sourceSets.forEach { ss -> ss.dependsOn.forEach { up -> add("-Xfragment-refines=${ss.name}:$up") } }
+                    filesBySourceSet.forEach { (name, files) ->
+                        files.filter { it.name.endsWith(".kt") }.forEach { add("-Xfragment-sources=$name:${it.absolutePath}") }
+                    }
                 }
-        val compiled = IsolatedKct.compile(File(workingDir, "compile"), sources, classpath, spec.languageVersion)
+            } else {
+                emptyList()
+            }
+        val compiled =
+            IsolatedKct.compile(File(workingDir, "compile"), sources, classpath, spec.languageVersion, kotlincArguments)
         val compileDiagnostics =
             compiled.diagnostics.map { (severity, message) ->
                 CodegenDiagnostic(
@@ -155,6 +171,7 @@ internal object AnalysisCodegenTestRunner {
             sources: List<File>,
             classpath: List<File>,
             languageVersion: String?,
+            kotlincArguments: List<String> = emptyList(),
         ): Compiled {
             val kctPackage = "me.tbsten.analysis.code.gen.testing.kct"
             val compilationClass = Class.forName("$kctPackage.KotlinCompilation", true, loader)
@@ -175,6 +192,10 @@ internal object AnalysisCodegenTestRunner {
             set("setInheritClassPath", Boolean::class.javaPrimitiveType!!, false)
             set("setClasspaths", List::class.java, classpath)
             set("setLanguageVersion", String::class.java, languageVersion)
+            if (kotlincArguments.isNotEmpty()) {
+                set("setMultiplatform", Boolean::class.javaPrimitiveType!!, true)
+                set("setKotlincArguments", List::class.java, kotlincArguments)
+            }
             set("setMessageOutputStream", java.io.OutputStream::class.java, output)
             val result = compilationClass.getMethod("compile").invoke(compilation)
 
