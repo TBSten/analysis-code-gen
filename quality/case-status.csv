@@ -259,7 +259,7 @@ PBT-04,P,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.pbt.KmpHier
 PBT-05,P,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.pbt.ProcessorConfigPbtTest
 PBT-06,U,M1,enabled,,1,me.tbsten.analysis.code.gen.pbt.run.ShrinkAndSeedTest
 XD-01,U,M1,enabled,,1,me.tbsten.analysis.code.gen.pbt.catalog.CatalogArbTest
-XD-02,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.xd.DifferentialE2ETest
+XD-02,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.xd.DifferentialE2ETest
 XD-03,E,M1,enabled,,1,me.tbsten.analysis.code.gen.differential.DifferentialRunnerTest
 XD-04,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.xd.DifferentialDiffTest
 XD-05,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.xd.XdStage1DiffTest
