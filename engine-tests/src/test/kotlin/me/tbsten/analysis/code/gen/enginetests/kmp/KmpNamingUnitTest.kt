@@ -3,8 +3,6 @@ package me.tbsten.analysis.code.gen.enginetests.kmp
 import io.kotest.matchers.collections.shouldBeUnique
 import io.kotest.matchers.shouldBe
 import me.tbsten.analysis.code.gen.gradle.AnalysisCodegenNaming
-import me.tbsten.analysis.code.gen.testfoundation.Milestone
-import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import me.tbsten.analysis.code.gen.testfoundation.UnitSpec
 
 /** F-KMP・F-KMP-CUSTOM・F-AND に現れる SourceSet と、(target, compilation) の組。 */
@@ -48,7 +46,7 @@ private val COMPILATIONS =
 
 // 5.2 のうち KMP-23（ADR-016 の命名規則）
 class KmpNamingUnitTest : UnitSpec({
-    case("KMP-23", "SourceSet / Compilation 名からタスク名を作る規則が一意（analysisCodeGenIosArm64MainSourceSet など、衝突しない）", PendingCase(Milestone.M1)) {
+    case("KMP-23", "SourceSet / Compilation 名からタスク名を作る規則が一意（analysisCodeGenIosArm64MainSourceSet など、衝突しない）") {
         AnalysisCodegenNaming.sourceSetTaskName("commonMain") shouldBe "analysisCodeGenCommonMainSourceSet"
         AnalysisCodegenNaming.sourceSetTaskName("iosArm64Main") shouldBe "analysisCodeGenIosArm64MainSourceSet"
         AnalysisCodegenNaming.sourceSetTaskName("main") shouldBe "analysisCodeGenMainSourceSet"

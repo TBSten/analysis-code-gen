@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 plugins {
     id("acg.library")
     id("acg.analysis-api")
+    id("acg.fixture-publish")
 }
 
 // ADR-012: analysis-code-gen-ksp-bridge は analysis-code-gen-engine-spi だけを通してエンジンに参加する。

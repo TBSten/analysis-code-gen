@@ -534,7 +534,7 @@ class GradleJvmE2ETest : E2ESpec({
         p.generated("test").root.exists() shouldBe false
     }
 
-    case("GRD-28", "Kotlin plugin が無いプロジェクトに適用したら、原因が分かるエラーで失敗する", M1) {
+    case("GRD-28", "Kotlin plugin が無いプロジェクトに適用したら、原因が分かるエラーで失敗する") {
         val p =
             emptyProject {
                 write("build.gradle.kts", "plugins { java\n id(\"me.tbsten.analysis.code.gen\") }")

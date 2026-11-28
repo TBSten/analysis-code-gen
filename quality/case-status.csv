@@ -26,7 +26,7 @@ GRD-24,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJ
 GRD-25,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-26,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-27,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
-GRD-28,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
+GRD-28,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-29,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-30,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 KMP-01,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
@@ -51,7 +51,7 @@ KMP-19,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ET
 KMP-20,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-21,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-22,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
-KMP-23,U,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpNamingUnitTest
+KMP-23,U,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpNamingUnitTest
 KMP-24,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-25,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 API-01,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.api.NativeApiIntegrationTest
