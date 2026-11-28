@@ -10,6 +10,7 @@
   python3 quality/catalog/scripts/catalog.py import-koin  <checkout>
   python3 quality/catalog/scripts/catalog.py import-real  <processor> <owner/repo> <checkout>
   python3 quality/catalog/scripts/catalog.py import-all   <cache-dir>   # processors.toml の固定コミットを取得して全部取り込む
+  python3 quality/catalog/scripts/catalog.py apply-k      <tsv>         # K（KSP2）の判定を STATUS・NOTE に反映する（ADR-072）
 
 取り込みは決定的に動く。同じ出所は id-map.tsv で同じ ID に対応づけるので、取り込み直しても ID は変わらない。
 """
@@ -290,9 +291,69 @@ def write_patterns(owner: str, src: str, pats: list[Pattern]):
     d.mkdir(parents=True, exist_ok=True)
     keep = set()
     for p in pats:
-        (d / f"{p.id}.kt").write_text(p.render(), encoding="utf-8")
+        f = d / f"{p.id}.kt"
+        if f.exists():
+            carry_k_status(p, f)
+        f.write_text(p.render(), encoding="utf-8")
         keep.add(p.id)
     return keep, prefix
+
+
+def carry_k_status(p: Pattern, old_file: Path):
+    """取り込み直したとき、K に関わる中身（コード・EXPECT・OPTIONS・PROCESSORS）が前と同じなら K の判定を引き継ぐ（ADR-072）。
+    変わっていれば candidate に戻り、次の verifyCatalog で判定し直す。"""
+    try:
+        old = parse_pattern(old_file)
+    except ValueError:
+        return
+    if k_key(old) == k_key(p) and old.status != "candidate":
+        p.status = old.status
+        k = K_NOTE.search(old.note)
+        p.note = (strip_k_note(p.note) + (" " + k.group(0) if k else "")).strip()
+
+
+def k_key(p: Pattern):
+    return (p.processors, p.expect, p.expect_message, p.options, [(f.path, f.content) for f in p.files])
+
+
+# K の判定を書いた NOTE の部分（apply-k が付ける）と、取り込み時の「K で確かめるまで candidate」の決まり文句
+K_NOTE = re.compile(r"K（KSP2 [^）]*）: .*$")
+K_PENDING = "、K で確かめるまで candidate"
+
+
+def strip_k_note(note: str) -> str:
+    return K_NOTE.sub("", note).replace(K_PENDING, "").strip()
+
+
+def ksp_version() -> str:
+    m = re.search(r'(?m)^ksp\s*=\s*"([^"]+)"', (ROOT.parent.parent / "gradle/libs.versions.toml").read_text(encoding="utf-8"))
+    return m.group(1) if m else "?"
+
+
+def apply_k(tsv: Path) -> int:
+    """verifyCatalog（e2e-tests）の TSV を読み、verified / rejected を各パターンに書く。skip・error の行は変えない。"""
+    rows = {}
+    for line in tsv.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        cols = line.split("\t")
+        rows[cols[0]] = (cols[1], cols[2] if len(cols) > 2 else "")
+    ver = ksp_version()
+    changed = Counter()
+    for p in load_patterns():
+        if p.id not in rows:
+            continue
+        status, reason = rows[p.id]
+        if status not in ("verified", "rejected"):
+            changed[f"変えない({status})"] += 1
+            continue
+        base = strip_k_note(p.note)
+        p.status = status
+        p.note = base if status == "verified" else (base + f" K（KSP2 {ver}）: {reason}").strip()
+        p.path.write_text(p.render(), encoding="utf-8")
+        changed[status] += 1
+    print("apply-k: " + "、".join(f"{k} {v} 件" for k, v in sorted(changed.items())))
+    return 0
 
 
 def prune(owner: str, prefix: str, keep_all: set[str], origin_prefix: str):
@@ -795,6 +856,7 @@ def build(write: bool = True):
     index = []
     cov: dict[str, Counter] = defaultdict(Counter)
     cov_ids: dict[str, list[str]] = defaultdict(list)
+    cov_verified: Counter = Counter()  # verified だけで数えた網羅（M1 以降の合格条件。ADR-020 の 6 項）
     for p in pats:
         if p.id in seen:
             errors.append(f"ID が重複しています: {p.id}（{seen[p.id]} と {p.path}）")
@@ -818,6 +880,8 @@ def build(write: bool = True):
             if t not in valid:
                 errors.append(f"{p.id}: 未定義のタグです: {t}")
         tags = sorted(all_tags(p) & valid)
+        for t in (tags if p.status == "verified" else []):
+            cov_verified[t] += 1
         for t in (tags if p.status != "rejected" else []):
             cov[t][p.source] += 1
             if len(cov_ids[t]) < 3:
@@ -840,7 +904,7 @@ def build(write: bool = True):
         (ROOT / "index.json").write_text(
             json.dumps({"schema": 1, "shards": SHARDS, "patterns": index}, ensure_ascii=False, indent=1) + "\n",
             encoding="utf-8")
-        (ROOT / "coverage.md").write_text(render_coverage(pats, dims, cov, cov_ids, gaps), encoding="utf-8")
+        (ROOT / "coverage.md").write_text(render_coverage(pats, dims, cov, cov_ids, gaps, cov_verified), encoding="utf-8")
         (ROOT / "THIRD_PARTY.md").write_text(render_third_party(pats), encoding="utf-8")
     return pats, errors, gaps
 
@@ -866,7 +930,7 @@ def render_third_party(pats) -> str:
     return "\n".join(L) + "\n"
 
 
-def render_coverage(pats, dims, cov, cov_ids, gaps) -> str:
+def render_coverage(pats, dims, cov, cov_ids, gaps, cov_verified) -> str:
     by = Counter((p.owner, p.source) for p in pats)
     owners = ["common", "cream", "moshi", "koin"]
     L = ["---", "title: 入力パターンカタログの網羅表", "project: analysisCodeGen",
@@ -883,7 +947,7 @@ def render_coverage(pats, dims, cov, cov_ids, gaps) -> str:
         L.append(f"| {o} | {n[0]} | {n[1]} | {n[2]} | {sum(n)} | {ver} |")
     tot = [sum(by[(o, s)] for o in owners) for s in ("test", "real", "own")]
     L.append(f"| **計** | {tot[0]} | {tot[1]} | {tot[2]} | {sum(tot)} | {sum(1 for p in pats if p.status == 'verified')} |")
-    L += ["", "「K で確認済み」は、KSP2 でビルドして結果を記録したパターン（ACG-42 の差分ハーネスが付ける）。", ""]
+    L += ["", "「K で確認済み」は、KSP2 でビルドして EXPECT どおりだったパターン（`:e2e-tests:verifyCatalog` と `catalog.py apply-k` が付ける。ADR-072）。", ""]
     req = [f"{d}={v['id']}" for d, dd in dims.items() for v in dd["values"] if v.get("required")]
     L += [f"## 2. 必須の値の網羅: {len(req) - len(gaps)} / {len(req)}", ""]
     if gaps:
@@ -894,6 +958,10 @@ def render_coverage(pats, dims, cov, cov_ids, gaps) -> str:
             if v.get("required") and 0 < sum(cov[f"{d}={v['id']}"].values()) < 3]
     if weak:
         L += ["1〜2 件しかない必須の値（薄いところ）: " + "、".join(f"`{w}`" for w in weak), ""]
+    vgaps = [r for r in req if cov_verified[r] == 0]
+    L += [f"K で確認済み（verified）だけで数えると: {len(req) - len(vgaps)} / {len(req)}（M1 以降の合格条件。ADR-020 の 6 項、ADR-072）", ""]
+    if vgaps:
+        L += ["verified のパターンがまだ無い必須の値: " + "、".join(f"`{g}`" for g in vgaps), ""]
     L += ["## 3. 次元ごとの網羅", ""]
     for dname, d in dims.items():
         L += [f"### {d['title']}（`{dname}`、対象: {d['scope']}）", "",
@@ -946,6 +1014,13 @@ def main(argv):
         import_all(Path(argv[1]))
     elif cmd == "import-real":
         import_real(argv[1], argv[2], Path(argv[3]))
+    elif cmd == "apply-k":
+        apply_k(Path(argv[1]))
+        pats, errors, gaps = build(True)
+        print(f"{len(pats)} パターン、必須の穴 {len(gaps)} 件、エラー {len(errors)} 件")
+        for e in errors + [f"必須の値にパターンがありません: {g}" for g in gaps]:
+            print("  " + e)
+        return 1 if errors or gaps else 0
     else:
         print(__doc__)
         return 2

@@ -65,7 +65,19 @@ fun Arb.Companion.userProject(set: ProcessorSet): Arb<UserProject> = arbitrary(
 | `verified` | K の結果が `EXPECT` どおり。K の出力を期待値として記録した | 使う |
 | `rejected` | K の結果が `EXPECT` と違う（依存が足りない・固定版の既知の不具合など）。`NOTE` に理由 | 使わない。網羅表でも数えない |
 
-状態の書き換えは差分ハーネス（ACG-42）が行い、PR で人が確かめる。網羅率の合格条件（必須の値が 100%）は、M1 以降は `verified` だけで数える。
+状態の書き換えは次の 2 段で行い、PR で人が確かめる（ACG-68、ADR-072）。
+
+網羅率の合格条件（必須の値が 100%）は、M1 以降は `verified` だけで数える。数字は `coverage.md` の 2 節。
+
+```sh
+./gradlew :e2e-tests:verifyCatalog -Pacg.catalog.out=/tmp/k.tsv      # 全パターンを K で動かす（約 8 分。止まっても同じコマンドで続きから）
+python3 quality/catalog/scripts/catalog.py apply-k /tmp/k.tsv           # verified / rejected と NOTE を書き、index を作り直す
+```
+
+- 判定は XD-02 のアサーションと同じ（`ok`・`warning` はビルドが通る、`error`・`compile-error` は失敗して `EXPECT_MESSAGE` を含む）。入力も XD-02 と同じ `toDiffInput` で作る
+- 動かせないもの（Room を含む、main 以外の SourceSet を含む KMP の配置）は candidate のまま残す
+- ③ が rejected になったら、まず書き損じを直す。上流の不具合で落ちるものは rejected のまま、理由を NOTE に残す
+- `-Pacg.catalog.ids=<ID,…>` で一部だけ、`-Pacg.catalog.verbose=true` で K の診断をすべて出す
 
 ## 取り込みの規則
 
