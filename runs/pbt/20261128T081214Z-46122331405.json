@@ -1,0 +1,13 @@
+{
+"workflow": "pbt",
+"runId": "46122331405",
+"sha": "75a6744506361f2823d778a06517ec791d4cc22a",
+"event": "workflow_dispatch",
+"conclusion": "success",
+"finishedAt": "2026-11-28T08:12:14Z",
+"cases": {
+"PBT-01": "pass",
+"PBT-06": "pass",
+"XD-01": "pass"
+}
+}
