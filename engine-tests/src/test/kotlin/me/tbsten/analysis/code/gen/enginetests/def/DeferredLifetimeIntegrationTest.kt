@@ -68,7 +68,7 @@ private fun generateAt(
 
 // 5.6 Deferred と Lifetime（DEF / LIF）。ADR-014「Deferred と Lifetime」
 class DeferredLifetimeIntegrationTest : IntegrationSpec({
-    case("DEF-01", "未解決のシンボルを defer し、次のラウンドで生成物によって解決されて処理される", M1) {
+    case("DEF-01", "未解決のシンボルを defer し、次のラウンドで生成物によって解決されて処理される") {
         val log = mutableListOf<String>()
         val result =
             runNative {
@@ -82,7 +82,7 @@ class DeferredLifetimeIntegrationTest : IntegrationSpec({
         result.generatedFile("LaterSeen.kt") shouldContain "object LaterSeen"
     }
 
-    case("DEF-02", "KaSymbolPointer がラウンドをまたいで復元できる", M1) {
+    case("DEF-02", "KaSymbolPointer がラウンドをまたいで復元できる") {
         val restored = mutableListOf<String>()
         var payload: String? = null
         runNative {
@@ -161,7 +161,7 @@ class DeferredLifetimeIntegrationTest : IntegrationSpec({
         warning shouldContain "DeferredLifetimeIntegrationTest"
     }
 
-    case("DEF-04", "最終ラウンドで解決できない deferred が残ったら、既定はエラー（Warning に変更可）で、残った対象の一覧を出す（ADR-014）", M1) {
+    case("DEF-04", "最終ラウンドで解決できない deferred が残ったら、既定はエラー（Warning に変更可）で、残った対象の一覧を出す（ADR-014）") {
         val asError =
             runNative {
                 kotlin("d/NeedsNever.kt", "package d\nclass NeedsNever")
@@ -184,7 +184,7 @@ class DeferredLifetimeIntegrationTest : IntegrationSpec({
         asWarning.warnings.single().message shouldContain "d.NeedsNever"
     }
 
-    case("DEF-05", "ある Processor の deferred が、別の Processor の生成物で解決される", M1) {
+    case("DEF-05", "ある Processor の deferred が、別の Processor の生成物で解決される") {
         val log = mutableListOf<String>()
         val result =
             runNative {
@@ -198,7 +198,7 @@ class DeferredLifetimeIntegrationTest : IntegrationSpec({
         log shouldBe listOf("defer FromOther in round 1", "defer FromOther in round 2", "resolve FromOther in round 3")
     }
 
-    case("LIF-01", "前のラウンドの KaSymbol をラウンド後に使うと、すぐ分かる例外で検出される", M2) {
+    case("LIF-01", "前のラウンドの KaSymbol をラウンド後に使うと、すぐ分かる例外で検出される") {
         var caught: Throwable? = null
         runNative {
             kotlin("d/A.kt", "package d\nclass A")
