@@ -35,22 +35,34 @@ public data class UserProject(
         public fun of(p: CatalogPattern): UserProject = if (p.background) UserProject(emptyList(), listOf(p)) else UserProject(listOf(p))
 
         /**
-         * 組み立て規則を守って合成する。守れないもの（エラーの 2 個目・同じファイルパス）は落とす。
-         * パッケージの付け替えはまだしない（ACG-42 で K に通して要るかを確かめる）。代わりに FILE のパスがぶつかる組を避ける。
+         * 組み立て規則を守って合成する。守れないものは落とす（ADR-073）:
+         * - エラーの 2 個目・同じファイルパス
+         * - 宣言するパッケージが、先に入れたパターンとぶつかるもの（[packagesOf]。パッケージの付け替えはしない）
+         * - `OPTIONS` の組が、先に入れたパターンの組と違うもの（[preferredOptions] は 1 組しか使えないため）
          */
         public fun compose(
             primary: List<CatalogPattern>,
             background: List<CatalogPattern>,
+            packagesOf: (CatalogPattern) -> Set<String> = { emptySet() },
         ): UserProject {
             val files = HashSet<String>()
             var hasError = false
             val ids = HashSet<String>()
+            val packages = HashSet<String>()
+            var options: Map<String, String>? = null
 
             fun accept(p: CatalogPattern): Boolean {
-                if (!ids.add(p.id)) return false
+                if (p.id in ids) return false
                 if (p.isError && hasError) return false
                 if (p.files.any { it in files }) return false
+                val own = packagesOf(p)
+                if (own.any { it in packages }) return false
+                val opts = p.options.firstOrNull()
+                if (opts != null && options != null && opts != options) return false
+                ids += p.id
                 files += p.files
+                packages += own
+                if (opts != null) options = opts
                 hasError = hasError || p.isError
                 return true
             }
@@ -85,7 +97,7 @@ public fun Arb.Companion.userProject(
         val r = rs.random
         val primary = List(1 + r.nextInt(3)) { fitting[r.nextInt(fitting.size)] }
         val bg = if (backgrounds.isEmpty()) emptyList() else List(r.nextInt(3)) { backgrounds[r.nextInt(backgrounds.size)] }
-        UserProject.compose(primary, bg)
+        UserProject.compose(primary, bg, catalog::packages)
     }
 }
 

@@ -51,8 +51,8 @@ fun Arb.Companion.userProject(set: ProcessorSet): Arb<UserProject> = arbitrary(
 
 - `PROCESSORS` が Processor の組に含まれるパターンだけを選ぶ。`*` の背景コードはどの組にも混ぜてよい
 - `EXPECT: error` / `compile-error` のパターンは 1 プロジェクトに 1 個まで。混ぜたら全体の期待結果はそのエラーになる
-- パッケージがぶつかるときは、パターン ID を付けたパッケージに付け替える（K・B・N に同じ入力を渡すので比較は崩れない）
-- `OPTIONS` があるパターンは、その組を優先して使う。無ければ `Arb<Options>` から引く
+- 宣言するパッケージがぶつかるパターンは混ぜない（付け替えはしない。ADR-073）
+- `OPTIONS` があるパターンは、その組を優先して使う。組の違うパターンは混ぜない（ADR-073）。無ければ `Arb<Options>` から引く
 - 縮小（shrinking）はパターン単位、次にファイル単位で外していく
 
 ## パターンの状態と K での確認

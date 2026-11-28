@@ -21,6 +21,26 @@ private fun catalogs(): List<PatternCatalog> {
 
 private fun setFor(p: CatalogPattern): ProcessorSet = ProcessorSet(p.processors.sortedBy { it.ordinal })
 
+private fun pattern(
+    id: String,
+    options: List<Map<String, String>> = emptyList(),
+) = CatalogPattern(
+    id = id,
+    title = id,
+    owner = "cream",
+    source = "T",
+    processors = setOf(ProcessorId.entries.first()),
+    background = false,
+    expect = Expect.OK,
+    expectMessage = "",
+    options = options,
+    tags = emptySet(),
+    status = PatternStatus.VERIFIED,
+    shard = -1,
+    path = "$id.kt",
+    files = listOf("$id.kt"),
+)
+
 class CatalogArbTest : UnitSpec({
     case("XD-01", "入力パターンカタログの全パターンが Arb から生成されうる（カタログと Arb がずれていない）") {
         for (catalog in catalogs()) {
@@ -93,5 +113,24 @@ class CatalogArbTest : UnitSpec({
         val all = catalog.usable
         val up = UserProject(all.filter { !it.background }.take(2), all.filter { it.background })
         UserProjectShrinker.shrink(up).all { it.primary.isNotEmpty() } shouldBe true
+    }
+
+    // ADR-073: 組み立てで、宣言するパッケージがぶつかるもの・OPTIONS の組が違うものは混ぜない（XD-02 の反例 CRM-T-0089 + CRM-T-0338）
+    "compose は宣言するパッケージがぶつかるパターンを落とす" {
+        val a = pattern("A")
+        val b = pattern("B")
+        val c = pattern("C")
+        val packages = mapOf("A" to setOf("x.gen"), "B" to setOf("x.gen"), "C" to setOf("y"))
+        UserProject.compose(listOf(a, b, c), emptyList()) { packages.getValue(it.id) }.ids shouldBe listOf("A", "C")
+    }
+
+    "compose は OPTIONS の組が違うパターンを落とし、同じ組か組の無いものは混ぜる" {
+        val a = pattern("A", options = listOf(mapOf("k" to "1")))
+        val b = pattern("B", options = listOf(mapOf("k" to "2")))
+        val c = pattern("C", options = listOf(mapOf("k" to "1")))
+        val d = pattern("D")
+        val project = UserProject.compose(listOf(d, a, b, c), emptyList())
+        project.ids shouldBe listOf("D", "A", "C")
+        project.preferredOptions shouldBe mapOf("k" to "1")
     }
 })
