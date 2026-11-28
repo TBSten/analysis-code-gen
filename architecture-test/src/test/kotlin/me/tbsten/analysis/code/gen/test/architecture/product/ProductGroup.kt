@@ -118,6 +118,19 @@ private fun DeclarationContainerScope.publicApiGroup() = "PublicApi".group {
             allow(private, anythingElse)
         }
     }
+    "TestingIsolation".role {
+        summary = "テスト補助の内部実装。kct・KSP2 を AA と分けて動かす ClassLoader（Isolated*、ADR-065）"
+        layout { mainKotlin("analysis-code-gen-testing", "testing") / "internal" / "Isolated*".ktFile() }
+        "JDK の ClassLoader だけで組む".ktFileContent {
+            `package`(matchingDirectory)
+            `import`("java.io.**")
+            `import`("java.net.**")
+            `import`("java.nio.**")
+            `import`("java.util.**")
+            allow(internal, anythingElse)
+            allow(private, anythingElse)
+        }
+    }
 }
 
 private fun DeclarationContainerScope.engineGroup() = "Engine".group {

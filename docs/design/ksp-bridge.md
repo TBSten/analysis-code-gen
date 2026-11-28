@@ -11,3 +11,8 @@ KSP の Processor を共通エンジンで回す analysis-code-gen-ksp-bridge �
 - KS オブジェクトはラウンドをまたいで使えない。持ち越すのは defer の pointer（`Restorable`）だけ
 - KSPConfig は KSP の `symbol-processing-common-deps` のものを使う。移植コードが読むのは `experimentalPsiResolution` だけ
 - AA の実装側の jar は compileOnly。足すときは `analysis-code-gen-ksp-bridge/build.gradle.kts` の一覧に足す
+
+## テストでの動かし方（ADR-065）
+
+- AA を動かすテストモジュールは、AA の一式（bundle `aa-runtime`）をテストの classpath の先頭に置く
+- `TestEngine.Ksp2`（kct + KSP2）は testing が AA を除いた ClassLoader で動かす。共有するのはテストの型・processor-api・KSP の公開 API だけ

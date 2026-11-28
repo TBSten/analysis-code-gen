@@ -120,7 +120,7 @@ class MixedProcessorsTest : IntegrationSpec({
         project.generated().keys.map { it.substringAfterLast('/') } shouldContain "UserRegistry.kt"
     }
 
-    case("MIX-02", "ラウンド 1 で Native Processor が生成したコードが、ラウンド 2 の KSP の getNewFiles に現れて処理される", pending = PendingCase(Milestone.M1)) {
+    case("MIX-02", "ラウンド 1 で Native Processor が生成したコードが、ラウンド 2 の KSP の getNewFiles に現れて処理される") {
         KspModelMapperProvider.seenByKsp.clear()
         val project = mixProject(NativeRegistryProvider::class)
         val result = project.run()
@@ -131,7 +131,7 @@ class MixedProcessorsTest : IntegrationSpec({
         result.rounds shouldBe 4
     }
 
-    case("MIX-04", "Native と KSP が同じ出力先に書いたらエラー", pending = PendingCase(Milestone.M1)) {
+    case("MIX-04", "Native と KSP が同じ出力先に書いたらエラー") {
         val project = mixProject(NativeCollideProvider::class)
         val result = project.run()
         result.success shouldBe false
@@ -140,7 +140,7 @@ class MixedProcessorsTest : IntegrationSpec({
         project.generated() shouldBe emptyMap()
     }
 
-    case("MIX-05", "Bridge と Native が同じ AA 環境を共有する（環境の構築が 1 回）", pending = PendingCase(Milestone.M2)) {
+    case("MIX-05", "Bridge と Native が同じ AA 環境を共有する（環境の構築が 1 回）") {
         val project = mixProject(NativeRegistryProvider::class)
         val factory = RecordingEnvironmentFactory()
         project.run(engineWith(factory)).success shouldBe true

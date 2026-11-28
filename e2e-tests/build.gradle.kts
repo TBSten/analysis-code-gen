@@ -18,7 +18,16 @@ dependencies {
     testImplementation(libs.kotlin.gradle.plugin)
     testImplementation(libs.kotlinx.serialization.json) // ACG-46: CLI のモデル JSON を書き換える
     acgCliRuntime(project(":analysis-code-gen-cli"))
+    // TestEngine.AnalysisCodegen（BRG など）で AA Standalone を実際に動かす一式（ADR-060）。コンパイルには載せない
+    testRuntimeOnly(libs.bundles.aa.runtime) { isTransitive = false }
 }
+
+// AA の *-for-ide と kotlin-compiler-embeddable は org.jetbrains.kotlin.cli.* を同じ名前で持つ。エンジンが for-ide 側を読むよう、
+// AA の一式を実行時クラスパスの先頭に置く（ADR-060）。KSP2 経路（kct）は testing が別の ClassLoader で動かす（ADR-065）
+val aaRuntimeFirst: Configuration by configurations.creating {
+    isTransitive = false
+}
+dependencies { aaRuntimeFirst(libs.bundles.aa.runtime) }
 
 tasks.withType<Test>().configureEach {
     // TestKit のビルドは plugin・エンジン・テスト用 Processor を build/fixture-repo から読む（ADR-027・060）
@@ -30,6 +39,7 @@ tasks.withType<Test>().configureEach {
     providers.gradleProperty("acg.mavenMirror").orNull?.let { systemProperty("acg.mavenMirror", it) }
     // ACG-46: CLI の実行時 classpath（ADR-040）
     jvmArgumentProviders += CliClasspathArgument(acgCliRuntime)
+    classpath = aaRuntimeFirst + classpath
 }
 
 /** CLI の実行時 classpath を system property で渡す。構成キャッシュに載るよう、スクリプトを参照しないクラスにする。 */

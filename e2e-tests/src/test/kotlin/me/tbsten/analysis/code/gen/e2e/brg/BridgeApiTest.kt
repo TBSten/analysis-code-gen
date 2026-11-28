@@ -21,8 +21,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import me.tbsten.analysis.code.gen.testfoundation.DiffSpec
 import me.tbsten.analysis.code.gen.testfoundation.IntegrationSpec
-import me.tbsten.analysis.code.gen.testfoundation.Milestone
-import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import me.tbsten.analysis.code.gen.testing.TestEngine
 import me.tbsten.analysis.code.gen.testing.runCodegenTest
 
@@ -223,7 +221,6 @@ class BridgeApiIntegrationTest : IntegrationSpec({
     case(
         "BRG-01",
         "SymbolProcessorProvider が見つかり、environment の options / kotlinVersion / apiVersion / platforms / logger / codeGenerator が正しい",
-        pending = PendingCase(Milestone.M1),
     ) {
         brg01(TestEngine.AnalysisCodegen)
         // 値そのものも KSP2 と同じ
@@ -240,22 +237,22 @@ class BridgeApiIntegrationTest : IntegrationSpec({
     }
     "[KSP2 で期待を確認] BRG-01" { brg01(TestEngine.Ksp2) }
 
-    case("BRG-04", "process() が返した deferred シンボルが次のラウンドで再び渡される", pending = PendingCase(Milestone.M1)) {
+    case("BRG-04", "process() が返した deferred シンボルが次のラウンドで再び渡される") {
         brg04(TestEngine.AnalysisCodegen)
     }
     "[KSP2 で期待を確認] BRG-04" { brg04(TestEngine.Ksp2) }
 
-    case("BRG-05", "CodeGenerator.createNewFile / associate / Dependencies(aggregating) が使える", pending = PendingCase(Milestone.M1)) {
+    case("BRG-05", "CodeGenerator.createNewFile / associate / Dependencies(aggregating) が使える") {
         brg05(TestEngine.AnalysisCodegen)
     }
     "[KSP2 で期待を確認] BRG-05" { brg05(TestEngine.Ksp2) }
 
-    case("BRG-06", "KSPLogger の error でビルドが失敗し、KSNode の位置が出る", pending = PendingCase(Milestone.M1)) {
+    case("BRG-06", "KSPLogger の error でビルドが失敗し、KSNode の位置が出る") {
         brg06(TestEngine.AnalysisCodegen)
     }
     "[KSP2 で期待を確認] BRG-06" { brg06(TestEngine.Ksp2) }
 
-    case("BRG-08", "Java ソース上の宣言も KS* として扱える", pending = PendingCase(Milestone.M2)) {
+    case("BRG-08", "Java ソース上の宣言も KS* として扱える") {
         brg08(TestEngine.AnalysisCodegen)
     }
     "[KSP2 で期待を確認] BRG-08" { brg08(TestEngine.Ksp2) }
@@ -448,7 +445,6 @@ class BridgeApiDiffTest : DiffSpec({
     case(
         "BRG-02",
         "Resolver の主要 API（getSymbolsWithAnnotation、getNewFiles、getAllFiles、getClassDeclarationByName、getDeclarationsFromPackage など）が KSP2 と同じ結果を返す",
-        pending = PendingCase(Milestone.M1),
     ) {
         val pair = inspectBoth(brgSources, ::resolverDump)
         pair.bridge shouldBe pair.ksp2
@@ -460,7 +456,7 @@ class BridgeApiDiffTest : DiffSpec({
         text shouldContain "missing=null"
     }
 
-    case("BRG-03", "KS* の型解決（resolve、isAssignableFrom、star projection、typealias、関数型）が KSP2 と同じ結果", pending = PendingCase(Milestone.M1)) {
+    case("BRG-03", "KS* の型解決（resolve、isAssignableFrom、star projection、typealias、関数型）が KSP2 と同じ結果") {
         val pair = inspectBoth(brgSources, ::typeDump)
         pair.bridge shouldBe pair.ksp2
     }
@@ -471,7 +467,7 @@ class BridgeApiDiffTest : DiffSpec({
         text shouldContain "[fun]"
     }
 
-    case("BRG-09", "ライブラリ（バイナリ）の宣言が KSP2 と同じ Origin・内容で表現される", pending = PendingCase(Milestone.M1)) {
+    case("BRG-09", "ライブラリ（バイナリ）の宣言が KSP2 と同じ Origin・内容で表現される") {
         val pair = inspectBoth(brgSources, ::libraryDump)
         pair.bridge shouldBe pair.ksp2
     }
@@ -479,7 +475,7 @@ class BridgeApiDiffTest : DiffSpec({
         inspect(TestEngine.Ksp2, brgSources, ::libraryDump) shouldContain "origin=KOTLIN_LIB"
     }
 
-    case("BRG-10", "JVM 固有 API（getJvmName、mapToJvmSignature、getOwnerJvmClassName など）が KSP2 と同じ結果", pending = PendingCase(Milestone.M2)) {
+    case("BRG-10", "JVM 固有 API（getJvmName、mapToJvmSignature、getOwnerJvmClassName など）が KSP2 と同じ結果") {
         val pair = inspectBoth(brgSources, ::jvmDump)
         pair.bridge shouldBe pair.ksp2
     }
@@ -487,7 +483,7 @@ class BridgeApiDiffTest : DiffSpec({
         inspect(TestEngine.Ksp2, brgSources, ::jvmDump) shouldContain "owner(transform)=com.example.ModelKt"
     }
 
-    case("BRG-12", "KSP 互換モードで、生成ファイルの相対パスとファイル名が KSP2 と一致する", pending = PendingCase(Milestone.M2)) {
+    case("BRG-12", "KSP 互換モードで、生成ファイルの相対パスとファイル名が KSP2 と一致する") {
         val provider =
             SymbolProcessorProvider { env ->
                 object : SymbolProcessor {

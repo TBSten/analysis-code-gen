@@ -110,7 +110,7 @@ private fun brg11(engine: TestEngine) {
 private fun probeFile(): File = Files.createTempFile("acg-probe", ".jsonl").toFile().apply { delete() }
 
 class BridgeE2ETest : E2ESpec({
-    case("BRG-11", "KotlinPoet の KSP 拡張（toTypeName、toClassName、writeTo）が Bridge 上で動く", pending = PendingCase(Milestone.M1)) {
+    case("BRG-11", "KotlinPoet の KSP 拡張（toTypeName、toClassName、writeTo）が Bridge 上で動く") {
         brg11(TestEngine.AnalysisCodegen)
     }
     "[KSP2 で期待を確認] BRG-11" { brg11(TestEngine.Ksp2) }
