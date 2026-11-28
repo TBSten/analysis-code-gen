@@ -37,7 +37,7 @@ KMP-05,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ET
 KMP-06,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-07,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-08,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
-KMP-09,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpIntegrationTest
+KMP-09,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpIntegrationTest
 KMP-10,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.kmp.KmpIntegrationTest
 KMP-11,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
 KMP-12,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.kmp.KmpE2ETest
@@ -70,12 +70,12 @@ API-13,U,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.api
 API-14,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.api.NativeApiIntegrationTest
 API-15,U,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.api.ApiCompatibilityUnitTest
 ANA-01,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ana.AnaE2ETest
-ANA-02,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
-ANA-03,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
-ANA-04,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
-ANA-05,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
-ANA-06,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
-ANA-07,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
+ANA-02,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
+ANA-03,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
+ANA-04,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
+ANA-05,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
+ANA-06,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
+ANA-07,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
 ANA-08,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest
 ANA-09,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ana.AnaE2ETest
 ANA-10,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.ana.AnalysisCapabilityIntegrationTest

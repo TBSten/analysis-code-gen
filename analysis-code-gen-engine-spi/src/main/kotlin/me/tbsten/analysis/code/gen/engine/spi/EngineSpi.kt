@@ -38,8 +38,14 @@ public interface ProcessorComponent {
     public val coordinates: String
     public val classLoader: ClassLoader
 
-    /** `META-INF/services/<serviceName>` を持つか。 */
+    /** `META-INF/services/<serviceName>` を持つか（テストで Provider のインスタンスを直接渡したときは、その型を持つか）。 */
     public fun hasService(serviceName: String): Boolean
+
+    /**
+     * この component が提供する [service] の実装を、登録順に作って返す。Frontend は ServiceLoader を直接使わず、これを使う。
+     * component の外（エンジンやテストの classpath）にある `META-INF/services` は見ない。
+     */
+    public fun <T : Any> loadServices(service: Class<T>): List<T>
 }
 
 @InternalAnalysisCodegenApi

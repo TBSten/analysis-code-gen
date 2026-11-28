@@ -35,6 +35,11 @@ public interface AnalysisEnvironment : AutoCloseable {
     /** [module] の現在の Java ファイル。JVM 以外の Compilation では空。パス順。 */
     public fun javaFiles(module: ModuleId): List<PsiJavaFile>
 
+    /**
+     * 差分を反映する。ラウンドの生成物は processing-engine が staging に書いたうえで [SourceChangeSet.added] で渡す。
+     * 反映の後に [kotlinFiles] / [javaFiles] を呼び直すと新しいファイルが入る。変わっていないファイルの PSI は作り直さない
+     * （前のラウンドの `KaSymbolPointer` を復元できるように）。変更・削除を含むときは環境を作り直すので PSI も新しくなる（ADR-060）。
+     */
     public fun applyChanges(changes: SourceChangeSet): AnalysisInvalidationResult
 }
 
@@ -46,7 +51,7 @@ public interface AnalysisEnvironmentFactory {
     ): AnalysisEnvironment
 }
 
-/** 実行単位の SourceSet / Compilation を AA のモジュールに写したもの。 */
+/** 実行単位の SourceSet / Compilation を AA のモジュールに写したもの。[ModuleId] は SourceSet 名。 */
 @InternalAnalysisCodegenApi
 public interface AnalysisModuleGraph {
     public val modules: Set<ModuleId>

@@ -78,7 +78,7 @@ private fun KaSession.text(type: KaType): String {
 
 // 5.4 AA ネイティブな解析能力（ANA）のうち I のケース
 class AnalysisCapabilityIntegrationTest : IntegrationSpec({
-    case("ANA-02", "ライブラリ（JAR / klib）の宣言と型を解決できる", M1) {
+    case("ANA-02", "ライブラリ（JAR / klib）の宣言と型を解決できる") {
         // JAR: テストの classpath（inheritClassPath）にある kotest と JDK。klib は KMP-07（E2E）で見る
         val (members, jdk) =
             analyzeRound1({ kotlin("a/A.kt", "package a\nclass A") }) {
@@ -91,7 +91,7 @@ class AnalysisCapabilityIntegrationTest : IntegrationSpec({
         jdk shouldBe true
     }
 
-    case("ANA-03", "Java ソースの宣言を KaSymbol として扱える", M1) {
+    case("ANA-03", "Java ソースの宣言を KaSymbol として扱える") {
         val seen =
             analyzeRound1({
                 kotlin("a/A.kt", "package a\nclass A")
@@ -117,7 +117,7 @@ class AnalysisCapabilityIntegrationTest : IntegrationSpec({
         seen shouldBe listOf("JAVA_SOURCE", "kotlin.String", "kotlin.Int", "Person.java")
     }
 
-    case("ANA-04", "ジェネリクス・型エイリアス・nullable・star projection・関数型を解決できる", M1) {
+    case("ANA-04", "ジェネリクス・型エイリアス・nullable・star projection・関数型を解決できる") {
         val types =
             analyzeRound1({
                 kotlin(
@@ -171,7 +171,7 @@ class AnalysisCapabilityIntegrationTest : IntegrationSpec({
         types["suspend"] shouldBe "true"
     }
 
-    case("ANA-05", "アノテーション引数（ネスト、配列、enum、KClass、repeatable、use-site target）を読める", M1) {
+    case("ANA-05", "アノテーション引数（ネスト、配列、enum、KClass、repeatable、use-site target）を読める") {
         val seen =
             analyzeRound1({
                 kotlin(
@@ -232,7 +232,7 @@ class AnalysisCapabilityIntegrationTest : IntegrationSpec({
         seen shouldBe listOf("n", listOf("x", "y"), "HIGH", "kotlin.String", listOf("a", "b"), "FIELD")
     }
 
-    case("ANA-06", "未解決参照などエラーを含むソースでも解析が落ちず、エラー型として扱える", M1) {
+    case("ANA-06", "未解決参照などエラーを含むソースでも解析が落ちず、エラー型として扱える") {
         var processed = false
         val types =
             analyzeRound1({
@@ -260,7 +260,7 @@ class AnalysisCapabilityIntegrationTest : IntegrationSpec({
         types shouldBe mapOf("missing" to "<error>", "ok" to "kotlin.Int", "call" to "true")
     }
 
-    case("ANA-07", "構文だけの処理（PSI）と意味解析（AA）を同じ Processor で混ぜて使える", M1) {
+    case("ANA-07", "構文だけの処理（PSI）と意味解析（AA）を同じ Processor で混ぜて使える") {
         val seen =
             analyzeRound1({
                 kotlin("a/Mix.kt", "package a\nclass Mix {\n  fun twice(x: Int) = x * 2\n  fun name() = \"n\"\n}")
