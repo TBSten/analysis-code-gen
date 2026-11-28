@@ -69,7 +69,9 @@ internal class AnalysisCodegenKotlinWiring(
                 val unitName = AnalysisCodegenNaming.compilationUnitName(target.unitTargetName(), compilation.name)
                 val spec = extension.compilations.maybeCreate(unitName)
                 val configuration =
-                    runtime.processorConfiguration(AnalysisCodegenNaming.compilationConfigurationName(target.unitTargetName(), compilation.name))
+                    runtime.processorConfiguration(
+                        AnalysisCodegenNaming.compilationConfigurationName(target.unitTargetName(), compilation.name),
+                    )
                 addProcessorDependencies(configuration, spec)
                 whenEvaluated { registerCompilationUnit(compilation, unitName, configuration) }
             }
@@ -420,7 +422,12 @@ internal class AnalysisCodegenKotlinWiring(
 
     // --- パス ---
 
-    private val buildDirRel: String get() = rel(project.layout.buildDirectory.get().asFile)
+    private val buildDirRel: String get() =
+        rel(
+            project.layout.buildDirectory
+                .get()
+                .asFile,
+        )
 
     private val GENERATED: String get() = "$buildDirRel/generated/analysisCodeGen"
 
@@ -429,7 +436,10 @@ internal class AnalysisCodegenKotlinWiring(
     /** 自分たちの生成物（`build/generated/analysisCodeGen`）は SourceSet のソースとして数えない（GRD-03）。 */
     private fun isGenerated(dir: File): Boolean = dir.startsWith(generatedRoot.get().asFile)
 
-    private fun kotlinRoots(sourceSet: KotlinSourceSet): List<File> = sourceSet.kotlin.srcDirs.filterNot(::isGenerated).sorted()
+    private fun kotlinRoots(sourceSet: KotlinSourceSet): List<File> =
+        sourceSet.kotlin.srcDirs
+            .filterNot(::isGenerated)
+            .sorted()
 
     private fun javaRoots(sourceSet: KotlinSourceSet): List<File> =
         javaSourceSets()

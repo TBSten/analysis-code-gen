@@ -58,7 +58,11 @@ public abstract class AnalysisCodegenWorkAction : WorkAction<AnalysisCodegenWork
                     else -> logger.info("i: $line")
                 }
             }
-        val modelJson = parameters.modelFile.get().asFile.readText()
+        val modelJson =
+            parameters.modelFile
+                .get()
+                .asFile
+                .readText()
         val success =
             try {
                 run.invoke(null, modelJson, unit, parameters.forceFull.get(), log) as Boolean

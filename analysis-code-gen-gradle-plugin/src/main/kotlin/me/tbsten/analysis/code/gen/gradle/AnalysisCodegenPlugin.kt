@@ -19,6 +19,7 @@ public abstract class AnalysisCodegenPlugin : Plugin<Project> {
         val kgpAvailable =
             runCatching { Class.forName(KOTLIN_EXTENSION_CLASS, false, AnalysisCodegenPlugin::class.java.classLoader) }.isSuccess
         var wiring: AnalysisCodegenKotlinWiring? = null
+
         fun wireIfKotlin() {
             if (wiring != null || !kgpAvailable) return
             wiring = AnalysisCodegenKotlinWiring.wireIfKotlin(target, extension)

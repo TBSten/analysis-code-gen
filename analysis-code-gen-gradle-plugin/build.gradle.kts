@@ -24,12 +24,19 @@ gradlePlugin {
 // plugin が実行時に読む値（plugin の版・AA 一式の座標。ADR-063）を resource に書き出す
 val buildInfoDir = layout.buildDirectory.dir("generated/acg-build-info")
 // Configuration Cache に catalog の Provider を載せられないので、文字列にしてから渡す
-val aaRuntime: String = libs.bundles.aa.runtime.get().joinToString(",") { "${it.module.group}:${it.module.name}:${it.version}" }
+val aaRuntime: String =
+    libs.bundles.aa.runtime
+        .get()
+        .joinToString(",") { "${it.module.group}:${it.module.name}:${it.version}" }
 val generateBuildInfo =
     tasks.register<WriteProperties>("generateBuildInfo") {
         destinationFile.set(buildInfoDir.map { it.file("me/tbsten/analysis/code/gen/gradle/acg-build-info.properties") })
         property("version", project.version.toString())
-        property("analysisApiVersion", libs.versions.analysis.api.get())
+        property(
+            "analysisApiVersion",
+            libs.versions.analysis.api
+                .get(),
+        )
         property("aaRuntime", aaRuntime)
     }
 sourceSets.main {

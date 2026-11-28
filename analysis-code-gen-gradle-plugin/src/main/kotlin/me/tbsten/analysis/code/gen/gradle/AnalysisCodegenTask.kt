@@ -172,7 +172,9 @@ public abstract class AnalysisCodegenTask : DefaultTask() {
 
     private fun buildModel(root: File): ProjectModel {
         val skeleton = MODEL_JSON.decodeFromString(ProjectModel.serializer(), modelSkeleton.get())
+
         fun rel(file: File): String = file.relativeToOrSelf(root).invariantSeparatorsPath
+
         fun existing(paths: List<String>): List<String> = paths.filter { root.resolve(it).isDirectory }
 
         val processors = processorModels(::rel)
@@ -234,6 +236,7 @@ public abstract class AnalysisCodegenTask : DefaultTask() {
             .distinctBy { it.id }
             .map { component ->
                 val closure = linkedSetOf<ComponentIdentifier>()
+
                 fun visit(c: ResolvedComponentResult) {
                     if (!closure.add(c.id)) return
                     c.dependencies.filterIsInstance<ResolvedDependencyResult>().forEach { visit(it.selected) }
@@ -258,7 +261,7 @@ public abstract class AnalysisCodegenTask : DefaultTask() {
         fun ComponentIdentifier.coordinates(): String =
             when (this) {
                 is ModuleComponentIdentifier -> "$group:$module:$version"
-                is ProjectComponentIdentifier -> "project(${projectPath})"
+                is ProjectComponentIdentifier -> "project($projectPath)"
                 else -> displayName
             }
 
