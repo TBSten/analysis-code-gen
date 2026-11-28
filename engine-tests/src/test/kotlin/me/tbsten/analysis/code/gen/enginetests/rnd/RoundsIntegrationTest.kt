@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.psi.psiUtil.collectDescendantsOfType
 
 // 5.5 マルチラウンド（RND）のうち I のケース
 class RoundsIntegrationTest : IntegrationSpec({
-    case("RND-01", "ラウンド 1 の生成物をラウンド 2 で解析・型解決できる", PendingCase(Milestone.M1)) {
+    case("RND-01", "ラウンド 1 の生成物をラウンド 2 で解析・型解決できる") {
         var resolvedInRound2: String? = null
         val result =
             runNative {
@@ -45,7 +45,7 @@ class RoundsIntegrationTest : IntegrationSpec({
         resolvedInRound2 shouldBe "a.A"
     }
 
-    case("RND-03", "同じラウンド内では他の Processor の生成物が見えない（スナップショット固定）", PendingCase(Milestone.M1)) {
+    case("RND-03", "同じラウンド内では他の Processor の生成物が見えない（スナップショット固定）") {
         val seenByB = mutableMapOf<Int, Pair<List<String>, Boolean>>()
         runNative {
             kotlin("a/A.kt", "package a\nclass A")
@@ -70,7 +70,7 @@ class RoundsIntegrationTest : IntegrationSpec({
         seenByB.getValue(2) shouldBe (listOf("A.kt", "FromA.kt") to true)
     }
 
-    case("RND-04", "newFiles に入るのは前のラウンドの生成物だけ", PendingCase(Milestone.M1)) {
+    case("RND-04", "newFiles に入るのは前のラウンドの生成物だけ") {
         val newFilesByRound = mutableMapOf<Int, List<String>>()
         runNative {
             kotlin("a/A.kt", "package a\nclass A")
@@ -126,7 +126,7 @@ class RoundsIntegrationTest : IntegrationSpec({
         result.errors.single().message shouldContain "a.A"
     }
 
-    case("RND-06", "前のラウンドで生成した Java ソースを、次のラウンドの Kotlin 解析で解決できる", PendingCase(Milestone.M2)) {
+    case("RND-06", "前のラウンドで生成した Java ソースを、次のラウンドの Kotlin 解析で解決できる") {
         var javaSeen: List<String>? = null
         var resolved: String? = null
         val result =

@@ -37,6 +37,21 @@ fun RepositoryHandler.fixtureRepositories() {
     }
     mavenCentral()
     google()
+    // Analysis API と IntelliJ Platform（plugin が Worker で使う。docs のインストールと同じ。ADR-063）
+    maven {
+        url = uri("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
+        content {
+            includeModuleByRegex("org\\.jetbrains\\.kotlin", ".*-for-ide")
+            includeGroupByRegex("org\\.jetbrains\\.intellij\\.deps.*")
+        }
+    }
+    maven {
+        url = uri("https://www.jetbrains.com/intellij-repository/releases")
+        content {
+            includeGroup("com.jetbrains.intellij.platform")
+            includeGroup("com.jetbrains.intellij.java")
+        }
+    }
 }
 
 pluginManagement {

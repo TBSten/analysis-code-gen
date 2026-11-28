@@ -58,6 +58,11 @@ private fun DeclarationContainerScope.publicApiGroup() = "PublicApi".group {
             fileAnnotation("OptIn")
             `import`("org.gradle.**")
             `import`("javax.inject.**")
+            // JDK と、project-model の JSON（ProjectModel を Worker へ渡す。ADR-063）。AA・エンジンは引き続き不可
+            `import`("java.io.**")
+            `import`("java.util.**")
+            `import`("java.lang.reflect.**")
+            `import`("kotlinx.serialization.**")
             `import`("org.jetbrains.kotlin.gradle.**")
             `import`("me.tbsten.analysis.code.gen.gradle.**")
             `import`("me.tbsten.analysis.code.gen.model.**")
@@ -188,6 +193,9 @@ private fun DeclarationContainerScope.engineGroup() = "Engine".group {
             `package`(matchingDirectory)
             fileAnnotation("OptIn")
             `import`("java.io.**")
+            // Gradle の Worker からの入口 EngineEntryPoint（JDK の型と ProjectModel の JSON だけで受ける。ADR-063）
+            `import`("java.util.function.**")
+            `import`("kotlinx.serialization.**")
             `import`(KOTLIN_COMPILER)
             `import`(INTELLIJ)
             `import`("me.tbsten.analysis.code.gen.**")
