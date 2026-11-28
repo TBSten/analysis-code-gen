@@ -10,13 +10,12 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmEnvironment
 import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import java.util.Properties
 
 /**
  * Worker に載せるエンジンと AA 一式を解決する（ADR-011、ADR-012、ADR-063）。
  *
- * - `analysisCodeGenRuntime`: analysis-code-gen-processing-engine（plugin と同じ版）と、AA 一式（利用者の Kotlin と同じ版）
+ * - `analysisCodeGenRuntime`: analysis-code-gen-processing-engine（plugin と同じ版）と、AA 一式（エンジンをビルドした版。ADR-063）
  * - `analysisCodeGenKspBridgeRuntime`: analysis-code-gen-ksp-bridge。KSP の Processor があるときだけ解決する（ADR-050）
  *
  * AA 一式の座標は、ビルド時に version catalog の bundle `aa-runtime` から書き出した resource を読む。
@@ -36,9 +35,13 @@ internal class AnalysisCodegenRuntime(
     /** plugin 自身の版。エンジンも同じ版を使う。 */
     val pluginVersion: String = buildInfo.getProperty("version")
 
-    /** 実行する AA の版。DSL の指定が無ければ利用者の KGP と同じ（ADR-011）。 */
+    /**
+     * 実行する AA の版。DSL の指定が無ければ、エンジンをビルドした AA の版（catalog の版）。
+     * エンジンは 1 つの AA の版に対してだけコンパイルされていて、版ごとの compat モジュール（ADR-011）が入るまでは
+     * 利用者の Kotlin の版の AA を載せると NoClassDefFoundError になるため（ADR-063）。
+     */
     val analysisApiVersion: Provider<String> =
-        extension.analysisApiVersion.orElse(project.provider { project.getKotlinPluginVersion() })
+        extension.analysisApiVersion.orElse(buildInfo.getProperty("analysisApiVersion"))
 
     val runtime: Configuration =
         project.configurations.create(RUNTIME_CONFIGURATION) { c ->
