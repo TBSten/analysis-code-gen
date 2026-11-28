@@ -16,10 +16,11 @@
  */
 // Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/resolved/KSAnnotationResolvedImpl.kt
 // Modified-By: analysis-code-gen contributors, 2026
-// Modifications: パッケージ名のみ変更
+// Modifications: パッケージ名を変更。AA 2.4.21 で KaAnnotation.useSiteTarget が明示の use-site target を返さなくなったため、PSI の値で補う（ADR-064）
 package me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.resolved
 
 import me.tbsten.analysis.code.gen.ksp.bridge.common.IdKeyPair
+import me.tbsten.analysis.code.gen.ksp.bridge.useSiteTargetOrSource
 import me.tbsten.analysis.code.gen.ksp.bridge.common.KSObjectCache
 import me.tbsten.analysis.code.gen.ksp.bridge.common.impl.KSNameImpl
 import me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin.KSAnnotationOps
@@ -31,6 +32,8 @@ import com.google.devtools.ksp.symbol.AnnotationUseSiteTarget
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSName
 import com.google.devtools.ksp.symbol.KSNode
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.KSValueArgument
 import com.google.devtools.ksp.symbol.KSVisitor
@@ -124,7 +127,7 @@ class KSAnnotationResolvedImpl private constructor(
         if (parent?.origin == Origin.KOTLIN_LIB || parent?.origin == Origin.JAVA_LIB)
             return@lazy null
 
-        when (annotationApplication.useSiteTarget) {
+        when (sourceUseSiteTarget()) {
             null -> null
             KaAnnotationUseSiteTarget.FILE -> AnnotationUseSiteTarget.FILE
             KaAnnotationUseSiteTarget.PROPERTY -> AnnotationUseSiteTarget.PROPERTY
@@ -137,6 +140,19 @@ class KSAnnotationResolvedImpl private constructor(
             KaAnnotationUseSiteTarget.PROPERTY_DELEGATE_FIELD -> AnnotationUseSiteTarget.DELEGATE
             KaAnnotationUseSiteTarget.ALL -> AnnotationUseSiteTarget.ALL
         }
+    }
+
+    /**
+     * AA 2.4.21 では KaAnnotation.useSiteTarget が非推奨になり、ソースに書いた `@receiver:` や `@all:` などでも null を返す。
+     * KSP2 2.3.14（AA 2.4.20-dev）の値に合わせるため、書いた位置の宣言に付いた注釈だけ PSI から読む。
+     * `@all:` から getter などへ広がった注釈は、KSP2 と同じく use-site target なし（null）にする（ADR-064）。
+     */
+    private fun sourceUseSiteTarget(): KaAnnotationUseSiteTarget? {
+        val target = annotationApplication.useSiteTargetOrSource() ?: return null
+        if (annotationApplication.useSiteTarget == null && target == KaAnnotationUseSiteTarget.ALL && parent !is KSPropertyDeclaration && parent !is KSValueParameter) {
+            return null
+        }
+        return target
     }
 
     override val location: Location by lazy {

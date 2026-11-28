@@ -16,12 +16,13 @@
  */
 // Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/symbol/kotlin/KSPropertyDeclarationImpl.kt
 // Modified-By: analysis-code-gen contributors, 2026
-// Modifications: パッケージ名のみ変更
+// Modifications: パッケージ名を変更。@delegate: の注釈を AA 2.4.21 でも拾えるよう useSiteTargetOrSource で読む（ADR-064）
 
 @file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 
 package me.tbsten.analysis.code.gen.ksp.bridge.impl.symbol.kotlin
 
+import me.tbsten.analysis.code.gen.ksp.bridge.useSiteTargetOrSource
 import me.tbsten.analysis.code.gen.ksp.bridge.InternalKSPException
 import com.google.devtools.ksp.closestClassDeclaration
 import me.tbsten.analysis.code.gen.ksp.bridge.common.KSObjectCache
@@ -104,7 +105,7 @@ class KSPropertyDeclarationImpl private constructor(internal val ktPropertySymbo
             .plus(
                 // Handle delegate use-site target
                 ktPropertySymbol.backingFieldSymbol?.annotations
-                    ?.filter { it.useSiteTarget == KaDelegateTarget }
+                    ?.filter { it.useSiteTargetOrSource() == KaDelegateTarget }
                     ?.asSequence()
                     ?: emptySequence()
             )
