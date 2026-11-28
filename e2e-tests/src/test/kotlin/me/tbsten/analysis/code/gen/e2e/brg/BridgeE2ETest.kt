@@ -110,12 +110,12 @@ private fun brg11(engine: TestEngine) {
 private fun probeFile(): File = Files.createTempFile("acg-probe", ".jsonl").toFile().apply { delete() }
 
 class BridgeE2ETest : E2ESpec({
-    case("BRG-11", "KotlinPoet の KSP 拡張（toTypeName、toClassName、writeTo）が Bridge 上で動く", pending = PendingCase(Milestone.M1)) {
+    case("BRG-11", "KotlinPoet の KSP 拡張（toTypeName、toClassName、writeTo）が Bridge 上で動く") {
         brg11(TestEngine.AnalysisCodegen)
     }
     "[KSP2 で期待を確認] BRG-11" { brg11(TestEngine.Ksp2) }
 
-    case("BRG-13", "analysisCodeGen { arg(...) } で渡した引数が KSP Processor の options に届く", pending = PendingCase(Milestone.M1)) {
+    case("BRG-13", "analysisCodeGen { arg(...) } で渡した引数が KSP Processor の options に届く") {
         val probe = probeFile()
         val fixture =
             acg45Project(Acg45Engine.Bridge, processors = "Probe", probeOut = probe, dsl = "arg(\"brg13.key\", \"hello world\")") {
@@ -128,7 +128,7 @@ class BridgeE2ETest : E2ESpec({
         create shouldContain "\"tp.processors\":\"Probe\""
     }
 
-    case("BRG-14", "KSP の Processor が無いプロジェクト（Bridge が有効にならない）の依存に KSP API が含まれない", pending = PendingCase(Milestone.M1)) {
+    case("BRG-14", "KSP の Processor が無いプロジェクト（Bridge が有効にならない）の依存に KSP API が含まれない") {
         val fixture = acg45Project(Acg45Engine.Native) { kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A")) }
         // ビルドスクリプトの classpath と、全 Configuration の依存
         val result = fixture.build("buildEnvironment", "dependencies", codegenTask(Acg45Engine.Native))
@@ -136,7 +136,7 @@ class BridgeE2ETest : E2ESpec({
         result.output shouldNotContain "symbol-processing"
     }
 
-    case("BRG-15", "KSP の主要な Gradle 設定（増分の有効・無効など）に対応する設定があり、同じ効果がある", pending = PendingCase(Milestone.M3)) {
+    case("BRG-15", "KSP の主要な Gradle 設定（増分の有効・無効など）に対応する設定があり、同じ効果がある") {
         // ADR-035: KSP の Gradle プロパティ ksp.incremental=false は Bridge でも同じ意味（毎回全件処理）。
         // ksp.incremental.log=true は analysisCodeGen の増分ログ（build/analysisCodeGen/caches/<unit>/incremental.log）に写す
         val probe = probeFile()

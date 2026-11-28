@@ -154,15 +154,17 @@ internal class KspEngineProcessor(
     }
 
     private fun createProcessor(): SymbolProcessor {
-        val kotlinVersion = environment.kotlinVersion.toKotlinVersion()
+        val compilerVersion = environment.kotlinVersion.toKotlinVersion()
+        // KSP2 と同じく、kotlinVersion・apiVersion は言語の版（major.minor）、compilerVersion はコンパイラの版そのもの
+        val languageVersion = KotlinVersion(compilerVersion.major, compilerVersion.minor)
         val symbolProcessorEnvironment =
             SymbolProcessorEnvironment(
                 environment.options,
-                kotlinVersion,
+                languageVersion,
                 codeGenerator,
                 logger,
-                kotlinVersion,
-                kotlinVersion,
+                languageVersion,
+                compilerVersion,
                 ResolverAAImpl.ktModule.targetPlatform.toPlatformInfo(kspConfig),
                 KotlinVersion(2, 0),
                 registerProcessorForNewFeatures = processorsRegisteredForNewFeatures::add,

@@ -148,25 +148,7 @@ internal object AnalysisCodegenTestRunner {
             val outputDirectory: File,
         )
 
-        private val loader: ClassLoader by lazy {
-            val entries = hostClasspath().filter { isolatable(it) }
-            java.net.URLClassLoader(entries.map { it.toURI().toURL() }.toTypedArray(), ClassLoader.getPlatformClassLoader())
-        }
-
-        /** AA と IntelliJ Platform（再配置されていないもの）を除く。kct と embeddable と、その依存だけが残る。 */
-        private fun isolatable(entry: File): Boolean {
-            if (entry.isDirectory) return true
-            if ("-for-ide" in entry.name) return false
-            return runCatching {
-                java.util.zip.ZipFile(entry).use { zip ->
-                    zip.getEntry("com/intellij/") == null &&
-                        zip.entries().asSequence().none {
-                            it.name.startsWith("com/intellij/") ||
-                                it.name.startsWith("org/jetbrains/kotlin/analysis/")
-                        }
-                }
-            }.getOrDefault(true)
-        }
+        private val loader: ClassLoader get() = IsolatedClasspath.standalone
 
         fun compile(
             workingDir: File,
@@ -355,13 +337,7 @@ internal object AnalysisCodegenTestRunner {
         return done.map { n -> all.first { it.name == n } }
     }
 
-    private fun hostClasspath(): List<File> =
-        System
-            .getProperty("java.class.path")
-            .split(File.pathSeparator)
-            .filter { it.isNotBlank() }
-            .map(::File)
-            .filter { it.exists() }
+    private fun hostClasspath(): List<File> = IsolatedClasspath.host()
 
     private fun readTree(root: File): Map<String, String> =
         if (!root.isDirectory) {

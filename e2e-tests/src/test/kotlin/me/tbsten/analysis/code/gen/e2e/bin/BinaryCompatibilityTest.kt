@@ -13,8 +13,6 @@ import me.tbsten.analysis.code.gen.e2e.support.acg45Project
 import me.tbsten.analysis.code.gen.e2e.support.generatedNames
 import me.tbsten.analysis.code.gen.e2e.support.mappedClass
 import me.tbsten.analysis.code.gen.testfoundation.E2ESpec
-import me.tbsten.analysis.code.gen.testfoundation.Milestone
-import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import me.tbsten.analysis.code.gen.testing.TestEngine
 import me.tbsten.analysis.code.gen.testing.gradle.GradleFixture
 import me.tbsten.analysis.code.gen.testing.gradle.gradleFixture
@@ -92,11 +90,11 @@ private val internalUser =
     }
 
 class BinaryCompatibilityTest : E2ESpec({
-    case("BIN-01", "Maven Central で公開済みの Processor JAR を、再ビルドせずに Bridge で実行できる", pending = PendingCase(Milestone.M1)) {
+    case("BIN-01", "Maven Central で公開済みの Processor JAR を、再ビルドせずに Bridge で実行できる") {
         moshiProject("1.15.2").shouldGenerateMoshiAdapter()
     }
 
-    case("BIN-02", "対応する KSP API バージョンの最古と最新でビルドされた Processor がどちらも動く", pending = PendingCase(Milestone.M3)) {
+    case("BIN-02", "対応する KSP API バージョンの最古と最新でビルドされた Processor がどちらも動く") {
         // ADR-035: 対応する KSP API の最古は KSP 1.7 系、最新は version catalog の ksp。
         // 最古の代表は moshi-kotlin-codegen 1.14.0（Kotlin 1.7 / KSP 1.7 でビルド）、最新の代表は TP の KSP 版（catalog の ksp でビルド）
         moshiProject("1.14.0").shouldGenerateMoshiAdapter()
@@ -108,7 +106,7 @@ class BinaryCompatibilityTest : E2ESpec({
         latest.generatedNames(Acg45Engine.Bridge) shouldContain "AMapper.kt"
     }
 
-    case("BIN-03", "KSP の内部実装クラスに依存する Processor では、原因が分かる診断が出る", pending = PendingCase(Milestone.M3)) {
+    case("BIN-03", "KSP の内部実装クラスに依存する Processor では、原因が分かる診断が出る") {
         // ADR-035: 診断には、見つからなかった KSP の内部クラス名と「KSP の内部実装（公開 API 外）に依存している」旨が出る
         val result =
             runCodegenTest(TestEngine.AnalysisCodegen) {
