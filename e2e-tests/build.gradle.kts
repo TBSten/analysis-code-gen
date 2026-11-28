@@ -21,6 +21,8 @@ dependencies {
 }
 
 tasks.withType<Test>().configureEach {
+    // TestKit のビルドは plugin・エンジン・テスト用 Processor を build/fixture-repo から読む（ADR-027・060）
+    dependsOn(":publishFixtureDeps")
     // F-* フィクスチャを複製して動かす補助（e2e.support、ADR-032）がリポジトリのルートを知るため
     systemProperty("acg.repoRoot", rootDir.absolutePath)
     // TestKit のフィクスチャが使う Kotlin（ADR-011）と Maven ミラー（クラウド環境向け、ADR-025）

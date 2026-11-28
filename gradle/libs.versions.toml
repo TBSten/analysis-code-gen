@@ -56,6 +56,22 @@ katachiKonsist = { module = "me.tbsten.katachi:katachi-konsist", version.ref = "
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 
+[bundles]
+# Worker で動かす AA 一式（ADR-011・060）。gradle-plugin がビルド時に座標を resource へ書き出し、実行時に利用者の Kotlin の版へ置き換えて解決する。
+# 全部を非推移で解決するので、実行時に要る成果物は推移的な依存も含めてここに並べる（一覧の正は ACG-61 が Standalone の実行で確定させる）
+aa-runtime = [
+    "aa-api",
+    "aa-compiler-common",
+    "ij-core",
+    "ij-core-impl",
+    "ij-util",
+    "ij-util-base",
+    "ij-util-rt",
+    "ij-extensions",
+    "ij-java-psi",
+    "ij-java-frontback-psi",
+]
+
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 # 以下はフィクスチャ（fixtures/projects/*）が使う（ADR-027）

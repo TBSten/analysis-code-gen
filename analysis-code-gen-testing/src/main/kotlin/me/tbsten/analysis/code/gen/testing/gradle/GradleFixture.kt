@@ -116,7 +116,7 @@ public class GradleFixture internal constructor(public val projectDir: File) {
             |
             |dependencyResolutionManagement {
             |    repositories {
-            |${repos(extraRepositories, listOf("mavenCentral()", "google()"))}
+            |${repos(extraRepositories, listOf("mavenCentral()", "google()") + ANALYSIS_API_REPOSITORIES)}
             |    }
             |}
             |
@@ -129,6 +129,13 @@ public class GradleFixture internal constructor(public val projectDir: File) {
     }
 
     public companion object {
+        /** analysisCodeGen の plugin が Worker で使う AA と IntelliJ Platform の置き場（docs のインストールと同じ。ADR-063）。 */
+        private val ANALYSIS_API_REPOSITORIES =
+            listOf(
+                "maven(\"https://packages.jetbrains.team/maven/p/ij/intellij-dependencies\")",
+                "maven(\"https://www.jetbrains.com/intellij-repository/releases\")",
+            )
+
         /** `acg.kotlin` か、testing が使っているコンパイラの版。 */
         public fun defaultKotlinVersion(): String =
             System.getProperty("acg.kotlin")?.takeIf { it.isNotBlank() } ?: KotlinCompilerVersion.VERSION
