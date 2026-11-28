@@ -5,7 +5,7 @@
 // TAGS: moshi.shape=default-values, moshi.shape=nested-adapter
 // ORIGIN: test:square/moshi@7f957b18ea12/kotlin/tests/codegen-only/src/test/kotlin/com/squareup/moshi/kotlin/codegen/GeneratedAdaptersTest.kt#UppercasePropertyName
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // NOTE: テストクラスの入れ子から取り出したものは最上位に移している
 // FILE: UppercasePropertyName.kt
 package com.squareup.moshi.kotlin.codegen

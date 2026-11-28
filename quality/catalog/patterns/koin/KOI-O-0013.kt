@@ -3,7 +3,7 @@
 // PROCESSORS: koin, moshi, cream
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/triple/Dto.kt
 package com.example.triple
 

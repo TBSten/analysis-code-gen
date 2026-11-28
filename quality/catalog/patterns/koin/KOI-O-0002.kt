@@ -4,7 +4,7 @@
 // EXPECT: ok
 // TAGS: koin.binding=auto-bind-interface
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/autobind/Repository.kt
 package com.example.autobind
 

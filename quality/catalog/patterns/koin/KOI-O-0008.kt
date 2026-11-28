@@ -3,7 +3,8 @@
 // PROCESSORS: koin, cream
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: rejected
+// NOTE: K（KSP2 2.3.14）: K でビルドが失敗した: Unresolved reference 'androidx'.
 // FILE: main/com/example/combo/LoginState.kt
 package com.example.combo
 

@@ -5,7 +5,7 @@
 // OPTIONS: KOIN_CONFIG_CHECK=true, KOIN_LOG_TIMES=true
 // ORIGIN: test:InsertKoinIO/koin-annotations@1d4c1af21faa/examples/compile-perf
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // NOTE: サンプルのモジュール丸ごと（テストソースは除く）。定義が 2,000 件以上ある大きな入力
 // FILE: main/org/koin/example/PerfApp.kt
 package org.koin.example

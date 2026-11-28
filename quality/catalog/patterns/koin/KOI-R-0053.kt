@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:MythicDrops/MythicDrops@b4ee6c605f64/spigot/src/main/kotlin/dev/mythicdrops/MythicDropsDevModule.kt
 // LICENSE: MIT
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: verified
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので
 // FILE: spigot/main/dev/mythicdrops/MythicDropsDevModule.kt
 package dev.mythicdrops
 

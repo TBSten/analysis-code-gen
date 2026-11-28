@@ -4,7 +4,7 @@
 // EXPECT: ok
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/RunCompileSnapshotTestSmokeTest/compiles a @CopyTo FileSpec, exposes the result to assertions, and returns it.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Source.kt
 package smoke.compile
 

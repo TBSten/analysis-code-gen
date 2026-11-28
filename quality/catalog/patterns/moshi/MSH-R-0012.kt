@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:GetStream/gemini-android@7021b359468d/core/model/src/main/kotlin/com/skydoves/gemini/core/model/GeminiChannel.kt
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: GeminiChannel.kt:29: Unresolved reference 'GeminiModel'.
 // FILE: model/main/com/skydoves/gemini/core/model/GeminiChannel.kt
 /*
  * Designed and developed by 2024 skydoves (Jaewoong Eum)

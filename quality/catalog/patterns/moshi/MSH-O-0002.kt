@@ -4,7 +4,7 @@
 // EXPECT: ok
 // OPTIONS: moshi.generated=javax.annotation.processing.Generated, moshi.generateProguardRules=false
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/moshi/generated/Profile.kt
 package com.example.moshi.generated
 

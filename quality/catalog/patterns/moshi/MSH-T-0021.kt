@@ -5,7 +5,7 @@
 // EXPECT_MESSAGE: supertype com.squareup.moshi.kotlin.codegen.JavaSuperclass is not a Kotlin type
 // ORIGIN: test:square/moshi@7f957b18ea12/moshi-kotlin-codegen/src/test/java/com/squareup/moshi/kotlin/codegen/ksp/JsonClassSymbolProcessorTest.kt#extendJavaType
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: source.kt
 package test
 import com.squareup.moshi.JsonClass

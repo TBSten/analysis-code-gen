@@ -4,8 +4,8 @@
 // EXPECT: ok
 // ORIGIN: real:MythicDrops/MythicDrops@b4ee6c605f64/spigot/src/main/kotlin/io/pixeloutlaw/minecraft/spigot/config/migration/migrators/JarConfigMigrator.kt
 // LICENSE: MIT
-// STATUS: candidate
-// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので、K で確かめるまで candidate
+// STATUS: rejected
+// NOTE: ファイル単体の抜き出し。同じプロジェクトの他の型やライブラリに依存するので K（KSP2 2.3.14）: K でビルドが失敗した: Unresolved reference 'tealcube'.
 // FILE: spigot/main/io/pixeloutlaw/minecraft/spigot/config/migration/migrators/JarConfigMigrator.kt
 /*
  * This file is part of MythicDrops, licensed under the MIT License.

@@ -5,8 +5,8 @@
 // OPTIONS: KOIN_CONFIG_CHECK=true, KOIN_LOG_TIMES=true
 // ORIGIN: test:InsertKoinIO/koin-annotations@1d4c1af21faa/examples/coffee-maker-module
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: サンプルのモジュール丸ごと（テストソースは除く）
+// STATUS: rejected
+// NOTE: サンプルのモジュール丸ごと（テストソースは除く） K（KSP2 2.3.14）: K でビルドが失敗した: Unresolved reference 'jakarta'.
 // FILE: main/org/koin/example/coffee/DetachedComponents.kt
 package org.koin.example.coffee
 

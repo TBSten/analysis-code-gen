@@ -5,8 +5,8 @@
 // TAGS: moshi.shape=default-values, moshi.shape=nested-adapter
 // ORIGIN: test:square/moshi@7f957b18ea12/kotlin/tests/src/test/kotlin/com/squareup/moshi/kotlin/DualKotlinTest.kt#TypeAliasUnwrapping
 // LICENSE: Apache-2.0
-// STATUS: candidate
-// NOTE: テストクラスの入れ子から取り出したものは最上位に移している
+// STATUS: rejected
+// NOTE: テストクラスの入れ子から取り出したものは最上位に移している K（KSP2 2.3.14）: K でビルドが失敗した: Argument type mismatch: actual type is 'GenericClass<List<out GenericClass<in Int>?>>?', but 'GenericClass<List<out GenericClass<in TypeAlias>?>?>?' was expected.
 // FILE: TypeAliasUnwrapping.kt
 package com.squareup.moshi.kotlin
 

@@ -7,7 +7,7 @@
 // TAGS: cream.family=map
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/CombineMappingSnapshotTest/All patterns/option=(prefix=to, escapeDot=replace-to-underscore)/06--map/mapOverridesNameMatch.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Mapping.kt
 package me.tbsten.cream.generated
 

@@ -3,7 +3,7 @@
 // PROCESSORS: *
 // EXPECT: compile-error
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // NOTE: Processor が走ったあとにコンパイルが失敗する。K と B で診断の位置と種類が一致することを確かめる
 // FILE: main/com/example/bg/broken/Broken.kt
 package com.example.bg.broken

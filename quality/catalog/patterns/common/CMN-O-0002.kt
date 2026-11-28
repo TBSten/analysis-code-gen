@@ -3,7 +3,7 @@
 // PROCESSORS: *
 // EXPECT: ok
 // ORIGIN: own
-// STATUS: candidate
+// STATUS: verified
 // FILE: main/com/example/bg/java/Box.java
 package com.example.bg.java;
 
@@ -21,7 +21,7 @@ public class Box<T extends Comparable<T>> {
     }
 
     public static Box<String> empty() {
-        return new Box<>(java.util.Collections.emptyList());
+        return new Box<String>(java.util.Collections.<String>emptyList());
     }
 }
 // FILE: main/com/example/bg/java/Listener.java

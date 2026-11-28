@@ -6,7 +6,7 @@
 // TAGS: cream.family=propertyShape
 // ORIGIN: test:TBSten/cream@2162ec8d5261/cream-ksp/src/test/resources/snapshots/SealedCopySnapshotTest/All patterns/option=(notCopyToObject=true, defaultVisibility=INTERNAL)/03--propertyShape/nullableProp.md
 // LICENSE: Apache-2.0
-// STATUS: candidate
+// STATUS: verified
 // FILE: Source.kt
 package me.tbsten.cream.generated
 
