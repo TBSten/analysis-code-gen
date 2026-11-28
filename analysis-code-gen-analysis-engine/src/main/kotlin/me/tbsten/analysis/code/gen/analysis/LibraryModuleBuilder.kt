@@ -1,0 +1,139 @@
+/*
+ * Copyright 2023 Google LLC
+ * Copyright 2010-2023 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/standalone/KspLibraryModuleBuilder.kt
+// Modified-By: analysis-code-gen contributors, 2026
+// Modifications: ktlint で整形。パッケージ名を変更。クラス名から Ksp を外して internal にし、使わない DSL 関数を除いた
+
+@file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
+
+package me.tbsten.analysis.code.gen.analysis
+
+import com.intellij.core.CoreApplicationEnvironment
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.impl.jar.CoreJarFileSystem
+import com.intellij.psi.search.GlobalSearchScope
+import org.jetbrains.kotlin.analysis.api.KaExperimentalApi
+import org.jetbrains.kotlin.analysis.api.KaImplementationDetail
+import org.jetbrains.kotlin.analysis.api.impl.base.util.LibraryUtils
+import org.jetbrains.kotlin.analysis.api.projectStructure.KaLibraryModule
+import org.jetbrains.kotlin.analysis.api.projectStructure.KaLibrarySourceModule
+import org.jetbrains.kotlin.analysis.api.standalone.base.projectStructure.StandaloneProjectFactory
+import org.jetbrains.kotlin.analysis.project.structure.builder.KtBinaryModuleBuilder
+import org.jetbrains.kotlin.analysis.project.structure.builder.KtModuleBuilderDsl
+import org.jetbrains.kotlin.analysis.project.structure.impl.KaLibraryModuleImpl
+import java.nio.file.Path
+
+@KtModuleBuilderDsl
+internal open class LibraryModuleBuilder(
+    private val coreApplicationEnvironment: CoreApplicationEnvironment,
+    private val project: Project,
+) : KtBinaryModuleBuilder() {
+    public lateinit var libraryName: String
+    public var librarySources: KaLibrarySourceModule? = null
+
+    override fun build(): KaLibraryModule = build(isSdk = false)
+
+    @OptIn(KaExperimentalApi::class)
+    fun build(isSdk: Boolean): KaLibraryModule {
+        val binaryRoots = getBinaryRoots()
+        val binaryVirtualFiles = getBinaryVirtualFiles()
+        val contentScope =
+            LibraryRootsSearchScope(
+                StandaloneProjectFactory.getVirtualFilesForLibraryRoots(
+                    binaryRoots,
+                    coreApplicationEnvironment,
+                ) + binaryVirtualFiles,
+            )
+        return KaLibraryModuleImpl(
+            directRegularDependencies,
+            directDependsOnDependencies,
+            directFriendDependencies,
+            contentScope,
+            platform,
+            project,
+            binaryRoots,
+            binaryVirtualFiles,
+            libraryName,
+            librarySources,
+            isSdk,
+        )
+    }
+}
+
+internal class LibraryRootsSearchScope(roots: List<VirtualFile>) : GlobalSearchScope() {
+    private val rootFiles: Set<VirtualFile> = roots.toSet()
+    private val jarRootUrls: Set<String> =
+        roots.mapNotNullTo(HashSet()) { root ->
+            if (root.fileSystem is CoreJarFileSystem) root.url else null
+        }
+
+    override fun contains(file: VirtualFile): Boolean {
+        if (rootFiles.isEmpty()) {
+            // Early return to avoid going through while-loop
+            // which will always evaluate to false.
+            return false
+        }
+
+        var current: VirtualFile? = file
+        var prev: VirtualFile = file
+        while (current != null) {
+            if (current in rootFiles) {
+                return true
+            }
+            prev = current
+            current = current.parent
+        }
+
+        // This is needed because CoreJarVirtualFile.equals compares the identity so
+        // it misses finding a root when the CoreJarVirtualFile instance has changed for
+        // that root. This can happen when multiple KSP executions are running in parallel
+        // because the CoreJarFileSystem instance is shared between all KSP executions,
+        // and each KSP execution clears the file handler cache after it's finished executing.
+        // To fix this, we fall back to checking if the url is in jarRootUrls. We use this only as a
+        // fallback since it can be expensive since CoreJarVirtualFile.getUrl() is not cached.
+        // See https://github.com/google/ksp/issues/3286.
+        return jarRootUrls.isNotEmpty() &&
+            // Prevent prev.url from being evaluated if the jarRootUrls set is empty
+            prev.fileSystem is CoreJarFileSystem &&
+            // Prevent prev.url from being evaluated if the prev is not from a jar
+            prev.url in jarRootUrls
+    }
+
+    override fun isSearchInModuleContent(aModule: Module): Boolean = false
+
+    override fun isSearchInLibraries(): Boolean = true
+}
+
+@KtModuleBuilderDsl
+internal class SdkModuleBuilder(
+    coreApplicationEnvironment: CoreApplicationEnvironment,
+    project: Project,
+) : LibraryModuleBuilder(coreApplicationEnvironment, project) {
+    @OptIn(KaImplementationDetail::class)
+    public fun addBinaryRootsFromJdkHome(
+        jdkHome: Path,
+        isJre: Boolean,
+    ) {
+        val jdkRoots = LibraryUtils.findClassesFromJdkHome(jdkHome, isJre)
+        addBinaryRoots(jdkRoots)
+    }
+
+    override fun build(): KaLibraryModule = build(isSdk = true)
+}
