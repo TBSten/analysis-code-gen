@@ -13,6 +13,7 @@ import me.tbsten.analysis.code.gen.model.SourceSetModel
 import me.tbsten.analysis.code.gen.model.UnitKind
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.Provider
@@ -302,7 +303,7 @@ internal class AnalysisCodegenKotlinWiring(
             .forEach { upstream ->
                 t.upstreamGenerated.from(upstream.flatMap { it.kotlinOutputDir }, upstream.flatMap { it.javaOutputDir })
             }
-        t.compileClasspath.from(compilation.compileDependencyFiles)
+        t.compileClasspath.from(compileDependencies(compilation))
         t.compileClasspath.from(androidBootClasspath(compilation))
         t.friendPaths.from(compilation.associatedCompilations.map { it.output.classesDirs })
         jvmLauncher(compilation)?.let(t.javaLauncher::convention)
@@ -317,6 +318,21 @@ internal class AnalysisCodegenKotlinWiring(
         val toolchains = project.extensions.findByType(JavaToolchainService::class.java) ?: return null
         val java = project.extensions.findByType(JavaPluginExtension::class.java)
         return if (java != null) toolchains.launcherFor(java.toolchain) else toolchains.launcherFor { }
+    }
+
+    /**
+     * Compilation のコンパイルクラスパス。Android は依存のモジュールが AAR・クラスの JAR など複数の形を出すので、
+     * Configuration をそのまま解決すると形を選べずに失敗する。AGP のコンパイルと同じくクラスの JAR（`android-classes-jar`）を選ぶ（GRD-12）
+     */
+    private fun compileDependencies(compilation: KotlinCompilation<*>): FileCollection {
+        if (compilation.platformType != KotlinPlatformType.androidJvm) return compilation.compileDependencyFiles
+        val configuration =
+            project.configurations.findByName(compilation.compileDependencyConfigurationName)
+                ?: return compilation.compileDependencyFiles
+        return configuration.incoming
+            .artifactView { view ->
+                view.attributes { it.attribute(ARTIFACT_TYPE, "android-classes-jar") }
+            }.files
     }
 
     /**
@@ -477,6 +493,7 @@ internal class AnalysisCodegenKotlinWiring(
 
     companion object {
         private const val ROOT_CONFIGURATION = "analysisCodeGen"
+        private val ARTIFACT_TYPE: Attribute<String> = Attribute.of("artifactType", String::class.java)
 
         /** プロジェクトに Kotlin の拡張（`kotlin { }`）があれば配線して返す。無ければ null。 */
         fun wireIfKotlin(
