@@ -233,7 +233,7 @@ VER-03,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ver.Version
 VER-04,U,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ver.VersionListUnitTest
 VER-05,D,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ver.VersionOutputDiffTest
 VER-06,E,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.ver.VersionCompatibilityE2ETest
-MEM-01,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mem.MemoryIntegrationTest
+MEM-01,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.mem.MemoryIntegrationTest
 MEM-02,B,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.mem.MemoryBenchTest
 MEM-03,B,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.mem.MemoryBenchTest
 MEM-04,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mem.MemoryIntegrationTest
