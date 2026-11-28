@@ -38,10 +38,8 @@ internal object IsolatedClasspath {
         if ("-for-ide" in entry.name) return false
         return runCatching {
             ZipFile(entry).use { zip ->
-                zip.entries().asSequence().none {
-                    it.name.startsWith("com/intellij/") ||
-                        it.name.startsWith("org/jetbrains/kotlin/analysis/")
-                }
+                // org/jetbrains/kotlin/analysis/ は見ない。kotlin-compiler-embeddable 2.4.0 も（再配置せずに）持っているため
+                zip.entries().asSequence().none { it.name.startsWith("com/intellij/") }
             }
         }.getOrDefault(true)
     }

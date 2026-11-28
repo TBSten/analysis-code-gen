@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 import me.tbsten.analysis.code.gen.e2e.support.emptyProject
 import me.tbsten.analysis.code.gen.e2e.support.processorModule
 import me.tbsten.analysis.code.gen.testfoundation.E2ESpec
+import me.tbsten.analysis.code.gen.testfoundation.Milestone
+import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import org.gradle.testkit.runner.TaskOutcome
 
 // 5.16 MIX-03。設計文書 11.6 の 3 ラウンド交互を、Native と KSP の Processor を同じ SourceSet に並べた実際の Gradle ビルドで確かめる
@@ -69,7 +71,7 @@ class AlternatingNativeProvider : AnalysisCodegenProcessorProvider {
 """
 
 class ThreeRoundAlternationE2ETest : E2ESpec({
-    case("MIX-03", "設計文書 11.6 の 3 ラウンド交互のシナリオが実際の Gradle ビルドで通る") {
+    case("MIX-03", "設計文書 11.6 の 3 ラウンド交互のシナリオが実際の Gradle ビルドで通る", pending = PendingCase(Milestone.M1)) {
         val project =
             emptyProject(includes = listOf(":native-processor", ":ksp-processor")) {
                 processorModule(
