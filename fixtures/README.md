@@ -4,6 +4,7 @@
 |---|---|
 | `processors/` | 移植・検証する既存 Processor の一覧（ADR-019） |
 | `projects/` | 共通フィクスチャ F-*（ADR-027） |
+| `real-world/` | 実用 Processor のサンプル（RW の E2E、ADR-037・070） |
 | `large/`・`scripts/gen_large.py` | F-LARGE の生成 |
 | `docs/` | ドキュメントのコード例の出所（ADR-031） |
 
@@ -24,11 +25,22 @@
 - `build.gradle.kts`: 公開 DSL（`analysisCodeGen {}`）と TP の Native 版。既定
 - `build.ksp.gradle.kts`: 同じソースを KSP2 と TP の KSP 版でビルドする。`-Pacg.fixture.engine=ksp` で切り替わる
 
+## 実用 Processor のサンプル
+
+`real-world/<Processor>/<サンプル>`（`crm/jvm`・`msh/jvm`・`kin/jvm`・`koi/jvm`・`cmb/koin-cream`）。スクリプトは 3 つで、`-Pacg.fixture.engine` で切り替える。
+
+- `build.gradle.kts`: N（Native 書き直し版）。まだ無い Processor は、ケース ID を書いたエラーで止まる
+- `build.bridge.gradle.kts`: B（Bridge + 元の Processor）。`engine=bridge`
+- `build.ksp.gradle.kts`: K（KSP2 + 元の Processor）。`engine=ksp`
+
+Processor の座標は version catalog `rw`、版は `processors.toml`（`-Pacg.processor.<ID>.version` で上書き）。
+
 ## 動かし方
 
 ```bash
 ./gradlew publishFixtureDeps                     # TP と plugin を build/fixture-repo へ
 ./gradlew -p fixtures/projects/jvm -Pacg.fixture.engine=ksp build
+./gradlew -p fixtures/real-world/koi/jvm -Pacg.fixture.engine=bridge test
 python3 fixtures/scripts/gen_large.py --files 1000   # build/fixtures/large-1000 に生成
 ```
 

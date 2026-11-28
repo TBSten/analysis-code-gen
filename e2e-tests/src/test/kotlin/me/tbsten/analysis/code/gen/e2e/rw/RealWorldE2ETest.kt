@@ -63,7 +63,7 @@ private fun upstreamSuiteShouldPassOnBridge(
 
 class RealWorldE2ETest : E2ESpec({
     // ---- cream.kt ----
-    case("RW-CRM-B1", "cream.kt（Bridge）: サンプルプロジェクトがビルドでき、生成コードを使う実行時テストが通る", pending = PendingCase(Milestone.M1)) {
+    case("RW-CRM-B1", "cream.kt（Bridge）: サンプルプロジェクトがビルドでき、生成コードを使う実行時テストが通る") {
         val sample = RealWorldSample.open("CRM", "jvm")
         sample.shouldPassRuntimeTests(SampleEngine.Bridge)
         sample.generated(SampleEngine.Bridge).keys.shouldNotBeEmpty()
@@ -73,7 +73,7 @@ class RealWorldE2ETest : E2ESpec({
         upstreamSuiteShouldPassOnBridge("CRM", ":test:allTests")
     }
 
-    case("RW-CRM-N1", "cream.kt（Native）: 書き直し版が元と同じ実行時テストを通る", pending = PendingCase(Milestone.M1)) {
+    case("RW-CRM-N1", "cream.kt（Native）: 書き直し版が元と同じ実行時テストを通る") {
         RealWorldSample.open("CRM", "jvm").shouldPassSameTestsAs(SampleEngine.Native)
     }
 
@@ -95,7 +95,7 @@ class RealWorldE2ETest : E2ESpec({
     }
 
     // ---- Moshi ----
-    case("RW-MSH-B1", "Moshi（Bridge）: サンプルがビルドでき、JSON の往復テストが通る", pending = PendingCase(Milestone.M1)) {
+    case("RW-MSH-B1", "Moshi（Bridge）: サンプルがビルドでき、JSON の往復テストが通る") {
         val sample = RealWorldSample.open("MSH", "jvm")
         sample.shouldPassRuntimeTests(SampleEngine.Bridge)
         // Moshi は @JsonClass(generateAdapter = true) ごとに <Class>JsonAdapter を作る
@@ -111,7 +111,7 @@ class RealWorldE2ETest : E2ESpec({
     }
 
     // ---- kotlin-inject ----
-    case("RW-KIN-B1", "kotlin-inject（Bridge）: JVM のサンプルがビルドでき、DI の実行時テストが通る", pending = PendingCase(Milestone.M1)) {
+    case("RW-KIN-B1", "kotlin-inject（Bridge）: JVM のサンプルがビルドでき、DI の実行時テストが通る") {
         val sample = RealWorldSample.open("KIN", "jvm")
         sample.shouldPassRuntimeTests(SampleEngine.Bridge)
         // @Component abstract class AppComponent から InjectAppComponent が作られる
@@ -134,7 +134,7 @@ class RealWorldE2ETest : E2ESpec({
     }
 
     // ---- Koin Annotations ----
-    case("RW-KOI-B1", "Koin Annotations（Bridge）: サンプルがビルドでき、DI の実行時テストが通る", pending = PendingCase(Milestone.M1)) {
+    case("RW-KOI-B1", "Koin Annotations（Bridge）: サンプルがビルドでき、DI の実行時テストが通る") {
         val sample = RealWorldSample.open("KOI", "jvm")
         sample.shouldPassRuntimeTests(SampleEngine.Bridge)
         // @Module class AppModule から AppModuleGencode（module 定義）が作られる
@@ -165,7 +165,6 @@ class RealWorldE2ETest : E2ESpec({
     case(
         "RW-CMB-01",
         "複数適用: Koin + cream.kt を同じモジュールに適用し、Bridge 版で両方の生成と実行時テストが通る",
-        pending = PendingCase(Milestone.M1),
     ) {
         val sample = RealWorldSample.open("CMB", "koin-cream")
         sample.shouldPassRuntimeTests(SampleEngine.Bridge)

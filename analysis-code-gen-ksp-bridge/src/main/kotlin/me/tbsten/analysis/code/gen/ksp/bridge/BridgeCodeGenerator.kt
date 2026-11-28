@@ -32,7 +32,9 @@ internal class BridgeCodeGenerator : CodeGenerator {
     private var filesByPath: Map<String, PsiFile> = emptyMap()
 
     private val opened = hashSetOf<String>()
-    private val written = linkedSetOf<String>()
+
+    /** このラウンドで作ったファイル（パス → 出力先）。KSP2 の generatedFile と同じくラウンドの頭で空にする。 */
+    private val openedThisRound = linkedMapOf<String, OutputKind>()
 
     val knownFiles: List<PsiFile> get() = filesByPath.values.toList()
 
@@ -43,10 +45,18 @@ internal class BridgeCodeGenerator : CodeGenerator {
     ) {
         sink = output
         filesByPath = files.associateBy { it.pathKey() }
+        openedThisRound.clear()
     }
 
+    /**
+     * KSP2 の CodeGeneratorImpl と同じく、このラウンドで作ったファイルの絶対パス（ラウンドをまたいで溜めない）。
+     * Koin などは「このラウンドで何か作ったか」の判定に使う（ADR-069）。
+     */
     override val generatedFile: Collection<File>
-        get() = written.map(::File)
+        get() {
+            val output = sink ?: return emptyList()
+            return openedThisRound.map { (path, kind) -> output.stagingFile(kind, path) }
+        }
 
     override fun createNewFile(
         dependencies: KspDependencies,
@@ -101,10 +111,12 @@ internal class BridgeCodeGenerator : CodeGenerator {
         extensionName: String,
     ): OutputStream {
         val output = checkNotNull(sink) { "KSP の CodeGenerator はラウンドの外では使えません" }
-        // KSP2 と同じく、作った時点で重複を検出する（ラウンドをまたいでも同じ。ADR-017・TRM-04）
-        if (!opened.add(path)) throw FileAlreadyExistsException(File(path))
-        val engineDependencies = dependencies.toEngine()
         val kind = kindOf(extensionName)
+        // KSP2 と同じく、作った時点で重複を検出する（ラウンドをまたいでも同じ。ADR-017・TRM-04）。例外の file は
+        // KSP2 と同じく実在する出力の絶対パスにする。Koin などは例外を捕まえてその file に直接書き直す（ADR-069）
+        if (!opened.add(path)) throw FileAlreadyExistsException(output.stagingFile(kind, path))
+        openedThisRound[path] = kind
+        val engineDependencies = dependencies.toEngine()
         return object : ByteArrayOutputStream() {
             private var closed = false
 
@@ -114,7 +126,6 @@ internal class BridgeCodeGenerator : CodeGenerator {
                 super.close()
                 // 同じパスへの 2 回目は KSP と同じ FileAlreadyExistsException（ADR-017・TRM-04）
                 output.write(kind, path, toByteArray(), engineDependencies, DuplicatePolicy.ThrowKspException)
-                written += path
             }
         }
     }

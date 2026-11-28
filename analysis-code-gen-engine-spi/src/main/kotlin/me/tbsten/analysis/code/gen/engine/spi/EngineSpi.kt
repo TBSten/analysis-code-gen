@@ -117,6 +117,16 @@ public interface OutputSink {
         relativePath: String,
         dependencies: Dependencies,
     )
+
+    /**
+     * [relativePath] の出力が Round Commit で置かれる staging 上のファイル（絶対パス）。KSP の
+     * `FileAlreadyExistsException.file` に使う。前のラウンドで書いた出力なら中身があり、そこへ直接書いた内容は
+     * Build Commit で出力ディレクトリへ移る（KSP2 で例外の file に書き直す Processor との互換。ADR-069）。
+     */
+    public fun stagingFile(
+        kind: OutputKind,
+        relativePath: String,
+    ): File
 }
 
 @InternalAnalysisCodegenApi
