@@ -21,7 +21,7 @@ body:
     id: versions
     attributes:
       label: バージョン
-      placeholder: "analysis-code-gen 0.1.0 / Kotlin 2.4.21 / Gradle 9.9.2 / AGP -"
+      placeholder: "analysis-code-gen 0.1.0 / Kotlin 2.4.21 / Gradle 9.9.3 / AGP -"
     validations:
       required: true
   - type: dropdown
