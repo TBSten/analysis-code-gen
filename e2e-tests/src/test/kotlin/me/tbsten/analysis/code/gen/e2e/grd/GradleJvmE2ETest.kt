@@ -522,10 +522,12 @@ class GradleJvmE2ETest : E2ESpec({
         p.generated("main").kotlin("gen/Hello.kt").isFile shouldBe true
     }
 
-    case("GRD-27", "Processor を指定していない SourceSet ではタスクが実行されない（登録しないか NO-SOURCE）", M1) {
+    case("GRD-27", "Processor を指定していない SourceSet ではタスクが実行されない（登録しないか NO-SOURCE）") {
         val p =
             fixtureProject(Fixture.JVM) {
                 edit("build.gradle.kts") { it.replace("test { processor(acg.testProcessors.native) }", "") }
+                // ⭐️ FixtureTest は test の Processor が作る TestOnlyMapper を参照するので、一緒に消す（ADR-074）
+                delete("src/test/kotlin/fixture/jvm/FixtureTest.kt")
             }
         val result = p.build("build")
         result.task(":analysisCodeGenMainSourceSet")?.outcome shouldBe TaskOutcome.SUCCESS
