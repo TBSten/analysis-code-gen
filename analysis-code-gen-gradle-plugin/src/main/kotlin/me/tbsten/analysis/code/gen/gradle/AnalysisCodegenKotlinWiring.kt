@@ -515,20 +515,20 @@ internal class AnalysisCodegenKotlinWiring(
 
         fun staticDirs(getter: String): Provider<List<File>> {
             val flat = sources.javaClass.getMethod(getter).invoke(sources) ?: return project.provider { emptyList() }
-
-            @Suppress("UNCHECKED_CAST")
-            val static = flat.javaClass.getMethod("getStatic").invoke(flat) as Provider<Collection<Collection<Directory>>>
-            return static.map { groups ->
-                groups
-                    .flatten()
-                    .map { it.asFile }
-                    .filterNot(::isGenerated)
-                    .distinct()
-                    .sorted()
-            }
+            // AGP の版で Provider<List<Directory>> と Provider<List<Collection<Directory>>> のどちらも返るので、入れ子をたどって集める
+            val static = flat.javaClass.getMethod("getStatic").invoke(flat) as Provider<*>
+            return static.map { value -> directories(value).filterNot(::isGenerated).distinct().sorted() }
         }
         androidVariantSources[name] = AndroidVariantSources(kotlin = staticDirs("getKotlin"), java = staticDirs("getJava"))
     }
+
+    private fun directories(value: Any?): List<File> =
+        when (value) {
+            is Directory -> listOf(value.asFile)
+            is File -> listOf(value)
+            is Iterable<*> -> value.flatMap(::directories)
+            else -> emptyList()
+        }
 
     /** Android の Compilation は Variant のソースをまとめて 1 つの SourceSet として渡す。 */
     private fun androidSourceSetModel(compilation: KotlinCompilation<*>): SourceSetModel? {
