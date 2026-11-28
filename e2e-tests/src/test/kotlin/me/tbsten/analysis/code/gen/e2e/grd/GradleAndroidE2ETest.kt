@@ -37,7 +37,7 @@ class GradleAndroidE2ETest : E2ESpec({
             .readText() shouldContain "\"fixture.android.app.PaidFeature\""
     }
 
-    case("GRD-12", "Android の boot classpath（android.jar）が解析に入り、android.* の型が解決される", M1) {
+    case("GRD-12", "Android の boot classpath（android.jar）が解析に入り、android.* の型が解決される") {
         val p = fixtureProject(Fixture.ANDROID)
         p.build(":app:analysisCodeGenFreeDebugCompilation")
         val mapper = p.generatedForCompilation("freeDebug", "app").kotlin("fixture/android/app/DeviceInfoMapper.kt").readText()

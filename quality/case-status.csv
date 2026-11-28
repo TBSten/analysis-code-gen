@@ -10,7 +10,7 @@ GRD-08,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-09,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-10,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.grd.GradleJvmE2ETest
 GRD-11,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
-GRD-12,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
+GRD-12,E,M1,enabled,,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
 GRD-13,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
 GRD-14,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
 GRD-15,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.grd.GradleAndroidE2ETest
