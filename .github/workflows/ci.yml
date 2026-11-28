@@ -81,7 +81,10 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          # 最後に書いたものが JAVA_HOME になる。17 は JAVA_HOME_17_X64 で渡り、KSPT の期待値（JDK 17 前提）に使う（ADR-024・064）
+          java-version: |
+            17
+            21
       - uses: gradle/actions/setup-gradle@v4
       # ケース ID 整合チェック（:quality:checkCaseIds、ADR-030、build に含む）の比較元を refs/acg/case-base に取る（ADR-045）
       # - PR: 最新の main。main への push: push 前の main（github.event.before）。走行中に main が進んでも比較元は動かない

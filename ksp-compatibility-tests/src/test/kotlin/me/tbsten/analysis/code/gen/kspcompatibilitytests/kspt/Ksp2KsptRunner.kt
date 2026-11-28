@@ -7,12 +7,8 @@ import com.google.devtools.ksp.impl.KotlinSymbolProcessing
 import com.google.devtools.ksp.processing.KSPJvmConfig
 import com.google.devtools.ksp.processing.KSPNativeConfig
 import com.google.devtools.ksp.processor.AbstractTestProcessor
-import org.jetbrains.kotlin.cli.common.ExitCode
-import org.jetbrains.kotlin.cli.jvm.K2JVMCompiler
-import org.jetbrains.kotlin.cli.metadata.KotlinMetadataCompiler
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.PrintStream
 import javax.tools.ToolProvider
 
 /**
@@ -22,7 +18,7 @@ import javax.tools.ToolProvider
  */
 object Ksp2KsptRunner {
     /** KSP2 2.3.14 の AA（2.4.20-dev）が既定で使う言語バージョン。上流のテストもこの値になる。 */
-    private const val LANGUAGE_VERSION = "2.4"
+    const val LANGUAGE_VERSION = "2.4"
 
     fun run(
         data: KsptTestData,
@@ -111,7 +107,7 @@ object Ksp2KsptRunner {
     }
 
     /** 上流の AbstractKSPTest.mkProcessor と同じく、Processor のコンストラクタに ApiFeatures（と引数）を渡す。 */
-    private fun newProcessor(
+    fun newProcessor(
         data: KsptTestData,
         features: KsptFeatures,
     ): AbstractTestProcessor {
@@ -128,7 +124,7 @@ object Ksp2KsptRunner {
         } as AbstractTestProcessor
     }
 
-    private fun writeSources(
+    fun writeSources(
         module: KsptModule,
         root: File,
     ): Pair<File, File> {
@@ -144,7 +140,7 @@ object Ksp2KsptRunner {
         return kotlinSrc to javaSrc
     }
 
-    private fun compileLibrary(
+    fun compileLibrary(
         data: KsptTestData,
         module: KsptModule,
         deps: List<File>,
@@ -156,15 +152,13 @@ object Ksp2KsptRunner {
         val classpath = (deps + runtimeLibraries()).joinToString(File.pathSeparator) { it.absolutePath }
         if (data.nativeTarget != null) {
             // Native はライブラリを KLIB（メタデータ）として渡す（上流の compileMetadata と同じ）
-            compile(
-                KotlinMetadataCompiler(),
+            KsptCompilers.metadata(
                 listOf("-d", out.path, "-module-name", module.compilerModuleName, "-classpath", classpath) + ktFiles.map { it.path },
             )
             return out
         }
         if (ktFiles.isNotEmpty()) {
-            compile(
-                K2JVMCompiler(),
+            KsptCompilers.jvm(
                 buildList {
                     addAll(listOf(kotlinSrc.path, javaSrc.path, "-d", out.path, "-no-stdlib", "-no-reflect"))
                     addAll(listOf("-module-name", module.compilerModuleName, "-classpath", "$classpath${File.pathSeparator}$kotlinSrc"))
@@ -182,19 +176,8 @@ object Ksp2KsptRunner {
         return out
     }
 
-    private fun compile(
-        compiler: Any,
-        args: List<String>,
-    ) {
-        val out = ByteArrayOutputStream()
-        // 上流（AbstractKSPAATest.runCompiler）と同じく exec(PrintStream, String[]) を呼ぶ
-        val exec = compiler.javaClass.getMethod("exec", PrintStream::class.java, Array<String>::class.java)
-        val code = exec.invoke(compiler, PrintStream(out), args.toTypedArray())
-        check(code == ExitCode.OK) { "Kotlin のコンパイルに失敗した（$code）:\n$out" }
-    }
-
     /** ライブラリのコンパイルと KSP に渡す実行時ライブラリ（Kotlin 標準ライブラリと JetBrains の注釈）。 */
-    private fun runtimeLibraries(): List<File> =
+    fun runtimeLibraries(): List<File> =
         listOf(KotlinVersion::class.java, org.jetbrains.annotations.NotNull::class.java).map {
             File(
                 it.protectionDomain.codeSource.location
