@@ -60,7 +60,30 @@ public class PatternCatalog(
         return splitFiles(File(dir, p.path).readText())
     }
 
+    private val packageCache = java.util.concurrent.ConcurrentHashMap<String, Set<String>>()
+
+    /**
+     * パターンの Kotlin / Java ファイルが宣言するパッケージ（宣言の無いファイルは `""`）。組み立てでぶつかりを避けるのに使う（ADR-073）。
+     * 本体を読めないとき（メモリ上のカタログ）は空。
+     */
+    public fun packages(p: CatalogPattern): Set<String> =
+        packageCache.getOrPut(p.id) {
+            if (baseDir == null) return@getOrPut emptySet()
+            sources(p)
+                .filterKeys { it.endsWith(".kt") || it.endsWith(".java") }
+                .values
+                .map { src ->
+                    PACKAGE
+                        .find(src)
+                        ?.groupValues
+                        ?.get(1)
+                        .orEmpty()
+                }.toSet()
+        }
+
     public companion object {
+        private val PACKAGE = Regex("""(?m)^\s*package\s+([\w.]+)""")
+
         /** 既定の置き場。`acg.repoRoot`（pbt の Test が渡す）→ カレントから上へ探す。 */
         public fun defaultIndexFile(): File? {
             System.getProperty("acg.repoRoot")?.let { root ->

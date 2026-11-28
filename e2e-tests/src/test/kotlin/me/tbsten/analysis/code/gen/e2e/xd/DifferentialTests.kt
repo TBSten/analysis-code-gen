@@ -70,7 +70,6 @@ class DifferentialE2ETest : E2ESpec({
     case(
         "XD-02",
         "Arb が作った有効な入力は K でビルドが通り、わざと誤った入力は K で想定どおりに失敗する（入力の分類が正しい）",
-        pending = PendingCase(Milestone.M1),
     ) {
         val inputs =
             Arb
