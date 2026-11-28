@@ -165,7 +165,7 @@ BINC-02,E,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.Bridg
 BINC-03,D,M3,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.binc.BridgeIncrementalDiffTest
 BINC-04,P,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.pbt.IncrementalPropertyTest
 BINC-05,I,M2,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.binc.BridgeIncrementalEngineTest
-MIX-01,I,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.enginetests.mix.MixedProcessorsTest
+MIX-01,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.mix.MixedProcessorsTest
 MIX-02,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.mix.MixedProcessorsTest
 MIX-03,E,M1,pending,NotImplemented,1,me.tbsten.analysis.code.gen.e2e.mix.ThreeRoundAlternationE2ETest
 MIX-04,I,M1,enabled,,1,me.tbsten.analysis.code.gen.enginetests.mix.MixedProcessorsTest
