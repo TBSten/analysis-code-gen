@@ -42,3 +42,11 @@ val generateBuildInfo =
 sourceSets.main {
     resources.srcDir(generateBuildInfo.map { buildInfoDir.get() })
 }
+
+// AnalysisCodegenSourceSets は NamedDomainObjectContainer を委譲で実装する。継承したメンバーまで載せると
+// Dokka が生成しないページへのリンク（named・withType の一部の overload）ができるので、自分で書いたメンバーだけを載せる
+dokka {
+    dokkaPublications.configureEach {
+        suppressInheritedMembers.set(true)
+    }
+}

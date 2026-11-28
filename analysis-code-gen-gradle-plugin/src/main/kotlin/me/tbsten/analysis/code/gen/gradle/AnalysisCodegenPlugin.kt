@@ -11,7 +11,7 @@ import org.gradle.api.Project
  * プロジェクトの評価が終わった時点で失敗する（GRD-28）。plugin の適用順に依存しないよう、Kotlin の検出は遅らせる。
  *
  * KGP が classpath に無いビルドでも原因の分かるエラーを出せるよう、このクラスは KGP の型を参照しない。
- * KGP の型に触れるのは [AnalysisCodegenKotlinWiring] だけで、KGP があると分かってから作る。
+ * KGP の型に触れるのは AnalysisCodegenKotlinWiring だけで、KGP があると分かってから作る。
  */
 public abstract class AnalysisCodegenPlugin : Plugin<Project> {
     override fun apply(target: Project) {
