@@ -48,7 +48,11 @@ internal class KspEngineProcessor(
     private val kspConfig = bridgeKspConfig(environment)
 
     // 増分（Lookup の記録）は M2（ADR-054）。M1 は記録しない IncrementalContextAA を一時ディレクトリで動かす
-    private val cachesDir: File = kotlin.io.path.createTempDirectory("acg-ksp-bridge").toFile()
+    private val cachesDir: File by lazy {
+        kotlin.io.path
+            .createTempDirectory("acg-ksp-bridge")
+            .toFile()
+    }
     private val incrementalContext: IncrementalContextAA by lazy {
         val anyChanges = AnyChanges(cachesDir)
         IncrementalContextAA(
@@ -200,8 +204,10 @@ internal class KspEngineProcessor(
         // 移植コードのスレッドごとの状態を外す（同じスレッドで別の実行単位が動いても混ざらないように）
         KSObjectCacheManager.clear()
         ResolverAAImpl.tearDown()
-        runCatching { incrementalContext.closeFiles() }
-        cachesDir.deleteRecursively()
+        if (processor != null) {
+            runCatching { incrementalContext.closeFiles() }
+            cachesDir.deleteRecursively()
+        }
     }
 
     private companion object {
