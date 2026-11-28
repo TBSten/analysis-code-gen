@@ -31,6 +31,7 @@ tasks.register("publishFixtureDeps") {
             ":test-processors:core",
             ":test-processors:ksp",
             ":test-processors:native",
+            ":real-world-ports:cream",
         )
             .filter { findProject(it) != null }
             .map { "$it:publishAllPublicationsToFixtureRepoRepository" },

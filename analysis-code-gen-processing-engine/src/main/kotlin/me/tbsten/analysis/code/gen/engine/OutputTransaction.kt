@@ -45,6 +45,12 @@ internal class OutputTransaction(
 
     fun stagingDir(kind: OutputKind): File = File(stagingRoot, kind.dirName)
 
+    /** Round Commit で [relativePath] が置かれる staging 上のファイル（絶対パス）。 */
+    fun stagingFile(
+        kind: OutputKind,
+        relativePath: String,
+    ): File = File(stagingDir(kind), relativePath).absoluteFile
+
     /** staging 上のファイルの、rootDir からの相対パス。 */
     fun stagingPath(entry: Entry): String = File(stagingDir(entry.kind), entry.relativePath).relativeTo(rootDir).invariantSeparatorsPath
 
@@ -78,7 +84,7 @@ internal class OutputTransaction(
         val written = synchronized(this) { writtenBy.getOrPut(processorName) { mutableSetOf() } }
         if (duplicatePolicy == DuplicatePolicy.ThrowKspException && entry.key in written) {
             // KSP の CodeGeneratorImpl と同じ例外（TRM-04 の KSP 側）
-            throw FileAlreadyExistsException(File(stagingDir(kind), path), reason = "$processorName が同じファイルを 2 回作った")
+            throw FileAlreadyExistsException(stagingFile(kind, path), reason = "$processorName が同じファイルを 2 回作った")
         }
         synchronized(this) {
             written += entry.key

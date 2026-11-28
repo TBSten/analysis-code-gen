@@ -13,6 +13,7 @@ fun DeclarationContainerScope.independentBuildFiles(
     roots: String,
     withGradleProperties: Boolean = false,
     withKspScript: Boolean = false,
+    withBridgeScript: Boolean = false,
     withWrapper: Boolean = false,
 ) {
     "${prefix}Settings".role {
@@ -30,6 +31,13 @@ fun DeclarationContainerScope.independentBuildFiles(
             summary = "同じビルドを KSP で動かすときのビルドスクリプト（差分テストの K。build.ksp.gradle.kts）"
             documented = false
             layout { roots / "**" / "build.ksp.gradle".ktsFile() }
+        }
+    }
+    if (withBridgeScript) {
+        "${prefix}BridgeBuildScript".role {
+            summary = "同じビルドを KSP の Processor + Bridge で動かすときのビルドスクリプト（差分テストの B。build.bridge.gradle.kts）"
+            documented = false
+            layout { roots / "**" / "build.bridge.gradle".ktsFile() }
         }
     }
     if (withGradleProperties) {

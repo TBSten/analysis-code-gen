@@ -124,6 +124,8 @@ internal class RealWorldSample private constructor(
 internal fun gradleArgs(engine: SampleEngine): List<String> =
     buildList {
         add("-Pacg.fixture.engine=${engine.property}")
+        // サンプルは一時ディレクトリに写して動かすので、build-support がリポジトリのルートを探せない
+        add("-Pacg.repoRoot=${repoRoot.absolutePath}")
         add("-Pacg.fixture.repo=${repoRoot.resolve("build/fixture-repo").absolutePath}")
         System.getProperty("acg.kotlin")?.takeIf { it.isNotBlank() }?.let { add("-Pacg.kotlin=$it") }
         System.getProperty("acg.mavenMirror")?.takeIf { it.isNotBlank() }?.let { add("-Pacg.mavenMirror=$it") }

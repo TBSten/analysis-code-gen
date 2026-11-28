@@ -57,3 +57,14 @@ license in its ORIGIN and LICENSE header lines and keeps any copyright notice
 the original file had. The list of upstream projects is in
 quality/catalog/THIRD_PARTY.md and their license texts are in
 quality/catalog/licenses/.
+
+------------------------------------------------------------------------
+
+The real-world-ports/cream module (an internal test module, not published)
+is a rewrite of cream.kt for the analysisCodeGen Native API,
+https://github.com/TBSten/cream
+  Copyright cream.kt contributors
+  Licensed under the Apache License, Version 2.0.
+  Written with reference to tag v0.10.0 (commit 2162ec8d5261e3cb047de6825545f589102caab5).
+  No file was copied as is; the referenced upstream paths are listed in
+  porting/cream/port-map.csv and in a "参考:" comment in each file.

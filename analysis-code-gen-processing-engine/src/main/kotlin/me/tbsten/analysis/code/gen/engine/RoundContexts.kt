@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.analysis.api.symbols.pointers.KaSymbolPointer
 import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.psi.KtElement
 import org.jetbrains.kotlin.psi.KtFile
+import java.io.File
 
 internal class SourceSetUnitImpl(
     override val name: String,
@@ -180,6 +181,11 @@ internal class ProcessorOutputSink(
         // 依存の追加は増分（M2、ADR-015）で使う。M1 は全件処理なので記録しない
         OutputTransaction.checkRelativePath(relativePath)
     }
+
+    override fun stagingFile(
+        kind: OutputKind,
+        relativePath: String,
+    ): File = outputs.stagingFile(kind, OutputTransaction.checkRelativePath(relativePath))
 }
 
 internal class EngineRoundContextImpl(

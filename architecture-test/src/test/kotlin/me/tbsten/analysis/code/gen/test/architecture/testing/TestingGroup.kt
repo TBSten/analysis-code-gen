@@ -19,6 +19,7 @@ fun DeclarationContainerScope.testingGroup() = "Testing".group {
     foundationGroup()
     caseTestsGroup()
     kspCompatibilityGroup()
+    realWorldPortGroup()
 
     "BenchmarksModule".role {
         summary = "性能測定のモジュール（中身は今後）"
@@ -151,6 +152,28 @@ private fun DeclarationContainerScope.testProcessorGroup() = "TestProcessor".gro
         summary = "TP-* の一覧と使い方"
         documented = false
         layout { "test-processors" / "README.md".file() }
+    }
+}
+
+private fun DeclarationContainerScope.realWorldPortGroup() = "RealWorldPort".group {
+    summary = "実用 Processor（ADR-019）の Native 書き直し版。RW-*-N のケースがサンプルで動かす（ADR-037、ADR-071）"
+
+    "RealWorldPortSource".role {
+        summary = "上流の KSP 版を読んで AA と processor-api で書き直した Processor（写したコードは無く、参考にした上流のパスをコメントに書く）"
+        layout { mainKotlin("real-world-ports/*", "port/*") / "*".ktFile() }
+        "KSP の API を使わず、processor-api と AA だけで書く".ktFileContent {
+            `package`(matchingDirectory)
+            `import`("**")
+            not.`import`("com.google.devtools.ksp.**")
+            allow(anythingElse)
+        }
+    }
+    "RealWorldPortServiceRegistration".role {
+        summary = "Native 書き直し版の Provider を ServiceLoader に登録するファイル"
+        documented = false
+        layout {
+            "real-world-ports/*/src/main/resources/META-INF/services" / "me.tbsten.analysis.code.gen.processor.AnalysisCodegenProcessorProvider".file()
+        }
     }
 }
 

@@ -8,6 +8,9 @@ import me.tbsten.katachi.dsl.kotlin.ktsFile
 /** 共通フィクスチャ F-* のビルド。新しいフィクスチャを足すときはここにも足す（ADR-027） */
 private const val COMMON_FIXTURES = "fixtures/projects/{android,java,jvm,jvm-multi,kmp,kmp-custom}"
 
+/** 実用 Processor のサンプル（fixtures/real-world/<Processor>/<サンプル>、ADR-037） */
+private const val REAL_WORLD_SAMPLES = "fixtures/real-world/*/*"
+
 /** docs のコード例の出所になるビルド。docs の区分に合わせる（ADR-031） */
 private const val DOC_FIXTURES = "fixtures/docs/{guides,install,migration,quick-start,testing}"
 
@@ -31,6 +34,26 @@ fun DeclarationContainerScope.fixturesGroup() = "Fixtures".group {
             layout { COMMON_FIXTURES / "**/src/main" / "AndroidManifest.xml".file() }
         }
         independentBuildFiles("CommonFixture", COMMON_FIXTURES, withGradleProperties = true, withKspScript = true)
+    }
+
+    "RealWorldSample".group {
+        summary = "実用 Processor（ADR-019）のサンプル。RW の E2E が K・B・N で同じ実行時テストを流す独立したビルド（ADR-037）"
+
+        "RealWorldSampleSource".role {
+            summary = "Processor の注釈を付けたサンプルのソース。1 ファイル 1 宣言でファイル名 = 宣言名"
+            layout { REAL_WORLD_SAMPLES / "src/main/kotlin" / "**" / "*".ktFile() }
+        }
+        "RealWorldSampleTest".role {
+            summary = "生成コードを使う実行時テスト。どの実行系でも同じテストが通る"
+            layout { REAL_WORLD_SAMPLES / "src/test/kotlin" / "**" / "*Test".ktFile() }
+        }
+        independentBuildFiles(
+            "RealWorldSample",
+            REAL_WORLD_SAMPLES,
+            withGradleProperties = true,
+            withKspScript = true,
+            withBridgeScript = true,
+        )
     }
 
     "FixtureBuildSupport".group {
