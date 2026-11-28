@@ -50,7 +50,7 @@ jobs:
             21
       - uses: gradle/actions/setup-gradle@v4
       - name: KSPT を KSP2 で全件流す
-        run: ./gradlew :ksp-compatibility-tests:test --tests '*KsptKsp2Test*' -Pacg.kspt.k=true -Pacg.kspt.jdkHome="$JAVA_HOME_17_X64" --console=plain
+        run: ./gradlew :ksp-compatibility-tests:ksptKsp2Test -Pacg.kspt.k=true -Pacg.kspt.jdkHome="$JAVA_HOME_17_X64" --console=plain
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@v4
