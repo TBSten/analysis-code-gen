@@ -17,7 +17,7 @@
 
 // Ported-From: google/ksp@a3aaaabae570bae3ab4b84e72385483a14ab4498:kotlin-analysis-api/src/main/kotlin/com/google/devtools/ksp/impl/KotlinSymbolProcessing.kt
 // Modified-By: analysis-code-gen contributors, 2026
-// Modifications: ktlint で整形。AA 環境の構築（createAASession・registerProjectServices）、全ファイルの準備（prepareAllKSFiles）、生成物の差分反映（prepareNewKSFiles・dropCaches）だけを取り出した。KSPConfig の代わりに ProjectModel から SourceSet ごとの KaSourceModule と dependsOn を組む（ADR-009）。KS* の生成・ラウンドループ・増分は除いた（processing-engine 側）。
+// Modifications: ktlint で整形。AA 環境の構築（createAASession・registerProjectServices）、全ファイルの準備（prepareAllKSFiles）、生成物の差分反映（prepareNewKSFiles・dropCaches）だけを取り出した。KSPConfig の代わりに ProjectModel から SourceSet ごとの KaSourceModule と dependsOn を組む（ADR-009）。KS* の生成・ラウンドループ・増分は除いた（processing-engine 側）。AA 2.4 で要る KotlinPackageProviderMerger の登録を足した。
 @file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER", "UnstableApiUsage")
 
 package me.tbsten.analysis.code.gen.analysis
@@ -50,8 +50,11 @@ import org.jetbrains.kotlin.analysis.api.platform.lifetime.KotlinAlwaysAccessibl
 import org.jetbrains.kotlin.analysis.api.platform.lifetime.KotlinLifetimeTokenFactory
 import org.jetbrains.kotlin.analysis.api.platform.modification.KotlinModificationTrackerFactory
 import org.jetbrains.kotlin.analysis.api.platform.modification.publishGlobalSourceModuleStateModificationEvent
+import org.jetbrains.kotlin.analysis.api.platform.packages.KotlinCompositePackageProvider
 import org.jetbrains.kotlin.analysis.api.platform.packages.KotlinPackagePartProviderFactory
+import org.jetbrains.kotlin.analysis.api.platform.packages.KotlinPackageProvider
 import org.jetbrains.kotlin.analysis.api.platform.packages.KotlinPackageProviderFactory
+import org.jetbrains.kotlin.analysis.api.platform.packages.KotlinPackageProviderMerger
 import org.jetbrains.kotlin.analysis.api.platform.permissions.KotlinAnalysisPermissionOptions
 import org.jetbrains.kotlin.analysis.api.platform.resolution.KaResolutionActivityTracker
 import org.jetbrains.kotlin.analysis.api.projectStructure.KaLibraryModule
@@ -395,6 +398,12 @@ internal class AaSession private constructor(
                     KotlinDeclarationProviderMerger::class.java,
                     KotlinStandaloneDeclarationProviderMerger(this),
                 )
+                // JS・Wasm・Native の klib を読むと、パッケージの provider を合成する merger が要る（KSP2 の版の AA には無かった。KMP-01）。
+                // Standalone の merger は KotlinStandalonePackageProvider しか合成できず、増分用の provider を渡すと落ちるので、合成するだけのものを使う
+                registerService(
+                    KotlinPackageProviderMerger::class.java,
+                    CompositePackageProviderMerger,
+                )
                 // Package provider factory requires binary library roots to discover packages
                 // declared in precompiled KLIBs (e.g. for Kotlin/Native and JS/Wasm targets).
                 registerService(
@@ -540,3 +549,8 @@ internal fun PlatformKind.toTargetPlatform(jvmTarget: String?): TargetPlatform =
         PlatformKind.Wasm -> WasmPlatforms.wasmJs
         PlatformKind.Native -> NativePlatforms.unspecifiedNativePlatform
     }
+
+/** パッケージの provider を順に問い合わせるだけの merger（KMP-01）。 */
+private object CompositePackageProviderMerger : KotlinPackageProviderMerger {
+    override fun merge(providers: List<KotlinPackageProvider>): KotlinPackageProvider = KotlinCompositePackageProvider.create(providers)
+}

@@ -61,6 +61,7 @@ fun acg45Project(
         val repo = "maven { url = uri(\"${Acg45Repo.fixtureRepo.toURI()}\") }"
         extraPluginRepositories += repo
         extraRepositories += repo
+        extraRepositories += ANALYSIS_API_REPOSITORIES
         val args =
             buildList {
                 add("arg(\"tp.processors\", \"$processors\")")
@@ -153,7 +154,7 @@ fun codegenTask(
 ): String =
     when (engine) {
         Acg45Engine.Ksp2 -> ":kspKotlin"
-        else -> ":analysisCodeGen" + unit.replaceFirstChar { it.uppercase() }
+        else -> ":analysisCodeGen" + unit.replaceFirstChar { it.uppercase() } + "SourceSet"
     }
 
 /** TP-Probe の記録（JSON Lines）を 1 行ずつ返す。 */
@@ -190,3 +191,22 @@ fun mappedClass(
     @Registered
     data class $name($props)
     """.trimIndent()
+
+/**
+ * plugin が Worker で使う Analysis API と IntelliJ Platform の取得元（ADR-063。docs のインストールと同じ）。
+ * Maven Central（ミラー）に問い合わせると 429 などで解決が止まるので、ここにしか無いものは exclusiveContent にする。
+ */
+val ANALYSIS_API_REPOSITORIES: List<String> =
+    listOf(
+        """exclusiveContent {
+            forRepository { maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") }
+            filter { includeModuleByRegex("org\\.jetbrains\\.kotlin", ".*-for-ide") }
+        }""",
+        """exclusiveContent {
+            forRepository { maven("https://www.jetbrains.com/intellij-repository/releases") }
+            filter { includeGroup("com.jetbrains.intellij.platform"); includeGroup("com.jetbrains.intellij.java") }
+        }""",
+        """maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") {
+            content { includeGroupByRegex("org\\.jetbrains\\.intellij\\.deps.*") }
+        }""",
+    )

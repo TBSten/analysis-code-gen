@@ -5,12 +5,10 @@ import io.kotest.matchers.shouldBe
 import me.tbsten.analysis.code.gen.e2e.support.Fixture
 import me.tbsten.analysis.code.gen.e2e.support.fixtureProject
 import me.tbsten.analysis.code.gen.testfoundation.E2ESpec
-import me.tbsten.analysis.code.gen.testfoundation.Milestone
-import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 
 // 5.8 決定性（DET）のうち E2E のケース。DET-02 は DetPbtTest
 class DetE2ETest : E2ESpec({
-    case("DET-01", "同じ入力で 2 回クリーンビルドすると、生成物がバイト単位で一致する", PendingCase(Milestone.M1)) {
+    case("DET-01", "同じ入力で 2 回クリーンビルドすると、生成物がバイト単位で一致する") {
         val p = fixtureProject(Fixture.JVM)
         p.build("clean", "analysisCodeGenMainSourceSet", "--no-build-cache")
         val first = p.file("build/generated/analysisCodeGen").bytesByPath()
@@ -21,7 +19,7 @@ class DetE2ETest : E2ESpec({
         first.forEach { (path, bytes) -> second.getValue(path).contentEquals(bytes) shouldBe true }
     }
 
-    case("DET-03", "別のディレクトリに checkout してビルドしても生成物が一致する（絶対パスが混ざらない）", PendingCase(Milestone.M2)) {
+    case("DET-03", "別のディレクトリに checkout してビルドしても生成物が一致する（絶対パスが混ざらない）") {
         val a = fixtureProject(Fixture.JVM_MULTI)
         val b = fixtureProject(Fixture.JVM_MULTI)
         (a.dir == b.dir) shouldBe false

@@ -9,8 +9,6 @@ import me.tbsten.analysis.code.gen.e2e.support.codegenTask
 import me.tbsten.analysis.code.gen.e2e.support.generatedFiles
 import me.tbsten.analysis.code.gen.e2e.support.mappedClass
 import me.tbsten.analysis.code.gen.testfoundation.E2ESpec
-import me.tbsten.analysis.code.gen.testfoundation.Milestone
-import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import org.gradle.testkit.runner.TaskOutcome
 import java.nio.file.Files
 
@@ -22,7 +20,6 @@ class GradleCacheE2ETest : E2ESpec({
     case(
         "GCC-01",
         "Configuration Cache を有効にして 2 回目で再利用され、問題の報告が 0 件（--configuration-cache-problems=fail）",
-        pending = PendingCase(Milestone.M1),
     ) {
         val fixture = acg45Project { kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A")) }
         val args = arrayOf(task, "--configuration-cache", "--configuration-cache-problems=fail")
@@ -37,7 +34,7 @@ class GradleCacheE2ETest : E2ESpec({
         second.task(task)?.outcome shouldBe TaskOutcome.SUCCESS
     }
 
-    case("GCC-02", "別ディレクトリのクリーンな checkout で Build Cache から復元される（FROM-CACHE、relocatable）", pending = PendingCase(Milestone.M2)) {
+    case("GCC-02", "別ディレクトリのクリーンな checkout で Build Cache から復元される（FROM-CACHE、relocatable）") {
         // ローカルの Build Cache を 2 つの checkout で共有する（TestKit は独自の Gradle user home を使うため init script で指定）
         val cacheDir = Files.createTempDirectory("acg-build-cache").toFile()
         val init = Files.createTempFile("acg-build-cache", ".init.gradle.kts").toFile()
@@ -60,7 +57,7 @@ class GradleCacheE2ETest : E2ESpec({
         second.generatedFiles(native) shouldBe first.generatedFiles(native)
     }
 
-    case("GCC-03", "入力が変わらないビルドで analysisCodeGen タスクが UP-TO-DATE になる（時間は PERF-09）", pending = PendingCase(Milestone.M2)) {
+    case("GCC-03", "入力が変わらないビルドで analysisCodeGen タスクが UP-TO-DATE になる（時間は PERF-09）") {
         val fixture =
             acg45Project {
                 kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A"))
@@ -75,7 +72,7 @@ class GradleCacheE2ETest : E2ESpec({
         fixture.build("compileKotlin").task(task)?.outcome shouldBe TaskOutcome.UP_TO_DATE
     }
 
-    case("GCC-05", "Isolated Projects を有効にしても警告なしで動く", pending = PendingCase(Milestone.M3)) {
+    case("GCC-05", "Isolated Projects を有効にしても警告なしで動く") {
         val fixture = acg45Project { kotlin("src/main/kotlin/com/example/A.kt", mappedClass("A")) }
         fixture.gradleProperties["org.gradle.unsafe.isolated-projects"] = "true"
         val result = fixture.build(task)

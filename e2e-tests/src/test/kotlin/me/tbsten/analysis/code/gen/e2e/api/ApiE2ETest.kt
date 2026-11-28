@@ -6,13 +6,11 @@ import me.tbsten.analysis.code.gen.e2e.support.Fixture
 import me.tbsten.analysis.code.gen.e2e.support.fixtureProject
 import me.tbsten.analysis.code.gen.e2e.support.readProbe
 import me.tbsten.analysis.code.gen.testfoundation.E2ESpec
-import me.tbsten.analysis.code.gen.testfoundation.Milestone
-import me.tbsten.analysis.code.gen.testfoundation.PendingCase
 import org.gradle.testkit.runner.TaskOutcome
 
 // 5.3 Native Processor API（API）のうち E2E のケース。I / U は engine-tests
 class ApiE2ETest : E2ESpec({
-    case("API-04", "logger の error でビルドが失敗し、ファイル名と行番号付きでビルド出力に出る。warn / info も出る", PendingCase(Milestone.M1)) {
+    case("API-04", "logger の error でビルドが失敗し、ファイル名と行番号付きでビルド出力に出る。warn / info も出る") {
         val out =
             kotlin.io.path
                 .createTempFile("probe", ".jsonl")
