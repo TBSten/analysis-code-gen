@@ -30,8 +30,6 @@ import me.tbsten.analysis.code.gen.testing.CodegenTestSpec
 import me.tbsten.analysis.code.gen.testing.TestEngine
 import me.tbsten.analysis.code.gen.testing.TestProcessor
 import me.tbsten.analysis.code.gen.testing.TestSourceSet
-import me.tbsten.analysis.code.gen.testing.kct.KotlinCompilation
-import me.tbsten.analysis.code.gen.testing.kct.SourceFile
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Files
@@ -105,47 +103,121 @@ internal object AnalysisCodegenTestRunner {
         classpath: List<File>,
     ): CodegenTestResult {
         val sources =
-            sourceSets.flatMap { ss -> ss.files.map { SourceFile.fromPath(File(root, "src/${ss.name}/${dirOf(it.path)}/${it.path}")) } } +
+            sourceSets.flatMap { ss -> ss.files.map { File(root, "src/${ss.name}/${dirOf(it.path)}/${it.path}") } } +
                 sourceSets.flatMap { ss ->
                     readTree(File(root, outputBase(ss.name)))
                         .keys
                         .filter { it.endsWith(".kt") || it.endsWith(".java") }
-                        .map { SourceFile.fromPath(File(root, "${outputBase(ss.name)}/$it")) }
+                        .map { File(root, "${outputBase(ss.name)}/$it") }
                 }
-        val output = ByteArrayOutputStream()
-        val compilation =
-            KotlinCompilation().apply {
-                this.workingDir = File(workingDir, "compile")
-                this.sources = sources
-                inheritClassPath = spec.inheritClassPath
-                classpaths = spec.classpath.toList()
-                languageVersion = spec.languageVersion
-                messageOutputStream = output
-            }
-        val result = compilation.compile()
-        val ok = result.exitCode == KotlinCompilation.ExitCode.OK
+        val compiled = IsolatedKct.compile(File(workingDir, "compile"), sources, classpath, spec.languageVersion)
         val compileDiagnostics =
-            result.diagnosticMessages.map {
+            compiled.diagnostics.map { (severity, message) ->
                 CodegenDiagnostic(
-                    when (it.severity.name) {
+                    when (severity) {
                         "ERROR" -> CodegenDiagnostic.Severity.Error
                         "WARNING" -> CodegenDiagnostic.Severity.Warning
                         "INFO" -> CodegenDiagnostic.Severity.Info
                         else -> CodegenDiagnostic.Severity.Logging
                     },
-                    it.message,
+                    message,
                 )
             }
         return CodegenTestResult(
             engine = TestEngine.AnalysisCodegen,
-            isSuccess = ok,
+            isSuccess = compiled.ok,
             generatedFiles = generated,
             // エンジンの診断を先に、コンパイラの診断（生成物が原因のコンパイルエラーなど）を後に並べる
             diagnostics = diagnostics + compileDiagnostics.filter { it.severity != CodegenDiagnostic.Severity.Logging },
-            messages = listOf(rendered, result.messages).filter { it.isNotBlank() }.joinToString("\n"),
-            outputDirectory = if (ok) result.outputDirectory else null,
-            classpath = compilation.classpaths + classpath,
+            messages = listOf(rendered, compiled.messages).filter { it.isNotBlank() }.joinToString("\n"),
+            outputDirectory = if (compiled.ok) compiled.outputDirectory else null,
+            classpath = classpath,
         )
+    }
+
+    /**
+     * kct（kotlin-compiler-embeddable）を AA（*-for-ide）と分けた ClassLoader で動かす（ADR-061）。
+     * 両者は org.jetbrains.kotlin.cli.* などを同じ名前で持ち、同じ ClassLoader では片方が壊れるため。
+     * kct の型はこちらの ClassLoader から見えないので、リフレクションで呼ぶ。
+     */
+    private object IsolatedKct {
+        class Compiled(
+            val ok: Boolean,
+            val messages: String,
+            val diagnostics: List<Pair<String, String>>,
+            val outputDirectory: File,
+        )
+
+        private val loader: ClassLoader by lazy {
+            val entries = hostClasspath().filter { isolatable(it) }
+            java.net.URLClassLoader(entries.map { it.toURI().toURL() }.toTypedArray(), ClassLoader.getPlatformClassLoader())
+        }
+
+        /** AA と IntelliJ Platform（再配置されていないもの）を除く。kct と embeddable と、その依存だけが残る。 */
+        private fun isolatable(entry: File): Boolean {
+            if (entry.isDirectory) return true
+            if ("-for-ide" in entry.name) return false
+            return runCatching {
+                java.util.zip.ZipFile(entry).use { zip ->
+                    zip.getEntry("com/intellij/") == null &&
+                        zip.entries().asSequence().none {
+                            it.name.startsWith("com/intellij/") ||
+                                it.name.startsWith("org/jetbrains/kotlin/analysis/")
+                        }
+                }
+            }.getOrDefault(true)
+        }
+
+        fun compile(
+            workingDir: File,
+            sources: List<File>,
+            classpath: List<File>,
+            languageVersion: String?,
+        ): Compiled {
+            val kctPackage = "me.tbsten.analysis.code.gen.testing.kct"
+            val compilationClass = Class.forName("$kctPackage.KotlinCompilation", true, loader)
+            val sourceFileClass = Class.forName("$kctPackage.SourceFile", true, loader)
+            val companion = sourceFileClass.getField("Companion").get(null)
+            val fromPath = companion.javaClass.getMethod("fromPath", File::class.java)
+            val compilation = compilationClass.getDeclaredConstructor().newInstance()
+            val output = ByteArrayOutputStream()
+
+            fun set(
+                name: String,
+                type: Class<*>,
+                value: Any?,
+            ) = compilationClass.getMethod(name, type).invoke(compilation, value)
+            set("setWorkingDir", File::class.java, workingDir)
+            set("setSources", List::class.java, sources.map { fromPath.invoke(companion, it) })
+            // 生成物から見える classpath は明示する（isolated な ClassLoader の classpath を継がない）
+            set("setInheritClassPath", Boolean::class.javaPrimitiveType!!, false)
+            set("setClasspaths", List::class.java, classpath)
+            set("setLanguageVersion", String::class.java, languageVersion)
+            set("setMessageOutputStream", java.io.OutputStream::class.java, output)
+            val result = compilationClass.getMethod("compile").invoke(compilation)
+
+            fun get(name: String): Any? = result.javaClass.getMethod(name).invoke(result)
+            val diagnostics =
+                (get("getDiagnosticMessages") as List<*>).map { d ->
+                    val severity =
+                        d!!
+                            .javaClass
+                            .getMethod("getSeverity")
+                            .invoke(d)
+                            .toString()
+                    severity to
+                        d.javaClass
+                            .getMethod("getMessage")
+                            .invoke(d)
+                            .toString()
+                }
+            return Compiled(
+                ok = get("getExitCode").toString() == "OK",
+                messages = get("getMessages") as String,
+                diagnostics = diagnostics,
+                outputDirectory = get("getOutputDirectory") as File,
+            )
+        }
     }
 
     private fun model(
