@@ -28,17 +28,24 @@ public sealed class Dependencies {
     ) : Dependencies()
 
     /** [inputs] を external inputs に足したコピーを返す。 */
-    public fun withExternalInputs(vararg inputs: File): Dependencies = TODO()
+    public fun withExternalInputs(vararg inputs: File): Dependencies {
+        val merged = (externalInputs + inputs).distinct()
+        return when (this) {
+            is Isolating -> Isolating(files, merged)
+            is Aggregating -> Aggregating(files, merged)
+            is All -> All(merged)
+        }
+    }
 
     public companion object {
-        public fun isolating(vararg files: PsiFile): Dependencies = TODO()
+        public fun isolating(vararg files: PsiFile): Dependencies = isolating(files.asList())
 
-        public fun isolating(files: Iterable<PsiFile>): Dependencies = TODO()
+        public fun isolating(files: Iterable<PsiFile>): Dependencies = Isolating(files.distinct(), emptyList())
 
-        public fun aggregating(vararg files: PsiFile): Dependencies = TODO()
+        public fun aggregating(vararg files: PsiFile): Dependencies = aggregating(files.asList())
 
-        public fun aggregating(files: Iterable<PsiFile>): Dependencies = TODO()
+        public fun aggregating(files: Iterable<PsiFile>): Dependencies = Aggregating(files.distinct(), emptyList())
 
-        public val all: Dependencies get() = TODO()
+        public val all: Dependencies get() = All(emptyList())
     }
 }
